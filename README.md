@@ -6,7 +6,75 @@
 
 ## 当前状态
 
-仓库处于初始化阶段，当前仅包含项目说明和 Git 忽略规则，尚未引入第三方源码、构建系统或可运行的仿真程序。下文中的架构、目录和实验流程均为开发规划，不表示功能已经实现。
+已实现首个可运行版本：固定步长质点仿真、限幅 PD 控制、悬停/直线/圆周参考轨迹、带噪位置观测、CV/CA 预测、时间对齐评测和 CSV 输出。可选接入 matplotlib-cpp 生成 PNG，以及 Pangolin 三维回放。
+
+**当前动力学是自行实现的重力补偿质点模型，尚未移植 EGO-Planner simulator**；没有姿态、角速度、电机、空气阻力或碰撞模型。它用于先验证预测与评测流程，不能据此评价真实四旋翼控制性能。首次获取上游源码时遇到 TLS 下载失败，后续将独立完成刚体动力学适配。
+
+## 构建与运行
+
+核心依赖为 C++17 编译器、CMake 3.16+ 和 Eigen 3.3+。本机已验证 GCC 11.4、CMake 3.22.1、Eigen 3.4.0。
+
+```bash
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build -j2
+ctest --test-dir build --output-on-failure
+./build/uav_sim --scene circle --output outputs/circle-001
+```
+
+每次运行使用新的输出目录；程序拒绝覆盖已有目录。`--help` 查看所有参数。默认仿真 12 s、积分步长 0.01 s、观测周期 0.1 s、预测周期 0.2 s、预测时域 2 s、历史窗口 10 个位置样本、位置噪声标准差 0.02 m、种子 42。
+
+```bash
+# 无噪声直线基线；CV 和 CA 的误差应接近浮点精度
+./build/uav_sim --scene line --noise 0 --output outputs/line-001
+
+# 悬停
+./build/uav_sim --scene hover --noise 0 --output outputs/hover-001
+```
+
+时间参数必须是积分步长的整数倍，预测周期和预测时域还须是观测周期的整数倍。历史窗口至少 3 个样本，仿真时长须容纳完整历史窗口和至少一次完整预测。状态初始化为参考轨迹在零时刻的位置及速度。
+
+### 图表与三维显示
+
+matplotlib-cpp 已固定版本并存入 `third_party/`，其来源、许可证和兼容性修改见 [第三方依赖记录](third_party/README.md)。绘图另需 Python 开发库、NumPy 和 Matplotlib；本机已验证 Python 3.10.12、NumPy 1.21.5 和 Matplotlib 3.5.1。Pangolin 使用本机安装的 CMake package。
+
+```bash
+cmake -S . -B build-visual -DCMAKE_BUILD_TYPE=Release \
+  -DUAV_ENABLE_PLOTTING=ON -DUAV_ENABLE_VIEWER=ON \
+  -DPython3_EXECUTABLE=/usr/bin/python3
+cmake --build build-visual -j2
+ctest --test-dir build-visual --output-on-failure
+
+# Agg 后端输出 PNG，不需要窗口；缓存目录需可写
+MPLCONFIGDIR=/tmp/uav-predict-matplotlib \
+  ./build-visual/uav_sim --plot --output outputs/circle-plot-001
+
+# 在有 OpenGL 显示环境的桌面终端中运行
+./build-visual/uav_sim --view --output outputs/circle-view-001
+```
+
+两个构建选项都默认关闭，也可以只开启其中一个。若 Pangolin 不在 CMake 默认搜索路径，设置 `-DPangolin_DIR=/path/to/lib/cmake/Pangolin`。`--plot` 和 `--view` 可以组合使用，禁用相应模块时程序会明确报错。
+
+Pangolin 中可用鼠标调整视角，使用 `Play` 暂停/继续、`Sample` 拖动回放位置，使用 `Observations`、`CV`、`CA` 切换显示。黑线是真值历史，绿点是观测，蓝/橙线是最近一次已评测的 CV/CA 预测，红色十字仅标记当前位置，不表达姿态。预测线显示其原始完整时域，失效后隐藏。窗口关闭后程序退出。
+
+PNG 生成已实际验证；Pangolin 已编译、链接通过，当前开发会话没有显示环境，尚未验证窗口交互。
+
+### 输出与复现
+
+| 文件 | 内容 |
+| --- | --- |
+| `config.txt` | 模型、坐标约定、参数、随机种子、配置 CMake 时的 Git revision |
+| `states.csv` | 每个积分步的时间、位置、速度真值 |
+| `observations.csv` | 采样时刻及带噪位置 |
+| `predictions.csv` | 方法、预测起点、目标时间、时距、预测/真值位置及欧氏距离误差 |
+| `metrics.csv` | 每次预测的 ADE、FDE 与预测耗时（微秒） |
+| `lead_metrics.csv` | 各预测时距的三维位置 RMSE 及样本数 |
+| `summary.png` | 使用 `--plot` 时生成的 XY 轨迹与 RMSE 图 |
+
+CV/CA 分别对历史位置做一次/二次最小二乘拟合，拟合局部时间以改善数值条件；不读取真值速度。所有预测只使用起点及之前的观测，未来真值只用于离线评测。仅评测拥有完整未来真值的预测起点，不截短末尾预测时域。控制器为 `a = 4 * position_error + 2.8 * velocity_error`，默认加速度模长限幅 5 m/s²；每个积分步内保持加速度不变并精确积分质点方程。
+
+相同可执行文件、标准库和种子可复现轨迹及指标，计时结果不保证相同；不同标准库的正态分布实现可能不同。提交代码后重新执行 CMake 配置和构建，以刷新记录的 Git revision（有已跟踪的未提交改动时带 `dirty` 标记）。
+
+CTest 覆盖解析积分、悬停、CV/CA 解析预测、时间对齐、随机种子、无效参数和完整预测时域；存在 Python 解释器时还检查 CSV、重新计算 ADE/FDE/RMSE、重复运行一致性及拒绝覆盖。开启绘图时同时检查 PNG 输出。
 
 ## 项目目标
 
@@ -31,7 +99,7 @@
 
 matplotlib-cpp 是 Python Matplotlib 的 C++ 封装，仍需 Python 开发头文件、可链接的 Python 库及 Matplotlib；使用 NumPy 数据接口时也需 NumPy。无 ROS 不代表无 Python。Pangolin 用于交互显示，需要可用的窗口及 OpenGL 环境。
 
-计划让绘图和可视化成为可选构建模块，使核心仿真与批量评测可以在没有显示环境的机器上运行。具体依赖版本与安装命令将在首次构建验证后补齐。
+绘图和可视化已作为可选构建模块，核心仿真与批量评测可以在没有显示环境的机器上运行。
 
 ## 模块与数据流
 
@@ -90,7 +158,7 @@ uav_predict_sim/
 3. 首次移植尽量保持原始方程和参数，以悬停、匀速及转弯等工况检查数值行为，再逐步修改模型。
 4. 记录每份引入代码的上游地址、commit、原文件路径、许可证与本地改动，保留版权声明。
 
-EGO-Planner 仓库标注为 GPL-3.0；引入前应核对具体文件及其依赖的许可证，再确定本仓库的分发许可。当前尚未导入上游代码，也尚未指定本项目许可证。
+EGO-Planner 仓库标注为 GPL-3.0；引入前应核对具体文件及其依赖的许可证，再确定本仓库的分发许可。当前尚未导入 EGO-Planner 代码，也尚未指定本项目许可证。已引入的 matplotlib-cpp 保留其原始许可证。
 
 ## 实验与评测规划
 
@@ -110,15 +178,15 @@ EGO-Planner 仓库标注为 GPL-3.0；引入前应核对具体文件及其依赖
 ## 开发顺序
 
 - [x] 编写项目 README，初始化 Git。
-- [ ] 建立最小 CMake 工程、状态类型和固定步长仿真入口。
+- [x] 建立最小 CMake 工程、状态类型和固定步长仿真入口。
 - [ ] 选定并记录上游 simulator 版本，完成无 ROS 动力学与控制适配。
-- [ ] 实现简单场景与 CSV 记录，验证悬停和基础运动。
-- [ ] 接入 CV / CA 基线、时间对齐和误差评测。
-- [ ] 接入 matplotlib-cpp，生成首组对比图。
-- [ ] 接入 Pangolin，完成三维显示与回放。
+- [x] 基于质点模型实现简单场景与 CSV 记录，验证悬停和基础运动。
+- [x] 接入 CV / CA 基线、时间对齐和误差评测。
+- [x] 接入 matplotlib-cpp，生成首组对比图。
+- [ ] Pangolin 三维回放已实现并编译，待桌面环境交互验证。
 - [ ] 扩展场景、扰动和预测算法，形成可复现实验集。
 
-当前没有可执行的构建或运行命令；首次可运行版本完成后，此处将补充经过验证的依赖安装、构建和示例实验命令。
+已验证的构建与实验命令见前文。下一阶段优先引入上游刚体动力学与控制模块，并补充姿态约定及模型回归检查。
 
 ## Git 工作约定
 
