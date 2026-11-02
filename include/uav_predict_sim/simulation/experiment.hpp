@@ -46,6 +46,7 @@ struct Experiment {
 using ReferenceFunction=std::function<FlatSample(double)>;
 Experiment run(const Config& config,ReferenceFunction reference_override={});
 void save(const Config& config,const Experiment& experiment,const std::filesystem::path& directory);
+Experiment load_experiment(const std::filesystem::path& directory);
 void print_summary(const Experiment& experiment);
 // Display and plotting consume saved frames; no dependency from physics to GUI.
 void plot(const Experiment& experiment,const std::filesystem::path& directory);

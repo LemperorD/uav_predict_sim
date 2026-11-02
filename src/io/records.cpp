@@ -20,7 +20,7 @@ void v4(std::ostream& s,const Vec4& v) { for(int i=0;i<4;++i) { if(i) s<<','; s<
 void quaternion(std::ostream& s,const Eigen::Quaterniond& q) { s<<q.w()<<','<<q.x()<<','<<q.y()<<','<<q.z(); }
 }
 void save(const Config& c,const Experiment& e,const std::filesystem::path& directory) {
-  if(e.frames.empty()) throw std::invalid_argument("empty experiment");
+  if(e.frames.empty() || e.forecasts.empty()) throw std::invalid_argument("empty experiment");
   if(!std::filesystem::create_directories(directory)) throw std::runtime_error("output already exists");
   auto config=stream(directory/"config.yaml"); config<<config_yaml(c); config.close();
   auto metadata=stream(directory/"metadata.txt");

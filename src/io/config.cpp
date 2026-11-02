@@ -38,9 +38,18 @@ Config load_config(const std::filesystem::path& file) {
   keys(sim,{"duration","dt","initial_position_offset"});
   read(sim,"duration",c.duration); read(sim,"dt",c.dt); vector(sim,"initial_position_offset",c.initial_position_offset);
   const auto vehicle=root["vehicle"];
-  keys(vehicle,{"mass","gravity","inertia_diagonal","arm","kf","km","motor_tau","min_rpm","max_rpm","drag"});
+  keys(vehicle,{"mass","gravity","inertia_diagonal","inertia","arm","kf","km","motor_tau","min_rpm","max_rpm","drag"});
   read(vehicle,"mass",c.vehicle.mass); read(vehicle,"gravity",c.vehicle.gravity);
   Vec3 inertia=c.vehicle.inertia.diagonal(); vector(vehicle,"inertia_diagonal",inertia); c.vehicle.inertia=inertia.asDiagonal();
+  if(vehicle && vehicle["inertia"]) {
+    if(vehicle["inertia_diagonal"]) throw std::invalid_argument("choose inertia or inertia_diagonal, not both");
+    const auto matrix=vehicle["inertia"].as<std::vector<std::vector<double>>>();
+    if(matrix.size()!=3) throw std::invalid_argument("inertia needs a 3x3 matrix");
+    for(int i=0;i<3;++i) {
+      if(matrix[i].size()!=3) throw std::invalid_argument("inertia needs a 3x3 matrix");
+      for(int j=0;j<3;++j) c.vehicle.inertia(i,j)=matrix[i][j];
+    }
+  }
   read(vehicle,"arm",c.vehicle.arm); read(vehicle,"kf",c.vehicle.kf); read(vehicle,"km",c.vehicle.km);
   read(vehicle,"motor_tau",c.vehicle.motor_tau); read(vehicle,"min_rpm",c.vehicle.min_rpm);
   read(vehicle,"max_rpm",c.vehicle.max_rpm); read(vehicle,"drag",c.vehicle.drag);
@@ -77,7 +86,7 @@ std::string config_yaml(const Config& c) {
   auto sim=n["simulation"]; sim["duration"]=c.duration; sim["dt"]=c.dt;
   sim["initial_position_offset"]=vec(c.initial_position_offset);
   auto p=n["vehicle"]; p["mass"]=c.vehicle.mass; p["gravity"]=c.vehicle.gravity;
-  p["inertia_diagonal"]=vec(c.vehicle.inertia.diagonal());
+  for(int i=0;i<3;++i) p["inertia"].push_back(vec(c.vehicle.inertia.row(i).transpose()));
   p["arm"]=c.vehicle.arm; p["kf"]=c.vehicle.kf; p["km"]=c.vehicle.km;
   p["motor_tau"]=c.vehicle.motor_tau; p["min_rpm"]=c.vehicle.min_rpm; p["max_rpm"]=c.vehicle.max_rpm; p["drag"]=c.vehicle.drag;
   auto g=n["control"]; g["position"]=vec(c.gains.position); g["velocity"]=vec(c.gains.velocity);
