@@ -730,7 +730,25 @@ void plot3(const std::vector<Numeric> &x,
   if (!gca) throw std::runtime_error("No gca");
   Py_INCREF(gca);
   PyObject *axis = PyObject_Call(
-      gca, detail::_interpreter::get().s_python_empty_tuple, gca_kwargs);
+      gca, detail::_interpreter::get().s_python_empty_tuple, nullptr);
+
+  // Matplotlib >= 3.4 removed gca(projection=...). Reuse the current 3D axes;
+  // replace an empty 2D axes only when starting a new 3D figure.
+  if (axis) {
+    PyObject *axis_name = PyObject_GetAttrString(axis, "name");
+    const bool is_3d = axis_name && PyUnicode_Check(axis_name) &&
+        std::string(PyUnicode_AsUTF8(axis_name)) == "3d";
+    Py_XDECREF(axis_name);
+    if (!is_3d) {
+      PyObject *removed = PyObject_CallMethod(fig, "delaxes", "(O)", axis);
+      Py_XDECREF(removed);
+      Py_DECREF(axis);
+      PyObject *add_subplot = PyObject_GetAttrString(fig, "add_subplot");
+      axis = add_subplot ? PyObject_Call(add_subplot,
+          detail::_interpreter::get().s_python_empty_tuple, gca_kwargs) : nullptr;
+      Py_XDECREF(add_subplot);
+    }
+  }
 
   if (!axis) throw std::runtime_error("No axis");
   Py_INCREF(axis);

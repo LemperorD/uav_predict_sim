@@ -27,6 +27,6 @@
 
 参考 commit：`ef0383f1315d32e0156335e10b82e90b334f6d9f`。
 
-自包含文件：`matplotlibcpp.h`、MIT `LICENSE` 和上游 `LICENSE.matplotlib`。头文件在该版本上将 `subplot()` 三个网格参数从 Python 浮点数改为整数，以兼容 Matplotlib 3.5.1。文件已实际复制到 `third_party/matplotlib-cpp/`，构建不读取其他工程或归档目录。
+自包含文件：`matplotlibcpp.h`、MIT `LICENSE` 和上游 `LICENSE.matplotlib`。头文件在该版本上将 `subplot()` 三个网格参数从 Python 浮点数改为整数，并将 `plot3()` 的旧 `gca(projection=...)` 改成复用三维 axes 或用 `add_subplot(projection=...)` 创建，以兼容 Matplotlib 3.5.1。文件已实际复制到 `third_party/matplotlib-cpp/`，构建不读取其他工程或归档目录。
 
 Pangolin、Eigen、yaml-cpp 和 Python/NumPy/Matplotlib 使用系统安装，不从 `last/` 或 `ego-planner/` 查找。
