@@ -1,4 +1,5 @@
 #include "uav_predict_sim/core.hpp"
+#include "uav_predict_sim/experiment.hpp"
 
 #include <cmath>
 #include <iostream>
@@ -43,6 +44,29 @@ int main() {
     }
     rejects([] { uav::integrate({}, uav::Vec3::Zero(), 0); });
     rejects([] { uav::predict({}, uav::Model::CA, 0.1, 20); });
+    uav::Config config;
+    config.scene = "line";
+    config.duration = 4;
+    config.noise_std = 0;
+    const auto line = uav::run(config);
+    require(line.states.size() == 401 && line.observations.size() == 41, "sample counts");
+    require(line.forecasts.size() == 12, "complete horizon count");
+    for (const auto& forecast : line.forecasts) {
+      require(forecast.error.ade < 1e-10 && forecast.error.fde < 1e-10, "line forecast error");
+      require(forecast.points.back().time <= config.duration + 1e-10, "truncated horizon");
+    }
+    config.scene = "circle";
+    config.noise_std = 0.02;
+    const auto first = uav::run(config), second = uav::run(config);
+    for (std::size_t i = 0; i < first.observations.size(); ++i)
+      require(first.observations[i].position == second.observations[i].position, "seed reproducibility");
+    config.seed += 1;
+    require(uav::run(config).observations[0].position != first.observations[0].position, "seed ignored");
+    config.prediction_period = 0.15;
+    rejects([&] { uav::run(config); });
+    config.prediction_period = 0.2;
+    config.duration = 1;
+    rejects([&] { uav::run(config); });
     std::cout << "Numerical checks passed\n";
     return 0;
   } catch (const std::exception& error) {
