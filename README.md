@@ -1,10 +1,59 @@
 # UAV Predict Sim：三维四旋翼轨迹预测数值仿真
 
-> **架构审查稿，尚未实现。** 本轮仅重写此 README；待架构审查通过后，再按阶段编写代码。`last/` 是上一版归档，`ego-planner/` 是本地上游参考源码，二者保持原样。本文中的类名、目录、配置与验收标准均为拟定设计。
+> **已按审查架构实现首个刚体仿真版本。** 包括六自由度刚体、电机动态、平坦映射、SO(3) 前馈控制、三维参考轨迹、位置观测、CV/CA 预测、延迟评测和日志回放。下文保留完整架构；尚未实现的约束优化预测器等内容会明确标注。
+
+`last/` 和 `ego-planner/` 均不参与构建、测试或运行，可以删除。必要的上游回归副本和许可证已经保存在 `tests/upstream/`、`third_party/` 及根 `LICENSE`，不是运行时从参考目录加载。
 
 本项目研究三维运动四旋翼的未来轨迹预测。以 EGO-Planner 的 `uav_simulator`，尤其是 `so3_control` 和 `so3_quadrotor_simulator` 为主要学习和移植来源，建立 **平坦输出参考轨迹 → SO(3) 跟踪控制 → 电机分配 → 四旋翼刚体动力学 → 观测 → 轨迹预测 → 评测** 的独立 C++ 仿真系统。
 
 无人机的横向加速度必须通过机体倾斜、推力和转动响应产生。三维位置、机体姿态、角速度与电机转速均参与真实状态演化。matplotlib-cpp 负责实验图表，Pangolin 负责真实机体姿态和三维轨迹回放，整个项目无 ROS。
+
+## 快速运行
+
+核心依赖：C++17、CMake 3.16+、Eigen 3.3+、yaml-cpp。默认开启测试，上游回归测试还需系统 Boost 头文件；不运行测试时可设置 `-DBUILD_TESTING=OFF`。本机已验证 GCC 11.4、CMake 3.22.1、Eigen 3.4.0、yaml-cpp 0.7.0 和 Boost 1.74。
+
+```bash
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build -j2
+ctest --test-dir build --output-on-failure
+
+# 三维螺旋：位置、姿态和转速由刚体动力学积分生成
+./build/uav_sim --config configs/helix.yaml --output outputs/helix-001
+
+# 三维空间八字，含独立的高度变化和航向变化
+./build/uav_sim --config configs/eight.yaml --output outputs/eight-001
+```
+
+输出目录必须是新目录。`--help` 查看参数；`--scene hover|vertical|helix|eight` 可在加载配置后覆盖场景。完整解析参数保存在运行目录 `config.yaml`，可用于复现。控制器默认读取理想当前状态，预测器只读取带噪历史位置。
+
+可选图表依赖 Python 开发库、NumPy、Matplotlib；三维回放需系统安装的 Pangolin/OpenGL。本机已验证 Python 3.10.12、NumPy 1.21.5、Matplotlib 3.5.1；Pangolin 已编译和链接，当前会话无显示环境，窗口交互尚待桌面验证。
+
+```bash
+cmake -S . -B build-visual -DCMAKE_BUILD_TYPE=Release \
+  -DUAV_ENABLE_PLOTTING=ON -DUAV_ENABLE_VIEWER=ON \
+  -DPython3_EXECUTABLE=/usr/bin/python3
+cmake --build build-visual -j2
+ctest --test-dir build-visual --output-on-failure
+
+# Agg 后端，不需要显示器
+MPLCONFIGDIR=/tmp/uav-predict-mpl \
+  ./build-visual/uav_sim --config configs/eight.yaml --output outputs/eight-plot-001 --plot
+
+# 读取已有日志，重新绘图，不重跑仿真
+MPLCONFIGDIR=/tmp/uav-predict-mpl \
+  ./build-visual/uav_sim --replay outputs/eight-plot-001 --plot
+
+# 在有图形显示的桌面终端回放
+./build-visual/uav_sim --replay outputs/eight-plot-001 --view
+```
+
+两个显示相关选项默认关闭，可独立开启。Pangolin 不在默认路径时设置 `-DPangolin_DIR=/path/to/lib/cmake/Pangolin`。`--replay` 不允许与场景、配置或输出覆盖参数组合；回放只读数值日志，`--plot` 会更新图表文件。
+
+运行目录包含 `config.yaml`、`metadata.txt`、`reference.csv`、`state.csv`、`control.csv`、`observation.csv`、`prediction.csv`、`metrics.csv`、`lead_metrics.csv`、`events.csv`。绘图生成 `trajectory3d.png`、`tracking.png`、`dynamics.png`、`prediction_errors.png`。末尾不完整预测保留在日志中，但 ADE/FDE 留空且不参与完整时域统计；CV/CA 的高阶物理约束标为不适用。
+
+当前实际的平坦可行性检查覆盖参考轨迹的每个积分 tick；不声称连续时间全局保证。含电机滞后的实际执行能力通过前向积分、饱和日志和跟踪误差观察。约束优化 `FlatnessPredictor` 尚未实现；CV/CA 仅作为无约束对照，不冒充物理可行预测器。
+
+实验元信息中的 `revision_at_build` 是 CMake 配置时确定、编译进二进制的版本；提交后重新配置和构建可刷新。相同二进制与标准库下的数值日志可复现，耗时不要求一致。详细验收依据见 [验证记录](docs/validation.md)，来源与许可见 [第三方记录](third_party/README.md)。
 
 ## 1. 本轮需要审查的架构选择
 
@@ -19,11 +68,11 @@
 | 方法组织 | CV/CA 作为无约束对照；平坦性约束预测器作为后续研究接口与实现目标 |
 | 图表/显示 | matplotlib-cpp 生成三维与分轴统计图；Pangolin 显示机体、参考、实际与预测轨迹 |
 | 运行组织 | 一个确定性仿真主循环；记录与回放分开，显示不驱动动力学 |
-| 当前交付 | 只交付架构文档，不修改或恢复旧实现，不开始新代码 |
+| 当前交付 | 刚体仿真、控制、因果基线预测、图表与姿态回放；约束优化预测器待后续实现 |
 
 ## 2. 本地上游代码：学习对象与移植边界
 
-本地参考仓库为 [ego-planner/](ego-planner/)，上游为 [ZJU-FAST-Lab/ego-planner](https://github.com/ZJU-FAST-Lab/ego-planner)，当前 HEAD：
+学习时的本地参考目录为 `ego-planner/`（可删除），上游为 [ZJU-FAST-Lab/ego-planner](https://github.com/ZJU-FAST-Lab/ego-planner)，固定参考版本：
 
 ```text
 bfda51284c8c1b476043255a8145ef925a3778a5
@@ -33,11 +82,11 @@ bfda51284c8c1b476043255a8145ef925a3778a5
 
 | 本地文件 | 已确认行为 | 新项目中的归属 |
 | --- | --- | --- |
-| [SO3Control.cpp](ego-planner/src/uav_simulator/so3_control/src/SO3Control.cpp) | 位置/速度反馈、加速度前馈及附加加速度误差项；由合力和航向构造期望姿态 | `control/so3_position_controller` |
-| [so3_control_nodelet.cpp](ego-planner/src/uav_simulator/so3_control/src/so3_control_nodelet.cpp) | 订阅位置命令和状态，发布合力、姿态与增益 | 仅提取输入输出语义，ROS 包装由实验调度器替代 |
-| [quadrotor_simulator_so3.cpp](ego-planner/src/uav_simulator/so3_quadrotor_simulator/src/quadrotor_simulator_so3.cpp) 的 `getControl()` | 合力向当前机体推力轴投影，SO(3) 姿态反馈、角速度阻尼、陀螺补偿和转速分配 | `control/so3_attitude_controller` 与 `actuation/rotor_allocator` |
-| [Quadrotor.h](ego-planner/src/uav_simulator/so3_quadrotor_simulator/include/quadrotor_simulator/Quadrotor.h) | 状态包括 `x, v, R, omega, motor_rpm`，输入为四电机期望 RPM | `dynamics/quadrotor` 的接口参考 |
-| [Quadrotor.cpp](ego-planner/src/uav_simulator/so3_quadrotor_simulator/src/dynamics/Quadrotor.cpp) | 推力/力矩、电机滞后、重力、阻力、外力/外力矩和数值积分 | `dynamics/quadrotor` 与 `actuation/motor_model` |
+| [SO3Control.cpp 回归副本](tests/upstream/SO3Control.cpp) | 位置/速度反馈、加速度前馈及附加加速度误差项；由合力和航向构造期望姿态 | `src/control/so3.cpp` |
+| 上游 `so3_control_nodelet.cpp` | 订阅位置命令和状态，发布合力、姿态与增益 | 仅提取输入输出语义，ROS 包装由实验调度器替代 |
+| 上游 `quadrotor_simulator_so3.cpp` 的 `getControl()` | 合力向当前机体推力轴投影，SO(3) 姿态反馈、角速度阻尼、陀螺补偿和转速分配 | `src/control/so3.cpp` 与 `src/dynamics/quadrotor.cpp` |
+| [Quadrotor.h 回归副本](tests/upstream/include/quadrotor_simulator/Quadrotor.h) | 状态包括 `x, v, R, omega, motor_rpm`，输入为四电机期望 RPM | `dynamics/quadrotor` 的接口参考 |
+| [Quadrotor.cpp 回归副本](tests/upstream/Quadrotor.cpp) | 推力/力矩、电机滞后、重力、阻力、外力/外力矩和数值积分 | `src/dynamics/quadrotor.cpp` |
 
 ### 2.2 需要显式处理的上游细节
 
@@ -229,7 +278,7 @@ F_c_ddot = m s_d + Kp(a_d - a) + Kv(j_d - j_actual)
 
 其中 `a`、`j_actual` 由当前动力学和电机状态计算，使用当前时刻及已知输入，不访问未来真值。标称实验中控制器可读取完整当前状态，这是理想状态反馈；预测器的观测权限另行限制。启用噪声控制反馈或扰动时，导数估计与控制带宽作为独立扩展实验。
 
-接口：`So3Controller::update(state_feedback, flat_reference, params) -> WrenchCommand`，再交给分配器和电机模型。正式模式不保留未经说明的外部 yaw 覆写，也不使用欧拉角积分姿态。
+实际接口为 `control(state, flat_reference, held_command, quad, gains, ...) -> ControlOutput`，再交给 `allocate()` 和 `Quadrotor::step()`。通过更新前持有的电机命令求当前 jerk，避免与新控制命令形成代数环。正式模式不保留未经说明的外部 yaw 覆写，也不使用欧拉角积分姿态。
 
 ## 6. 总体模块与数据流
 
@@ -372,7 +421,7 @@ uav_predict_sim/
 ├── README.md                      # 架构与使用文档
 ├── ego-planner/                    # 用户提供的上游参考，不直接加入本工程构建
 ├── last/                           # 上一版归档，不作为新架构基础
-├── CMakeLists.txt                  # 审查后创建
+├── CMakeLists.txt                  # 独立构建
 ├── include/uav_predict_sim/
 │   ├── types/                     # 状态、单位/坐标约定、参数、结果状态
 │   ├── trajectory/                # 平坦轨迹接口
@@ -397,7 +446,7 @@ uav_predict_sim/
 
 拟定每次运行保存：解析后的完整配置、当前代码 revision/dirty 状态、上游版本、依赖版本、随机种子、坐标/单位说明，以及 `reference.csv`、`state.csv`、`control.csv`、`observation.csv`、`prediction.csv`、`metrics.csv`、`events.csv`。每次预测保留起点、目标时间、方法、状态和约束报告；日志精度应足以离线重算误差。已有结果目录不覆盖。
 
-上游文件在移植时逐个记录原路径、commit、许可和本地修改，保留版权声明；仓库根部提供的上游许可为 GPL-3.0，具体文件和附带依赖也需逐项保留许可信息。当前文档阶段不复制源码、不修改项目许可。
+上游文件的原路径、commit、许可和本地修改记录在 `third_party/README.md`。根 `LICENSE` 保留上游 GPL-3.0 全文，本项目改写代码按 GPL-3.0-only 提供；matplotlib-cpp 保留独立 MIT 许可。回归副本使用系统 Boost，不依赖上游内嵌 odeint 目录。
 
 ## 12. 实施阶段与验收门槛
 
@@ -412,4 +461,4 @@ uav_predict_sim/
 
 验收阈值将在实现前写入各阶段配置与测试说明，依据单位、轨迹强度和步长确定；不在尚未实现时声称已达到某个跟踪精度。每次提交只包含一个可审查改动，模型移植、控制扩展、数值修复和实验改动分别提交。
 
-**当前停在阶段 A。架构审查通过后才开始阶段 B。**
+**当前进度：B、C、D 已实现并通过自动检查；E 的图表和日志回放已验证，Pangolin 已编译、待桌面交互验收；F 尚未实现。** 空间航点多项式、额外观测模式、扰动配置与约束优化器仍是扩展工作，当前 CLI 不提供这些未实现功能。
