@@ -1,4 +1,5 @@
 #include "uav_predict_sim/experiment.hpp"
+#include "uav_predict_sim/presentation.hpp"
 
 #include <cmath>
 #include <iostream>
@@ -24,6 +25,7 @@ int main(int argc, char** argv) {
   try {
     uav::Config config;
     std::filesystem::path directory = "outputs/demo";
+    bool plotting = false, viewing = false;
     for (int i = 1; i < argc; ++i) {
       const std::string option = argv[i];
       if (option == "--help") {
@@ -32,9 +34,13 @@ int main(int argc, char** argv) {
                   << "  --duration 12 --dt 0.01 --observation-period 0.1\n"
                   << "  --prediction-period 0.2 --horizon 2 --history 10\n"
                   << "  --noise 0.02 --seed 42 --max-acceleration 5\n"
+                  << "  --plot (requires UAV_ENABLE_PLOTTING)\n"
+                  << "  --view (requires UAV_ENABLE_VIEWER)\n"
                   << "All time values are seconds; noise is position standard deviation in metres.\n";
         return 0;
       }
+      if (option == "--plot") { plotting = true; continue; }
+      if (option == "--view") { viewing = true; continue; }
       if (i + 1 >= argc) throw std::invalid_argument("missing value for " + option);
       const std::string value = argv[++i];
       if (option == "--scene") config.scene = value;
@@ -54,6 +60,12 @@ int main(int argc, char** argv) {
         config.history_size = static_cast<int>(count);
       } else throw std::invalid_argument("unknown option: " + option);
     }
+#ifndef UAV_ENABLE_PLOTTING
+    if (plotting) throw std::runtime_error("rebuild with -DUAV_ENABLE_PLOTTING=ON");
+#endif
+#ifndef UAV_ENABLE_VIEWER
+    if (viewing) throw std::runtime_error("rebuild with -DUAV_ENABLE_VIEWER=ON");
+#endif
     if (std::filesystem::exists(directory))
       throw std::runtime_error("output already exists: " + directory.string());
     const auto experiment = uav::run(config);
@@ -69,6 +81,12 @@ int main(int argc, char** argv) {
                 << " m, FDE=" << fde / count << " m\n";
     }
     std::cout << "Saved " << std::filesystem::absolute(directory) << '\n';
+#ifdef UAV_ENABLE_PLOTTING
+    if (plotting) uav::plot(experiment, directory);
+#endif
+#ifdef UAV_ENABLE_VIEWER
+    if (viewing) uav::view(experiment);
+#endif
     return 0;
   } catch (const std::exception& error) {
     std::cerr << "Error: " << error.what() << '\n';
