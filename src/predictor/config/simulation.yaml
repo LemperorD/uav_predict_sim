@@ -1,0 +1,30 @@
+/**:
+  ros__parameters:
+    # Relative file paths resolve from this YAML's directory. Use a new output_dir for each run.
+    output_dir: ../../../outputs/demo
+    input_csv: ""  # optional: t,px,py,pz,vx,vy,vz,ax,ay,az; seconds, SI, world frame
+    duration: 30.0
+    sample_rate: 50.0
+    trajectory: figure8  # figure8 | straight | acceleration (ignored with input_csv)
+    inject_noise: true
+    noise_seed: 42
+    position_noise_std: 0.15
+    velocity_noise_std: 0.10
+    cv_accel_density: 0.30
+    ca_jerk_density: 1.0
+    stay_probability: 0.98
+    prediction_step: 0.05
+    prediction_steps: 20
+    max_time_gap: 1.0
+    odometry_topic: /prediction_demo/odometry
+    command_topic: /prediction_demo/command
+    show_viewer: true
+    record_video: true
+    frame_dir: frames
+    video_file: simulation.mp4
+    plot_file: summary.png
+    metrics_file: metrics.json
+    window_width: 1280
+    window_height: 800
+    video_fps: 15
+    ffmpeg_path: /usr/bin/ffmpeg
