@@ -20,6 +20,7 @@ install(TARGETS imm EXPORT immTargets ARCHIVE DESTINATION lib LIBRARY DESTINATIO
 install(TARGETS predictor_node kinematic_source DESTINATION lib/${PROJECT_NAME})
 install(DIRECTORY include/ DESTINATION include)
 install(DIRECTORY config launch DESTINATION share/${PROJECT_NAME})
+install(FILES README.md DESTINATION share/${PROJECT_NAME})
 if(BUILD_TESTING)
   enable_testing()
   add_executable(test_imm test/test_imm.cpp)

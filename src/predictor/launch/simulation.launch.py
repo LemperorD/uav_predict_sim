@@ -29,7 +29,11 @@ def setup(context):
     output = Path(params['output_dir'])
     output.mkdir(parents=True, exist_ok=True)
     # Snapshot of resolved parameters makes each run reproducible.
-    (output / 'resolved.yaml').write_text(yaml.safe_dump({'/**': {'ros__parameters': params}}))
+    snapshot = Path(params.get('snapshot_file', 'resolved.yaml'))
+    if not snapshot.is_absolute():
+        snapshot = output / snapshot
+    snapshot.parent.mkdir(parents=True, exist_ok=True)
+    snapshot.write_text(yaml.safe_dump({'/**': {'ros__parameters': params}}))
     topics = [('odometry', params['odometry_topic']), ('command', params['command_topic'])]
     simulator = Node(package='poscmd_2_odom', executable='poscmd_2_odom',
                      name='ego_kinematic_simulator', output='screen',
@@ -38,17 +42,20 @@ def setup(context):
                      output='screen', parameters=[params], remappings=topics)
     source = Node(package='predictor', executable='kinematic_source',
                   output='screen', parameters=[params], remappings=topics)
-    nodes = [simulator, predictor]
+    nodes = [predictor]
+    processors = [simulator, predictor]
     if params.get('show_viewer', True):
-        nodes.append(Node(package='prediction_visualize', executable='prediction_viewer',
-                          output='screen', parameters=[params]))
+        viewer = Node(package='prediction_visualize', executable='prediction_viewer',
+                      output='screen', parameters=[params])
+        nodes.append(viewer)
+        processors.append(viewer)
     # Subscribers and GL initialization start before commands are sent.
-    nodes.append(TimerAction(period=2.0, actions=[source]))
+    nodes.append(TimerAction(period=2.0, actions=[simulator, source]))
     nodes.append(RegisterEventHandler(OnProcessExit(target_action=source, on_exit=[
         TimerAction(period=0.5, actions=[EmitEvent(event=Shutdown(reason='trajectory completed'))])
     ])))
     # Fail fast when a processing node dies before the source finishes.
-    for node in nodes[:2] + ([nodes[2]] if params.get('show_viewer', True) else []):
+    for node in processors:
         nodes.append(RegisterEventHandler(OnProcessExit(target_action=node, on_exit=[
             EmitEvent(event=Shutdown(reason='processing node exited'))
         ])))

@@ -4,7 +4,7 @@
 #include <vector>
 
 namespace predictor {
-using State = Eigen::Matrix<double, 9, 1>;  // position, velocity, acceleration
+using State = Eigen::Matrix<double, 9, 1>; // position, velocity, acceleration
 using Covariance = Eigen::Matrix<double, 9, 9>;
 using Measurement = Eigen::Matrix<double, 6, 1>;
 struct Settings {
@@ -19,12 +19,13 @@ struct Estimate {
   Eigen::Vector2d probability = Eigen::Vector2d::Constant(0.5);
 };
 class Imm {
- public:
+public:
   explicit Imm(Settings settings = {});
-  Estimate update(const Measurement& measurement, double dt);
+  Estimate update(const Measurement &measurement, double dt);
   std::vector<Estimate> forecast(double step, int count) const;
   Estimate estimate() const;
- private:
+
+private:
   void predict(double dt);
   Settings settings_;
   bool initialized_ = false;
@@ -32,4 +33,4 @@ class Imm {
   std::array<Covariance, 2> p_;
   Eigen::Vector2d weights_ = Eigen::Vector2d::Constant(0.5);
 };
-}  // namespace predictor
+} // namespace predictor

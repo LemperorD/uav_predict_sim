@@ -1,6 +1,7 @@
 #include <array>
 #include <deque>
 #include <filesystem>
+#include <fstream>
 #include <iomanip>
 #include <nav_msgs/msg/path.hpp>
 #include <pangolin/display/default_font.h>
@@ -41,8 +42,21 @@ int main(int argc, char **argv) {
     if (width <= 0 || height <= 0 || width % 2 || height % 2 || fps <= 0 ||
         fps > 120)
       throw std::invalid_argument("invalid video dimensions/fps");
-    if (record)
+    std::ofstream frame_times;
+    if (record) {
       std::filesystem::create_directories(frames);
+      auto times_path =
+          std::filesystem::path(node->declare_parameter<std::string>(
+              "frame_timestamps_file", "frame_times.csv"));
+      if (times_path.is_relative())
+        times_path = output / times_path;
+      if (!times_path.parent_path().empty())
+        std::filesystem::create_directories(times_path.parent_path());
+      frame_times.open(times_path);
+      if (!frame_times)
+        throw std::runtime_error("cannot open frame timestamps file");
+      frame_times << "frame,elapsed_s\n" << std::setprecision(12);
+    }
     pangolin::CreateWindowAndBind("UAV IMM-KF | truth green - observation gray "
                                   "- estimate blue - forecast orange",
                                   width, height);
@@ -117,6 +131,7 @@ int main(int argc, char **argv) {
         });
     auto next = std::chrono::steady_clock::now();
     int frame = 0;
+    const auto recording_start = std::chrono::steady_clock::now();
     while (rclcpp::ok() && !pangolin::ShouldQuit()) {
       rclcpp::spin_some(node);
       glClearColor(.04, .055, .08, 1);
@@ -199,6 +214,11 @@ int main(int argc, char **argv) {
       glPopMatrix();
       glMatrixMode(GL_MODELVIEW);
       if (record) {
+        const double elapsed =
+            std::chrono::duration<double>(std::chrono::steady_clock::now() -
+                                          recording_start)
+                .count();
+        frame_times << frame << ',' << elapsed << '\n';
         std::vector<unsigned char> pixels(width * height * 3);
         glPixelStorei(GL_PACK_ALIGNMENT, 1);
         glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE,

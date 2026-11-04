@@ -6,7 +6,6 @@ import json
 import math
 import os
 from pathlib import Path
-import shutil
 import signal
 import subprocess
 import sys
@@ -25,12 +24,12 @@ def rmse(values):
     return math.sqrt(sum(x*x for x in values) / len(values)) if values else None
 
 
-def summarize(output, destination):
-    with (output / 'samples.csv').open() as f:
+def summarize(samples, forecasts, destination):
+    with samples.open() as f:
         rows = [{k: float(v) for k, v in row.items()} for row in csv.DictReader(f)]
     if len(rows) < 20:
         raise RuntimeError('too few samples; simulation failed')
-    with (output / 'predictions.csv').open() as f:
+    with forecasts.open() as f:
         predictions = list(csv.DictReader(f))
     # Warm-up is excluded from aggregate filter metrics, retained in raw files.
     settled = [r for r in rows if r['t'] >= min(2.0, rows[-1]['t'] / 4)]
@@ -68,6 +67,9 @@ def main():
     params = yaml.safe_load(config.read_text())['/**']['ros__parameters']
     output = output_path(config.parent, params['output_dir']).resolve()
     output.mkdir(parents=True, exist_ok=True)
+    samples = output_path(output, params.get('samples_file', 'samples.csv'))
+    forecasts = output_path(output, params.get('predictions_file', 'predictions.csv'))
+    launch_log = output_path(output, params.get('launch_log_file', 'launch.log'))
     metrics_file = output_path(output, params['metrics_file'])
     plot_file = output_path(output, params['plot_file'])
     frames = output_path(output, params['frame_dir'])
@@ -77,13 +79,15 @@ def main():
         raise RuntimeError('Pangolin needs DISPLAY. Run in a graphical terminal or use --headless.')
     if not args.finalize_only:
         # Refuse overwrites so failed/new runs cannot masquerade as an earlier success.
-        if (output/'samples.csv').exists() or any(frames.glob('frame_*.png')):
+        if samples.exists() or forecasts.exists() or any(frames.glob('frame_*.png')):
             raise RuntimeError(f'Output already contains a run: {output}. Choose a new output_dir.')
         command = ['ros2','launch','predictor','simulation.launch.py',f'config:={config}']
         if args.headless:
             command.append('viewer:=false')
-        with (output/'launch.log').open('w') as log:
-            child = subprocess.Popen(command, stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
+        launch_log.parent.mkdir(parents=True, exist_ok=True)
+        with launch_log.open('w') as log:
+            run_env = dict(os.environ, ROS_LOG_DIR=str(output_path(output, params.get('ros_log_dir', 'ros_logs'))))
+            child = subprocess.Popen(command, stdout=log, stderr=subprocess.STDOUT, start_new_session=True, env=run_env)
             try:
                 code = child.wait(timeout=float(params['duration'])+35)
             except (KeyboardInterrupt, subprocess.TimeoutExpired):
@@ -93,22 +97,41 @@ def main():
                 except subprocess.TimeoutExpired:
                     os.killpg(child.pid, signal.SIGKILL)
                     child.wait()
-                raise RuntimeError(f'Simulation interrupted/timed out; inspect {output / "launch.log"}')
-        log_text = (output/'launch.log').read_text()
+                raise RuntimeError(f'Simulation interrupted/timed out; inspect {launch_log}')
+        log_text = launch_log.read_text()
         if code or 'process has died' in log_text or '[ERROR]' in log_text:
-            raise RuntimeError(f'ROS run failed; inspect {output / "launch.log"}')
-    result = summarize(output, metrics_file)
+            raise RuntimeError(f'ROS run failed; inspect {launch_log}')
+    result = summarize(samples, forecasts, metrics_file)
     if not args.finalize_only and result['duration_s'] < float(params['duration']) - 1.0:
         raise RuntimeError('Simulation terminated before configured duration')
-    env = dict(os.environ, MPLBACKEND='Agg', PYTHONNOUSERSITE='1', MPLCONFIGDIR=str(output/'.matplotlib'))
-    subprocess.run(['ros2','run','prediction_visualize','prediction_plot',str(output/'samples.csv'),str(plot_file)], check=True, env=env)
+    env = dict(os.environ, MPLBACKEND='Agg', PYTHONNOUSERSITE='1', MPLCONFIGDIR=str(output_path(output, params.get('matplotlib_cache_dir', '.matplotlib'))))
+    subprocess.run(['ros2','run','prediction_visualize','prediction_plot',str(samples),str(plot_file)], check=True, env=env)
     if params.get('record_video', True) and show:
         if not any(frames.glob('frame_*.png')):
             raise RuntimeError('Recording requested but no Pangolin frames were captured')
         video.parent.mkdir(parents=True, exist_ok=True)
         ffmpeg = str(output_path(config.parent, params.get('ffmpeg_path', '/usr/bin/ffmpeg')))
-        subprocess.run([ffmpeg,'-y','-loglevel','error','-framerate',str(params['video_fps']),
-                        '-i',str(frames/'frame_%06d.png'),'-c:v','libx264','-pix_fmt','yuv420p',str(video)], check=True)
+        times_file = output_path(output, params.get('frame_timestamps_file', 'frame_times.csv'))
+        with times_file.open() as f:
+            times = [(int(r['frame']), float(r['elapsed_s'])) for r in csv.DictReader(f)]
+        if len(times) < 2:
+            raise RuntimeError('Recording has fewer than two timestamped frames')
+        manifest = output_path(output, params.get('video_manifest_file', 'video_frames.ffconcat'))
+        manifest.parent.mkdir(parents=True, exist_ok=True)
+        def entry(index):
+            # ffconcat uses single-quoted filenames; escape literal apostrophes.
+            name = str((frames/f'frame_{index:06d}.png').resolve()).replace("'", "'\\''")
+            return f"file '{name}'\n"
+        with manifest.open('w') as f:
+            f.write('ffconcat version 1.0\n')
+            for i, (index, timestamp) in enumerate(times):
+                interval = times[i+1][1]-timestamp if i+1<len(times) else 1/params['video_fps']
+                if not math.isfinite(interval) or interval <= 0:
+                    raise RuntimeError('Invalid recording timestamps')
+                f.write(entry(index)+f'duration {interval:.9f}\n')
+            f.write(entry(times[-1][0]))
+        subprocess.run([ffmpeg,'-y','-loglevel','error','-f','concat','-safe','0',
+                        '-i',str(manifest),'-vsync','vfr','-c:v','libx264','-pix_fmt','yuv420p',str(video)], check=True)
     print(f'Acceptance artifacts: {output}')
 
 
