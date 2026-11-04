@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>predictor</name><version>0.1.0</version>
+  <description>3D IMM Kalman prediction and kinematic EGO simulation</description>
+  <maintainer email="ld@example.com">ld</maintainer><license>MIT</license>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <depend>rclcpp</depend><depend>nav_msgs</depend><depend>std_msgs</depend>
+  <depend>quadrotor_msgs</depend><depend>eigen</depend>
+  <exec_depend>launch_ros</exec_depend><exec_depend>ament_index_python</exec_depend>
+  <exec_depend>poscmd_2_odom</exec_depend><exec_depend>python3-yaml</exec_depend>
+  <export><build_type>ament_cmake</build_type></export>
+</package>
