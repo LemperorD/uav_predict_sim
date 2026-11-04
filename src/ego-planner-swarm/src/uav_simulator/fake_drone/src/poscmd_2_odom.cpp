@@ -108,17 +108,16 @@ int main(int argc, char *argv[])
         "command", 1, rcvPosCmdCallBack);
     _odom_pub = node->create_publisher<nav_msgs::msg::Odometry>("odometry", 1);
 
-    // 主循环，发布里程计信息
-    rclcpp::Rate rate(100);  // 100Hz
-    bool status = rclcpp::ok();
-    while (status)
-    {
-        pubOdom();
-        rclcpp::spin_some(node);
-        status = rclcpp::ok();
-        rate.sleep();
-    }
-
-    rclcpp::shutdown();
+    // Let the executor own shutdown; spin_some after SIGINT can otherwise
+    // create a guard condition against an already-invalid ROS context.
+    auto timer = node->create_wall_timer(std::chrono::milliseconds(10), pubOdom);
+    rclcpp::spin(node);
+    // Global ROS handles must be destroyed before middleware static teardown.
+    timer.reset();
+    _cmd_sub.reset();
+    _odom_pub.reset();
+    node.reset();
+    if (rclcpp::ok())
+        rclcpp::shutdown();
     return 0;
 }
