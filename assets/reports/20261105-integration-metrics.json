@@ -1,0 +1,67 @@
+{
+  "straight_noisy": {
+    "samples": 799,
+    "scored_predictions": 699,
+    "duration_s": 7.98005795479,
+    "measurement_position_rmse_m": 0.25771029534164464,
+    "filtered_position_rmse_m": 0.030066459687936517,
+    "velocity_rmse_mps": 0.05530730483061204,
+    "horizon_position_rmse_m": 0.18254989454120898,
+    "mean_position_nees": 5.9388301820558,
+    "position_2sigma_axis_coverage": {
+      "x": 0.9632721202003339,
+      "y": 0.4958263772954925,
+      "z": 0.991652754590985
+    },
+    "unscored_tail_note": "Predictions whose target is beyond the last truth sample are excluded."
+  },
+  "acceleration_noisy": {
+    "samples": 766,
+    "scored_predictions": 666,
+    "duration_s": 7.65007328987,
+    "measurement_position_rmse_m": 0.26012100607581856,
+    "filtered_position_rmse_m": 0.030630230069688204,
+    "velocity_rmse_mps": 0.05605064436323927,
+    "horizon_position_rmse_m": 0.18428829731435198,
+    "mean_position_nees": 6.149825527942178,
+    "position_2sigma_axis_coverage": {
+      "x": 0.9616724738675958,
+      "y": 0.4721254355400697,
+      "z": 0.9912891986062717
+    },
+    "unscored_tail_note": "Predictions whose target is beyond the last truth sample are excluded."
+  },
+  "figure8_clean": {
+    "samples": 799,
+    "scored_predictions": 698,
+    "duration_s": 7.98011064529,
+    "measurement_position_rmse_m": 0.0,
+    "filtered_position_rmse_m": 0.010731183356617956,
+    "velocity_rmse_mps": 0.009525575722413838,
+    "horizon_position_rmse_m": 0.22027315272592654,
+    "mean_position_nees": 0.7645657014986718,
+    "position_2sigma_axis_coverage": {
+      "x": 1.0,
+      "y": 0.9816360601001669,
+      "z": 1.0
+    },
+    "unscored_tail_note": "Predictions whose target is beyond the last truth sample are excluded."
+  },
+  "csv_replay": {
+    "samples": 800,
+    "scored_predictions": 700,
+    "duration_s": 7.99014091492,
+    "measurement_position_rmse_m": 0.2576702731986288,
+    "filtered_position_rmse_m": 0.030039906422258043,
+    "velocity_rmse_mps": 0.05527391053217787,
+    "horizon_position_rmse_m": 0.18934170449107973,
+    "mean_position_nees": 5.928956564997567,
+    "position_2sigma_axis_coverage": {
+      "x": 0.955,
+      "y": 0.49333333333333335,
+      "z": 0.9916666666666667
+    },
+    "unscored_tail_note": "Predictions whose target is beyond the last truth sample are excluded."
+  },
+  "invalid_config_rejected": true
+}

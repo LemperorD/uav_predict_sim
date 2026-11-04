@@ -1,0 +1,16 @@
+{
+  "samples": 2999,
+  "scored_predictions": 2899,
+  "duration_s": 29.9802298546,
+  "measurement_position_rmse_m": 0.25793966090391773,
+  "filtered_position_rmse_m": 0.022946765778562046,
+  "velocity_rmse_mps": 0.05925899800915506,
+  "horizon_position_rmse_m": 0.2866186506778397,
+  "mean_position_nees": 3.5047167512502027,
+  "position_2sigma_axis_coverage": {
+    "x": 0.9692747409789211,
+    "y": 0.8488745980707395,
+    "z": 0.993926402286531
+  },
+  "unscored_tail_note": "Predictions whose target is beyond the last truth sample are excluded."
+}
