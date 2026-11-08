@@ -4,19 +4,16 @@
 #include <Eigen/Core>
 #include <boost/array.hpp>
 
-namespace QuadrotorSimulator
-{
+namespace QuadrotorSimulator {
 
-class Quadrotor
-{
-public:
-  struct State
-  {
+class Quadrotor {
+ public:
+  struct State {
     Eigen::Vector3d x;
     Eigen::Vector3d v;
     Eigen::Matrix3d R;
     Eigen::Vector3d omega;
-    Eigen::Array4d  motor_rpm;
+    Eigen::Array4d motor_rpm;
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   };
 
@@ -28,18 +25,23 @@ public:
 
   void setStatePos(const Eigen::Vector3d& Pos);
 
+  // 质量
   double getMass(void) const;
   void setMass(double mass);
 
-  double getGravity(void) const;
-  void setGravity(double g);
-
+  // 转动惯量
   const Eigen::Matrix3d& getInertia(void) const;
   void setInertia(const Eigen::Matrix3d& inertia);
 
+  // 重力加速度
+  double getGravity(void) const;
+  void setGravity(double g);
+
+  // 机械臂长度
   double getArmLength(void) const;
   void setArmLength(double d);
 
+  // 螺旋桨半径
   double getPropRadius(void) const;
   void setPropRadius(double r);
 
@@ -78,34 +80,34 @@ public:
   // For internal use, but needs to be public for odeint
   typedef boost::array<double, 22> InternalState;
   void operator()(const Quadrotor::InternalState& x,
-                  Quadrotor::InternalState&       dxdt, const double /* t */);
+                  Quadrotor::InternalState& dxdt, const double /* t */);
 
   Eigen::Vector3d getAcc() const;
 
-private:
+ private:
   void updateInternalState(void);
 
-  double          alpha0; // AOA
-  double          g_;     // gravity
-  double          mass_;
-  Eigen::Matrix3d J_; // Inertia
-  double          kf_;
-  double          km_;
-  double          prop_radius_;
-  double          arm_length_;
-  double          motor_time_constant_; // unit: sec
-  double          max_rpm_;
-  double          min_rpm_;
+  double alpha0;  // AOA
+  double g_;      // gravity
+  double mass_;
+  Eigen::Matrix3d J_;  // Inertia
+  double kf_;          // propeller thrust coefficient
+  double km_;          // propeller moment coefficient
+  double prop_radius_;
+  double arm_length_;
+  double motor_time_constant_;  // unit: sec
+  double max_rpm_;
+  double min_rpm_;
 
   Quadrotor::State state_;
 
   Eigen::Vector3d acc_;
 
-  Eigen::Array4d  input_;
+  Eigen::Array4d input_;
   Eigen::Vector3d external_force_;
   Eigen::Vector3d external_moment_;
 
   InternalState internal_state_;
 };
-}
+}  // namespace QuadrotorSimulator
 #endif

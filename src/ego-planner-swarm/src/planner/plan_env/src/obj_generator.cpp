@@ -1,11 +1,12 @@
 /**
  * This file is part of Fast-Planner.
  *
- * Copyright 2019 Boyu Zhou, Aerial Robotics Group, Hong Kong University of Science and Technology, <uav.ust.hk>
- * Developed by Boyu Zhou <bzhouai at connect dot ust dot hk>, <uv dot boyuzhou at gmail dot com>
- * for more information see <https://github.com/HKUST-Aerial-Robotics/Fast-Planner>.
- * If you use this code, please cite the respective publications as
- * listed on the above website.
+ * Copyright 2019 Boyu Zhou, Aerial Robotics Group, Hong Kong University of
+ * Science and Technology, <uav.ust.hk> Developed by Boyu Zhou <bzhouai at
+ * connect dot ust dot hk>, <uv dot boyuzhou at gmail dot com> for more
+ * information see <https://github.com/HKUST-Aerial-Robotics/Fast-Planner>. If
+ * you use this code, please cite the respective publications as listed on the
+ * above website.
  *
  * Fast-Planner is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -21,26 +22,29 @@
  * along with Fast-Planner. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "visualization_msgs/msg/marker.hpp"
-#include <rclcpp/rclcpp.hpp>
-
-#include <geometry_msgs/msg/pose_stamped.hpp>
-#include <nav_msgs/msg/odometry.hpp>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl_conversions/pcl_conversions.h>
+
+#include <geometry_msgs/msg/pose_stamped.hpp>
+#include <nav_msgs/msg/odometry.hpp>
+#include <plan_env/linear_obj_model.hpp>
 #include <random>
+#include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <string>
 
-#include <plan_env/linear_obj_model.hpp>
+#include "visualization_msgs/msg/marker.hpp"
 using namespace std;
 
 int obj_num, _input_type;
-double _x_size, _y_size, _h_size, _vel, _yaw_dot, _acc_r1, _acc_r2, _acc_z, _scale1, _scale2, _interval;
+double _x_size, _y_size, _h_size, _vel, _yaw_dot, _acc_r1, _acc_r2, _acc_z,
+    _scale1, _scale2, _interval;
 
-rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr obj_pub;           // visualize marker
-vector<rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr> pose_pubs; // obj pose (from optitrack)
+rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr
+    obj_pub;  // visualize marker
+vector<rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr>
+    pose_pubs;  // obj pose (from optitrack)
 vector<LinearObjModel> obj_models;
 
 random_device rd;
@@ -62,8 +66,7 @@ rclcpp::Time time_update, time_change;
 void updateCallback();
 void visualizeObj(int id);
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
   rclcpp::init(argc, argv);
   auto node = rclcpp::Node::make_shared("dynamic_obj");
 
@@ -97,9 +100,9 @@ int main(int argc, char **argv)
   node->get_parameter("obj_generator/interval", _interval);
   node->get_parameter("obj_generator/input_type", _input_type);
 
-  obj_pub = node->create_publisher<visualization_msgs::msg::Marker>("/dynamic/obj", 10);
-  for (int i = 0; i < obj_num; ++i)
-  {
+  obj_pub = node->create_publisher<visualization_msgs::msg::Marker>(
+      "/dynamic/obj", 10);
+  for (int i = 0; i < obj_num; ++i) {
     auto pose_pub = node->create_publisher<geometry_msgs::msg::PoseStamped>(
         "/dynamic/pose_" + std::to_string(i), 10);
     pose_pubs.push_back(pose_pub);
@@ -107,7 +110,8 @@ int main(int argc, char **argv)
 
   auto update_timer = node->create_wall_timer(
       std::chrono::duration<double>(1 / 30.0), updateCallback);
-  cout << "[dynamic]: initialize with " + to_string(obj_num) << " moving obj." << endl;
+  cout << "[dynamic]: initialize with " + to_string(obj_num) << " moving obj."
+       << endl;
   rclcpp::sleep_for(std::chrono::seconds(1));
 
   rand_color = uniform_real_distribution<double>(0.0, 1.0);
@@ -123,13 +127,13 @@ int main(int argc, char **argv)
   rand_yaw_dot = uniform_real_distribution<double>(-_yaw_dot, _yaw_dot);
 
   /* ---------- give initial value of each obj ---------- */
-  for (int i = 0; i < obj_num; ++i)
-  {
+  for (int i = 0; i < obj_num; ++i) {
     LinearObjModel model;
     Eigen::Vector3d pos(rand_pos_x(eng), rand_pos_y(eng), rand_h(eng));
     Eigen::Vector3d vel(rand_vel(eng), rand_vel(eng), 0.0);
     Eigen::Vector3d color(rand_color(eng), rand_color(eng), rand_color(eng));
-    Eigen::Vector3d scale(rand_scale(eng), 1.5 * rand_scale(eng), 5.0 * rand_scale(eng));
+    Eigen::Vector3d scale(rand_scale(eng), 1.5 * rand_scale(eng),
+                          5.0 * rand_scale(eng));
     double yaw = rand_yaw(eng);
     double yaw_dot = rand_yaw_dot(eng);
 
@@ -139,16 +143,15 @@ int main(int argc, char **argv)
     z = rand_acc_z(eng);
     Eigen::Vector3d acc(r * cos(t), r * sin(t), z);
 
-    if (_input_type == 1)
-    {
-      model.initialize(pos, vel, acc, yaw, yaw_dot, color, scale, _input_type); // Vel input
+    if (_input_type == 1) {
+      model.initialize(pos, vel, acc, yaw, yaw_dot, color, scale,
+                       _input_type);  // Vel input
+    } else {
+      model.initialize(pos, Eigen::Vector3d(0, 0, 0), acc, yaw, yaw_dot, color,
+                       scale, _input_type);  // Acc input
     }
-    else
-    {
-      model.initialize(pos, Eigen::Vector3d(0, 0, 0), acc, yaw, yaw_dot, color, scale, _input_type); // Acc input
-    }
-    model.setLimits(Eigen::Vector3d(_x_size / 2, _y_size / 2, _h_size), Eigen::Vector2d(0.0, _vel),
-                    Eigen::Vector2d(0, 0));
+    model.setLimits(Eigen::Vector3d(_x_size / 2, _y_size / 2, _h_size),
+                    Eigen::Vector2d(0.0, _vel), Eigen::Vector2d(0, 0));
     obj_models.push_back(model);
   }
 
@@ -161,8 +164,7 @@ int main(int argc, char **argv)
   return 0;
 }
 
-void updateCallback()
-{
+void updateCallback() {
   rclcpp::Time time_now = rclcpp::Clock().now();
 
   /* ---------- change input ---------- */
@@ -193,8 +195,7 @@ void updateCallback()
   /* ---------- update obj state ---------- */
   double dt = (time_now - time_update).seconds();
   time_update = time_now;
-  for (int i = 0; i < obj_num; ++i)
-  {
+  for (int i = 0; i < obj_num; ++i) {
     obj_models[i].update(dt);
     visualizeObj(i);
     rclcpp::sleep_for(std::chrono::microseconds(1));
@@ -213,8 +214,7 @@ void updateCallback()
   //   }
 }
 
-void visualizeObj(int id)
-{
+void visualizeObj(int id) {
   Eigen::Vector3d pos, color, scale;
   pos = obj_models[id].getPosition();
   color = obj_models[id].getColor();
@@ -236,14 +236,16 @@ void visualizeObj(int id)
   mk.id = id;
 
   mk.scale.x = scale(0), mk.scale.y = scale(1), mk.scale.z = scale(2);
-  mk.color.a = 1.0, mk.color.r = color(0), mk.color.g = color(1), mk.color.b = color(2);
+  mk.color.a = 1.0, mk.color.r = color(0), mk.color.g = color(1),
+  mk.color.b = color(2);
 
   mk.pose.orientation.w = qua.w();
   mk.pose.orientation.x = qua.x();
   mk.pose.orientation.y = qua.y();
   mk.pose.orientation.z = qua.z();
 
-  mk.pose.position.x = pos(0), mk.pose.position.y = pos(1), mk.pose.position.z = pos(2);
+  mk.pose.position.x = pos(0), mk.pose.position.y = pos(1),
+  mk.pose.position.z = pos(2);
 
   obj_pub->publish(mk);
 
@@ -251,7 +253,8 @@ void visualizeObj(int id)
   geometry_msgs::msg::PoseStamped pose;
   pose.header.frame_id = "world";
   // pose.header.seq = id;
-  pose.pose.position.x = pos(0), pose.pose.position.y = pos(1), pose.pose.position.z = pos(2);
+  pose.pose.position.x = pos(0), pose.pose.position.y = pos(1),
+  pose.pose.position.z = pos(2);
   pose.pose.orientation.w = 1.0;
   pose_pubs[id]->publish(pose);
 }

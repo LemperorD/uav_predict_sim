@@ -1,5 +1,6 @@
 """EGO kinematic simulator -> noisy observation -> IMM -> Pangolin (no RViz)."""
 from pathlib import Path
+import csv
 import math
 import yaml
 from launch import LaunchDescription
@@ -9,6 +10,28 @@ from launch.events import Shutdown
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
+
+
+def initial_position(params):
+    """Start the simulator at the first command, including phase and CSV input."""
+    if params.get('input_csv'):
+        with Path(params['input_csv']).open() as stream:
+            first = next(csv.DictReader(stream))
+        return [float(first[key]) for key in ('px', 'py', 'pz')]
+    position = list(params.get('trajectory_origin', [0.0, 0.0, 2.0]))
+    trajectory = params.get('trajectory', 'figure8')
+    if trajectory in ('circle', 'helix'):
+        radius = params.get('trajectory_radius', 4.0)
+        phase = params.get('trajectory_circle_phase', 0.0)
+        position[0] += radius * math.cos(phase)
+        position[1] += radius * math.sin(phase)
+    elif trajectory in ('figure8', 'sinusoid'):
+        amplitude = params.get('trajectory_amplitude', [4.0, 3.0, 0.6])
+        phase = params.get('trajectory_phase', [0.0, 0.0, 0.0])
+        position = [position[i] + amplitude[i] * math.sin(phase[i]) for i in range(3)]
+    if len(position) != 3 or not all(math.isfinite(value) for value in position):
+        raise ValueError('initial trajectory position must contain three finite values')
+    return position
 
 
 def setup(context):
@@ -35,9 +58,10 @@ def setup(context):
     snapshot.parent.mkdir(parents=True, exist_ok=True)
     snapshot.write_text(yaml.safe_dump({'/**': {'ros__parameters': params}}))
     topics = [('odometry', params['odometry_topic']), ('command', params['command_topic'])]
+    start = initial_position(params)
     simulator = Node(package='poscmd_2_odom', executable='poscmd_2_odom',
                      name='ego_kinematic_simulator', output='screen',
-                     parameters=[{'init_x': 0.0, 'init_y': 0.0, 'init_z': 2.0}], remappings=topics)
+                     parameters=[dict(zip(('init_x', 'init_y', 'init_z'), start))], remappings=topics)
     predictor = Node(package='predictor', executable='predictor_node',
                      output='screen', parameters=[params], remappings=topics)
     source = Node(package='predictor', executable='kinematic_source',

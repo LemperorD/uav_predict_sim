@@ -1,4 +1,3 @@
-#include "predictor/imm.hpp"
 #include <deque>
 #include <filesystem>
 #include <fstream>
@@ -11,8 +10,10 @@
 #include <std_msgs/msg/bool.hpp>
 #include <std_msgs/msg/float64_multi_array.hpp>
 
+#include "predictor/imm.hpp"
+
 class Predictor : public rclcpp::Node {
-public:
+ public:
   Predictor() : Node("predictor_node") {
     predictor::Settings s;
     s.position_std = declare_parameter("position_noise_std", 0.15);
@@ -22,15 +23,19 @@ public:
     s.stay_probability = declare_parameter("stay_probability", 0.98);
     filter_ = std::make_unique<predictor::Imm>(s);
     settings_ = s;
+
     noise_ = declare_parameter("inject_noise", true);
     rng_.seed(declare_parameter("noise_seed", 42));
+
     step_ = declare_parameter("prediction_step", 0.05);
     count_ = declare_parameter("prediction_steps", 20);
     max_gap_ = declare_parameter("max_time_gap", 1.0);
     if (!std::isfinite(step_) || step_ <= 0 || count_ <= 0 || count_ > 10000 ||
-        !std::isfinite(max_gap_) || max_gap_ <= 0)
+        !std::isfinite(max_gap_) || max_gap_ <= 0) {
       throw std::invalid_argument(
           "invalid prediction step/count or max_time_gap");
+    }
+
     auto dir = std::filesystem::path(
         declare_parameter<std::string>("output_dir", "outputs/demo"));
     std::filesystem::create_directories(dir);
@@ -38,18 +43,25 @@ public:
         declare_parameter<std::string>("samples_file", "samples.csv"));
     auto prediction_path = std::filesystem::path(
         declare_parameter<std::string>("predictions_file", "predictions.csv"));
-    if (sample_path.is_relative())
+    if (sample_path.is_relative()) {
       sample_path = dir / sample_path;
-    if (prediction_path.is_relative())
+    }
+    if (prediction_path.is_relative()) {
       prediction_path = dir / prediction_path;
-    if (!sample_path.parent_path().empty())
+    }
+    if (!sample_path.parent_path().empty()) {
       std::filesystem::create_directories(sample_path.parent_path());
-    if (!prediction_path.parent_path().empty())
+    }
+    if (!prediction_path.parent_path().empty()) {
       std::filesystem::create_directories(prediction_path.parent_path());
+    }
+
     samples_.open(sample_path);
     predictions_.open(prediction_path);
-    if (!samples_ || !predictions_)
+    if (!samples_ || !predictions_) {
       throw std::runtime_error("cannot open output CSV files");
+    }
+
     samples_ << std::setprecision(12);
     predictions_ << std::setprecision(12);
     samples_
@@ -58,6 +70,7 @@ public:
            "position_error,horizon_error,velocity_error,position_nees\n";
     predictions_ << "origin_t,target_t,pred_x,pred_y,pred_z,truth_x,truth_y,"
                     "truth_z,error,std_x,std_y,std_z\n";
+
     estimate_pub_ = create_publisher<nav_msgs::msg::Odometry>("estimate", 10);
     path_pub_ = create_publisher<nav_msgs::msg::Path>("prediction", 10);
     metrics_pub_ =
@@ -73,20 +86,27 @@ public:
         });
     sub_ = create_subscription<nav_msgs::msg::Odometry>(
         "odometry", rclcpp::QoS(50),
-        [this](nav_msgs::msg::Odometry::ConstSharedPtr m) { receive(*m); });
+        [this](nav_msgs::msg::Odometry::ConstSharedPtr m) {
+          receive(*m);
+        });
   }
 
-private:
+ private:
   struct Pending {
     double origin, target;
     Eigen::Vector3d p, std;
   };
+
   void receive(const nav_msgs::msg::Odometry &m) {
-    if (finished_)
+    if (finished_) {
       return;
+    }
+
     const double stamp = rclcpp::Time(m.header.stamp).seconds();
-    if (!std::isfinite(stamp))
+    if (!std::isfinite(stamp)) {
       return;
+    }
+
     predictor::Measurement truth;
     truth << m.pose.pose.position.x, m.pose.pose.position.y,
         m.pose.pose.position.z, m.twist.twist.linear.x, m.twist.twist.linear.y,
@@ -95,8 +115,10 @@ private:
       RCLCPP_WARN(get_logger(), "Skipping nonfinite odometry");
       return;
     }
-    if (start_stamp_ < 0)
+
+    if (start_stamp_ < 0) {
       start_stamp_ = stamp;
+    }
     double t = stamp - start_stamp_,
            dt = last_stamp_ < 0 ? 0.01 : stamp - last_stamp_;
     if (dt <= 0) {
@@ -108,31 +130,41 @@ private:
       pending_.clear();
       RCLCPP_WARN(get_logger(), "Reset IMM after time gap %.3f", dt);
     }
+
     predictor::Measurement z = truth;
-    if (noise_)
-      for (int i = 0; i < 6; ++i)
+    if (noise_) {
+      for (int i = 0; i < 6; ++i) {
         z(i) += normal_(rng_) *
                 (i < 3 ? settings_.position_std : settings_.velocity_std);
+      }
+    }
+
     auto e = filter_->update(z, dt);
+
     double horizon_error = std::numeric_limits<double>::quiet_NaN();
     while (!pending_.empty() && pending_.front().target <= t) {
       auto p = pending_.front();
       pending_.pop_front();
-      if (last_stamp_ < 0 || p.target < last_stamp_ - start_stamp_)
+      if (last_stamp_ < 0 || p.target < last_stamp_ - start_stamp_) {
         continue;
+      }
       double a = (p.target - (last_stamp_ - start_stamp_)) / dt;
       Eigen::Vector3d target = (1 - a) * last_truth_ + a * truth.head<3>();
       horizon_error = (p.p - target).norm();
       predictions_ << p.origin << ',' << p.target;
-      for (double v : p.p)
+      for (double v : p.p) {
         predictions_ << ',' << v;
-      for (double v : target)
+      }
+      for (double v : target) {
         predictions_ << ',' << v;
+      }
       predictions_ << ',' << horizon_error;
-      for (double v : p.std)
+      for (double v : p.std) {
         predictions_ << ',' << v;
+      }
       predictions_ << '\n';
     }
+
     const auto future = filter_->forecast(step_, count_);
     pending_.push_back({t, t + step_ * count_, future.back().mean.head<3>(),
                         future.back()
@@ -140,6 +172,7 @@ private:
                             .head<3>()
                             .cwiseMax(0)
                             .cwiseSqrt()});
+
     nav_msgs::msg::Odometry odom;
     odom.header = m.header;
     odom.child_frame_id = "prediction";
@@ -150,12 +183,14 @@ private:
     odom.twist.twist.linear.x = e.mean(3);
     odom.twist.twist.linear.y = e.mean(4);
     odom.twist.twist.linear.z = e.mean(5);
-    for (int i = 0; i < 3; ++i)
+    for (int i = 0; i < 3; ++i) {
       for (int j = 0; j < 3; ++j) {
         odom.pose.covariance[6 * i + j] = e.covariance(i, j);
         odom.twist.covariance[6 * i + j] = e.covariance(i + 3, j + 3);
       }
+    }
     estimate_pub_->publish(odom);
+
     nav_msgs::msg::Path path;
     path.header = m.header;
     for (int i = 0; i < count_; ++i) {
@@ -170,19 +205,25 @@ private:
       path.poses.push_back(p);
     }
     path_pub_->publish(path);
+
     Eigen::Vector3d error = e.mean.head<3>() - truth.head<3>();
     double nees =
         error.dot(e.covariance.topLeftCorner<3, 3>().ldlt().solve(error));
+
     std_msgs::msg::Float64MultiArray metrics;
     metrics.data.push_back(t);
-    for (double v : truth.head<3>())
+    for (double v : truth.head<3>()) {
       metrics.data.push_back(v);
-    for (double v : z.head<3>())
+    }
+    for (double v : z.head<3>()) {
       metrics.data.push_back(v);
-    for (double v : e.mean.head<3>())
+    }
+    for (double v : e.mean.head<3>()) {
       metrics.data.push_back(v);
-    for (double v : e.covariance.diagonal().head<3>().cwiseMax(0).cwiseSqrt())
+    }
+    for (double v : e.covariance.diagonal().head<3>().cwiseMax(0).cwiseSqrt()) {
       metrics.data.push_back(v);
+    }
     metrics.data.push_back(e.probability(0));
     metrics.data.push_back(e.probability(1));
     metrics.data.push_back(error.norm());
@@ -190,9 +231,11 @@ private:
     metrics.data.push_back((e.mean.segment<3>(3) - truth.tail<3>()).norm());
     metrics.data.push_back(nees);
     metrics_pub_->publish(metrics);
+
     for (size_t i = 0; i < metrics.data.size(); ++i) {
-      if (i)
+      if (i) {
         samples_ << ',';
+      }
       samples_ << metrics.data[i];
     }
     samples_ << '\n';
@@ -200,9 +243,11 @@ private:
       samples_.flush();
       predictions_.flush();
     }
+
     last_truth_ = truth.head<3>();
     last_stamp_ = stamp;
   }
+
   predictor::Settings settings_;
   std::unique_ptr<predictor::Imm> filter_;
   bool noise_;
@@ -220,6 +265,7 @@ private:
   rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr path_pub_;
   rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr metrics_pub_;
 };
+
 int main(int argc, char **argv) {
   rclcpp::init(argc, argv);
   try {
@@ -229,7 +275,8 @@ int main(int argc, char **argv) {
     rclcpp::shutdown();
     return 1;
   }
-  if (rclcpp::ok())
+  if (rclcpp::ok()) {
     rclcpp::shutdown();
+  }
   return 0;
 }

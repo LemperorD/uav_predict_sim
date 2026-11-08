@@ -1,17 +1,18 @@
-#include <nav_msgs/msg/odometry.hpp>
-#include <nav_msgs/msg/path.hpp>
 #include <pcl/filters/voxel_grid.h>
 #include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl/search/kdtree.h>
 #include <pcl_conversions/pcl_conversions.h>
-#include <rclcpp/rclcpp.hpp>
-#include <sensor_msgs/msg/point_cloud2.hpp>
+
 #include <Eigen/Dense>
 #include <fstream>
 #include <iostream>
+#include <nav_msgs/msg/odometry.hpp>
+#include <nav_msgs/msg/path.hpp>
 #include <pcl/search/impl/kdtree.hpp>
+#include <rclcpp/rclcpp.hpp>
+#include <sensor_msgs/msg/point_cloud2.hpp>
 #include <vector>
 
 using namespace std;
@@ -23,13 +24,11 @@ rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pub_cloud;
 sensor_msgs::msg::PointCloud2 local_map_pcl;
 sensor_msgs::msg::PointCloud2 local_depth_pcl;
 
-
 rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odom_sub;
 rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr global_map_sub;
 rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr local_map_sub;
 
 rclcpp::TimerBase::SharedPtr local_sensing_timer;
-
 
 bool has_global_map = false;
 bool has_local_map = false;
@@ -82,10 +81,13 @@ pcl::search::KdTree<pcl::PointXYZ> _kdtreeLocalMap;
 vector<int> _pointIdxRadiusSearch;
 vector<float> _pointRadiusSquaredDistance;
 
-void rcvGlobalPointCloudCallBack(const sensor_msgs::msg::PointCloud2::SharedPtr pointcloud_map) {
-  if (has_global_map) return;
+void rcvGlobalPointCloudCallBack(
+    const sensor_msgs::msg::PointCloud2::SharedPtr pointcloud_map) {
+  if (has_global_map)
+    return;
 
-  RCLCPP_WARN(rclcpp::get_logger("rcvGlobalPointCloudCallBack"), "Global Pointcloud received..");
+  RCLCPP_WARN(rclcpp::get_logger("rcvGlobalPointCloudCallBack"),
+              "Global Pointcloud received..");
 
   // 转换消息信息格式
   pcl::PointCloud<pcl::PointXYZ> cloud_input;
@@ -103,7 +105,8 @@ void rcvGlobalPointCloudCallBack(const sensor_msgs::msg::PointCloud2::SharedPtr 
 }
 
 void renderSensedPoints(/*const rclcpp::TimerBase event*/) {
-  if (!has_global_map || !has_odom) return;
+  if (!has_global_map || !has_odom)
+    return;
 
   // 获取无人机姿态
   Eigen::Quaterniond q;
@@ -144,7 +147,8 @@ void renderSensedPoints(/*const rclcpp::TimerBase event*/) {
                              pt.y - _odom.pose.pose.position.y,
                              pt.z - _odom.pose.pose.position.z);
 
-      if (pt_vec.normalized().dot(yaw_vec) < 0.5) continue;
+      if (pt_vec.normalized().dot(yaw_vec) < 0.5)
+        continue;
 
       _local_map.points.push_back(pt);
     }
@@ -200,12 +204,14 @@ int main(int argc, char** argv) {
       "odometry", 50, rcvOdometryCallbck);
 
   // 发布者：点云数据
-  pub_cloud = node->create_publisher<sensor_msgs::msg::PointCloud2>("pcl_render_node/cloud", 10);
+  pub_cloud = node->create_publisher<sensor_msgs::msg::PointCloud2>(
+      "pcl_render_node/cloud", 10);
 
   // 定时器：控制渲染频率
   double sensing_duration = 1.0 / sensing_rate * 2.5;
-  local_sensing_timer = node->create_wall_timer(
-      std::chrono::duration<double>(sensing_duration), std::bind(&renderSensedPoints));
+  local_sensing_timer =
+      node->create_wall_timer(std::chrono::duration<double>(sensing_duration),
+                              std::bind(&renderSensedPoints));
 
   _inv_resolution = 1.0 / _resolution;
 
@@ -220,7 +226,7 @@ int main(int argc, char** argv) {
   rclcpp::Rate rate(100);
   bool status = rclcpp::ok();
   while (status) {
-    rclcpp::spin_some(node);  
+    rclcpp::spin_some(node);
     status = rclcpp::ok();
     rate.sleep();
   }

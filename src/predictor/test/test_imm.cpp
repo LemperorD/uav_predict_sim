@@ -1,12 +1,16 @@
-#include "predictor/imm.hpp"
 #include <iostream>
 #include <limits>
 #include <random>
 #include <stdexcept>
+
+#include "predictor/imm.hpp"
+
 void require(bool ok, const char *msg) {
-  if (!ok)
+  if (!ok) {
     throw std::runtime_error(msg);
+  }
 }
+
 int main() {
   try {
     predictor::Imm filter;
@@ -19,8 +23,9 @@ int main() {
       predictor::Measurement z, truth;
       truth << t, 0.4 * t, 2.0, 1.0, 0.4, 0.0;
       z = truth;
-      for (int k = 0; k < 6; ++k)
+      for (int k = 0; k < 6; ++k) {
         z(k) += (k < 3 ? 0.15 : 0.1) * normal(rng);
+      }
       e = filter.update(z, 0.02);
       require(e.mean.allFinite() && e.covariance.allFinite(),
               "nonfinite output");

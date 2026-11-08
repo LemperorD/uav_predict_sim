@@ -5,7 +5,18 @@
     input_csv: ""  # optional: t,px,py,pz,vx,vy,vz,ax,ay,az; seconds, SI, world frame
     duration: 30.0
     sample_rate: 50.0
-    trajectory: figure8  # figure8 | straight | acceleration (ignored with input_csv)
+    trajectory: figure8  # hover | straight | acceleration | circle | helix | figure8 | sinusoid
+    # World frame, SI units. input_csv overrides the built-in trajectory.
+    trajectory_origin: [0.0, 0.0, 2.0]  # start for linear motion; center for periodic motion
+    # Optional trajectory_velocity: [1.0, 0.4, 0.0]; acceleration defaults to [0.0, 0.2, 0.0]
+    trajectory_acceleration: [0.2, 0.0, 0.0]
+    trajectory_amplitude: [4.0, 3.0, 0.6]
+    trajectory_frequency: [0.35, 0.7, 0.5]  # rad/s; figure8 uses y = 2 * x frequency
+    trajectory_phase: [0.0, 0.0, 0.0]  # rad
+    trajectory_radius: 4.0
+    trajectory_angular_speed: 0.35  # rad/s, negative reverses direction
+    trajectory_circle_phase: 0.0  # rad
+    trajectory_vertical_speed: 0.2  # m/s, helix only
     inject_noise: true
     noise_seed: 42
     position_noise_std: 0.15

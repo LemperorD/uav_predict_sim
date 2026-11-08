@@ -1,7 +1,8 @@
+#include <plan_env/raycast.h>
+
 #include <Eigen/Eigen>
 #include <cmath>
 #include <iostream>
-#include <plan_env/raycast.h>
 
 int signum(int x) {
   return x == 0 ? 0 : x < 0 ? -1 : 1;
@@ -22,8 +23,9 @@ double intbound(double s, double ds) {
   }
 }
 
-void Raycast(const Eigen::Vector3d& start, const Eigen::Vector3d& end, const Eigen::Vector3d& min,
-             const Eigen::Vector3d& max, int& output_points_cnt, Eigen::Vector3d* output) {
+void Raycast(const Eigen::Vector3d& start, const Eigen::Vector3d& end,
+             const Eigen::Vector3d& min, const Eigen::Vector3d& max,
+             int& output_points_cnt, Eigen::Vector3d* output) {
   //    std::cout << start << ' ' << end << std::endl;
   // From "A Fast Voxel Traversal Algorithm for Ray Tracing"
   // by John Amanatides and Andrew Woo, 1987
@@ -75,20 +77,24 @@ void Raycast(const Eigen::Vector3d& start, const Eigen::Vector3d& end, const Eig
   double tDeltaZ = ((double)stepZ) / dz;
 
   // Avoids an infinite loop.
-  if (stepX == 0 && stepY == 0 && stepZ == 0) return;
+  if (stepX == 0 && stepY == 0 && stepZ == 0)
+    return;
 
   double dist = 0;
   while (true) {
-    if (x >= min.x() && x < max.x() && y >= min.y() && y < max.y() && z >= min.z() && z < max.z()) {
+    if (x >= min.x() && x < max.x() && y >= min.y() && y < max.y() &&
+        z >= min.z() && z < max.z()) {
       output[output_points_cnt](0) = x;
       output[output_points_cnt](1) = y;
       output[output_points_cnt](2) = z;
 
       output_points_cnt++;
-      dist = sqrt((x - start(0)) * (x - start(0)) + (y - start(1)) * (y - start(1)) +
+      dist = sqrt((x - start(0)) * (x - start(0)) +
+                  (y - start(1)) * (y - start(1)) +
                   (z - start(2)) * (z - start(2)));
 
-      if (dist > maxDist) return;
+      if (dist > maxDist)
+        return;
 
       /*            if (output_points_cnt > 1500) {
                       std::cerr << "Error, too many racyast voxels." <<
@@ -97,7 +103,8 @@ void Raycast(const Eigen::Vector3d& start, const Eigen::Vector3d& end, const Eig
                   }*/
     }
 
-    if (x == endX && y == endY && z == endZ) break;
+    if (x == endX && y == endY && z == endZ)
+      break;
 
     // tMaxX stores the t-value at which we cross a cube boundary along the
     // X axis, and similarly for Y and Z. Therefore, choosing the least tMax
@@ -125,8 +132,9 @@ void Raycast(const Eigen::Vector3d& start, const Eigen::Vector3d& end, const Eig
   }
 }
 
-void Raycast(const Eigen::Vector3d& start, const Eigen::Vector3d& end, const Eigen::Vector3d& min,
-             const Eigen::Vector3d& max, std::vector<Eigen::Vector3d>* output) {
+void Raycast(const Eigen::Vector3d& start, const Eigen::Vector3d& end,
+             const Eigen::Vector3d& min, const Eigen::Vector3d& max,
+             std::vector<Eigen::Vector3d>* output) {
   //    std::cout << start << ' ' << end << std::endl;
   // From "A Fast Voxel Traversal Algorithm for Ray Tracing"
   // by John Amanatides and Andrew Woo, 1987
@@ -180,16 +188,19 @@ void Raycast(const Eigen::Vector3d& start, const Eigen::Vector3d& end, const Eig
   output->clear();
 
   // Avoids an infinite loop.
-  if (stepX == 0 && stepY == 0 && stepZ == 0) return;
+  if (stepX == 0 && stepY == 0 && stepZ == 0)
+    return;
 
   double dist = 0;
   while (true) {
-    if (x >= min.x() && x < max.x() && y >= min.y() && y < max.y() && z >= min.z() && z < max.z()) {
+    if (x >= min.x() && x < max.x() && y >= min.y() && y < max.y() &&
+        z >= min.z() && z < max.z()) {
       output->push_back(Eigen::Vector3d(x, y, z));
 
       dist = (Eigen::Vector3d(x, y, z) - start).squaredNorm();
 
-      if (dist > maxDist) return;
+      if (dist > maxDist)
+        return;
 
       if (output->size() > 1500) {
         std::cerr << "Error, too many racyast voxels." << std::endl;
@@ -197,7 +208,8 @@ void Raycast(const Eigen::Vector3d& start, const Eigen::Vector3d& end, const Eig
       }
     }
 
-    if (x == endX && y == endY && z == endZ) break;
+    if (x == endX && y == endY && z == endZ)
+      break;
 
     // tMaxX stores the t-value at which we cross a cube boundary along the
     // X axis, and similarly for Y and Z. Therefore, choosing the least tMax

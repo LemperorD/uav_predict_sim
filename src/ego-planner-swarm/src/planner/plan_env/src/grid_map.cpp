@@ -3,8 +3,7 @@
 // #define current_img_ md_.depth_image_[image_cnt_ & 1]
 // #define last_img_ md_.depth_image_[!(image_cnt_ & 1)]
 
-void GridMap::initMap(rclcpp::Node::SharedPtr node)
-{
+void GridMap::initMap(rclcpp::Node::SharedPtr node) {
   node_ = node;
 
   /* get parameter */
@@ -50,20 +49,29 @@ void GridMap::initMap(rclcpp::Node::SharedPtr node)
   node_->get_parameter("grid_map/map_size_x", x_size);
   node_->get_parameter("grid_map/map_size_y", y_size);
   node_->get_parameter("grid_map/map_size_z", z_size);
-  node_->get_parameter("grid_map/local_update_range_x", mp_.local_update_range_(0));
-  node_->get_parameter("grid_map/local_update_range_y", mp_.local_update_range_(1));
-  node_->get_parameter("grid_map/local_update_range_z", mp_.local_update_range_(2));
-  node_->get_parameter("grid_map/obstacles_inflation", mp_.obstacles_inflation_);
+  node_->get_parameter("grid_map/local_update_range_x",
+                       mp_.local_update_range_(0));
+  node_->get_parameter("grid_map/local_update_range_y",
+                       mp_.local_update_range_(1));
+  node_->get_parameter("grid_map/local_update_range_z",
+                       mp_.local_update_range_(2));
+  node_->get_parameter("grid_map/obstacles_inflation",
+                       mp_.obstacles_inflation_);
   node_->get_parameter("grid_map/fx", mp_.fx_);
   node_->get_parameter("grid_map/fy", mp_.fy_);
   node_->get_parameter("grid_map/cx", mp_.cx_);
   node_->get_parameter("grid_map/cy", mp_.cy_);
   node_->get_parameter("grid_map/use_depth_filter", mp_.use_depth_filter_);
-  node_->get_parameter("grid_map/depth_filter_tolerance", mp_.depth_filter_tolerance_);
-  node_->get_parameter("grid_map/depth_filter_maxdist", mp_.depth_filter_maxdist_);
-  node_->get_parameter("grid_map/depth_filter_mindist", mp_.depth_filter_mindist_);
-  node_->get_parameter("grid_map/depth_filter_margin", mp_.depth_filter_margin_);
-  node_->get_parameter("grid_map/k_depth_scaling_factor", mp_.k_depth_scaling_factor_);
+  node_->get_parameter("grid_map/depth_filter_tolerance",
+                       mp_.depth_filter_tolerance_);
+  node_->get_parameter("grid_map/depth_filter_maxdist",
+                       mp_.depth_filter_maxdist_);
+  node_->get_parameter("grid_map/depth_filter_mindist",
+                       mp_.depth_filter_mindist_);
+  node_->get_parameter("grid_map/depth_filter_margin",
+                       mp_.depth_filter_margin_);
+  node_->get_parameter("grid_map/k_depth_scaling_factor",
+                       mp_.k_depth_scaling_factor_);
   node_->get_parameter("grid_map/skip_pixel", mp_.skip_pixel_);
   node_->get_parameter("grid_map/p_hit", mp_.p_hit_);
   node_->get_parameter("grid_map/p_miss", mp_.p_miss_);
@@ -72,8 +80,10 @@ void GridMap::initMap(rclcpp::Node::SharedPtr node)
   node_->get_parameter("grid_map/p_occ", mp_.p_occ_);
   node_->get_parameter("grid_map/min_ray_length", mp_.min_ray_length_);
   node_->get_parameter("grid_map/max_ray_length", mp_.max_ray_length_);
-  node_->get_parameter("grid_map/visualization_truncate_height", mp_.visualization_truncate_height_);
-  node_->get_parameter("grid_map/virtual_ceil_height", mp_.virtual_ceil_height_);
+  node_->get_parameter("grid_map/visualization_truncate_height",
+                       mp_.visualization_truncate_height_);
+  node_->get_parameter("grid_map/virtual_ceil_height",
+                       mp_.virtual_ceil_height_);
   node_->get_parameter("grid_map/virtual_ceil_yp", mp_.virtual_ceil_yp_);
   node_->get_parameter("grid_map/virtual_ceil_yn", mp_.virtual_ceil_yn_);
   node_->get_parameter("grid_map/show_occ_time", mp_.show_occ_time_);
@@ -83,13 +93,13 @@ void GridMap::initMap(rclcpp::Node::SharedPtr node)
   node_->get_parameter("grid_map/ground_height", mp_.ground_height_);
   node_->get_parameter("grid_map/odom_depth_timeout", mp_.odom_depth_timeout_);
 
-  if (mp_.virtual_ceil_height_ - mp_.ground_height_ > z_size)
-  {
+  if (mp_.virtual_ceil_height_ - mp_.ground_height_ > z_size) {
     mp_.virtual_ceil_height_ = mp_.ground_height_ + z_size;
   }
 
   mp_.resolution_inv_ = 1 / mp_.resolution_;
-  mp_.map_origin_ = Eigen::Vector3d(-x_size / 2.0, -y_size / 2.0, mp_.ground_height_);
+  mp_.map_origin_ =
+      Eigen::Vector3d(-x_size / 2.0, -y_size / 2.0, mp_.ground_height_);
   mp_.map_size_ = Eigen::Vector3d(x_size, y_size, z_size);
 
   mp_.prob_hit_log_ = logit(mp_.p_hit_);
@@ -113,9 +123,11 @@ void GridMap::initMap(rclcpp::Node::SharedPtr node)
 
   // initialize data buffers
 
-  int buffer_size = mp_.map_voxel_num_(0) * mp_.map_voxel_num_(1) * mp_.map_voxel_num_(2);
+  int buffer_size =
+      mp_.map_voxel_num_(0) * mp_.map_voxel_num_(1) * mp_.map_voxel_num_(2);
 
-  md_.occupancy_buffer_ = vector<double>(buffer_size, mp_.clamp_min_log_ - mp_.unknown_flag_);
+  md_.occupancy_buffer_ =
+      vector<double>(buffer_size, mp_.clamp_min_log_ - mp_.unknown_flag_);
   md_.occupancy_buffer_inflate_ = vector<char>(buffer_size, 0);
 
   md_.count_hit_and_miss_ = vector<short>(buffer_size, 0);
@@ -128,61 +140,66 @@ void GridMap::initMap(rclcpp::Node::SharedPtr node)
   md_.proj_points_.resize(640 * 480 / mp_.skip_pixel_ / mp_.skip_pixel_);
   md_.proj_points_cnt = 0;
 
-  md_.cam2body_ << 0.0, 0.0, 1.0, 0.0,
-      -1.0, 0.0, 0.0, 0.0,
-      0.0, -1.0, 0.0, 0.0,
+  md_.cam2body_ << 0.0, 0.0, 1.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0,
       0.0, 0.0, 0.0, 1.0;
 
   /* init callback */
 
   // 初始化 message_filters::Subscriber
-  depth_sub_ = std::make_shared<message_filters::Subscriber<sensor_msgs::msg::Image>>(
-      node_, "grid_map/depth", rclcpp::QoS(50).get_rmw_qos_profile());
+  depth_sub_ =
+      std::make_shared<message_filters::Subscriber<sensor_msgs::msg::Image>>(
+          node_, "grid_map/depth", rclcpp::QoS(50).get_rmw_qos_profile());
 
   extrinsic_sub_ = node_->create_subscription<nav_msgs::msg::Odometry>(
       "/vins_estimator/extrinsic", 10,
       std::bind(&GridMap::extrinsicCallback, this, std::placeholders::_1));
 
-  if (mp_.pose_type_ == POSE_STAMPED)
-  {
-    pose_sub_ = std::make_shared<message_filters::Subscriber<geometry_msgs::msg::PoseStamped>>(
+  if (mp_.pose_type_ == POSE_STAMPED) {
+    pose_sub_ = std::make_shared<
+        message_filters::Subscriber<geometry_msgs::msg::PoseStamped>>(
         node_, "grid_map/pose", rclcpp::QoS(25).get_rmw_qos_profile());
 
-    sync_image_pose_ = std::make_shared<message_filters::Synchronizer<SyncPolicyImagePose>>(
-        SyncPolicyImagePose(100), *depth_sub_, *pose_sub_);
-    sync_image_pose_->registerCallback(
-        std::bind(&GridMap::depthPoseCallback, this, std::placeholders::_1, std::placeholders::_2));
-  }
-  else if (mp_.pose_type_ == ODOMETRY)
-  {
-    odom_sub_ = std::make_shared<message_filters::Subscriber<nav_msgs::msg::Odometry>>(
-        node_, "grid_map/odom", rclcpp::QoS(100).get_rmw_qos_profile());
+    sync_image_pose_ =
+        std::make_shared<message_filters::Synchronizer<SyncPolicyImagePose>>(
+            SyncPolicyImagePose(100), *depth_sub_, *pose_sub_);
+    sync_image_pose_->registerCallback(std::bind(&GridMap::depthPoseCallback,
+                                                 this, std::placeholders::_1,
+                                                 std::placeholders::_2));
+  } else if (mp_.pose_type_ == ODOMETRY) {
+    odom_sub_ =
+        std::make_shared<message_filters::Subscriber<nav_msgs::msg::Odometry>>(
+            node_, "grid_map/odom", rclcpp::QoS(100).get_rmw_qos_profile());
 
-    sync_image_odom_ = std::make_shared<message_filters::Synchronizer<SyncPolicyImageOdom>>(
-        SyncPolicyImageOdom(100), *depth_sub_, *odom_sub_);
-    sync_image_odom_->registerCallback(
-        std::bind(&GridMap::depthOdomCallback, this, std::placeholders::_1, std::placeholders::_2));
+    sync_image_odom_ =
+        std::make_shared<message_filters::Synchronizer<SyncPolicyImageOdom>>(
+            SyncPolicyImageOdom(100), *depth_sub_, *odom_sub_);
+    sync_image_odom_->registerCallback(std::bind(&GridMap::depthOdomCallback,
+                                                 this, std::placeholders::_1,
+                                                 std::placeholders::_2));
   }
 
   // 使用独立的里程计和点云订阅
   indep_cloud_sub_ = node_->create_subscription<sensor_msgs::msg::PointCloud2>(
-      "grid_map/cloud", 10, std::bind(&GridMap::cloudCallback, this, std::placeholders::_1));
+      "grid_map/cloud", 10,
+      std::bind(&GridMap::cloudCallback, this, std::placeholders::_1));
 
   indep_odom_sub_ = node_->create_subscription<nav_msgs::msg::Odometry>(
-      "grid_map/odom", 10, std::bind(&GridMap::odomCallback, this, std::placeholders::_1));
+      "grid_map/odom", 10,
+      std::bind(&GridMap::odomCallback, this, std::placeholders::_1));
 
   // 定时器
   occ_timer_ = node_->create_wall_timer(
       std::chrono::duration<double>(0.05),
       std::bind(&GridMap::updateOccupancyCallback, this));
 
-  vis_timer_ = node_->create_wall_timer(
-      std::chrono::duration<double>(0.11),
-      std::bind(&GridMap::visCallback, this));
+  vis_timer_ = node_->create_wall_timer(std::chrono::duration<double>(0.11),
+                                        std::bind(&GridMap::visCallback, this));
 
   // 发布者
-  map_pub_ = node_->create_publisher<sensor_msgs::msg::PointCloud2>("grid_map/occupancy", 10);
-  map_inf_pub_ = node_->create_publisher<sensor_msgs::msg::PointCloud2>("grid_map/occupancy_inflate", 10);
+  map_pub_ = node_->create_publisher<sensor_msgs::msg::PointCloud2>(
+      "grid_map/occupancy", 10);
+  map_inf_pub_ = node_->create_publisher<sensor_msgs::msg::PointCloud2>(
+      "grid_map/occupancy_inflate", 10);
 
   md_.occ_need_update_ = false;
   md_.local_updated_ = false;
@@ -205,8 +222,7 @@ void GridMap::initMap(rclcpp::Node::SharedPtr node)
   // eng_ = default_random_engine(rd());
 }
 
-void GridMap::resetBuffer()
-{
+void GridMap::resetBuffer() {
   Eigen::Vector3d min_pos = mp_.map_min_boundary_;
   Eigen::Vector3d max_pos = mp_.map_max_boundary_;
 
@@ -216,9 +232,7 @@ void GridMap::resetBuffer()
   md_.local_bound_max_ = mp_.map_voxel_num_ - Eigen::Vector3i::Ones();
 }
 
-void GridMap::resetBuffer(Eigen::Vector3d min_pos, Eigen::Vector3d max_pos)
-{
-
+void GridMap::resetBuffer(Eigen::Vector3d min_pos, Eigen::Vector3d max_pos) {
   Eigen::Vector3i min_id, max_id;
   posToIndex(min_pos, min_id);
   posToIndex(max_pos, max_id);
@@ -229,14 +243,12 @@ void GridMap::resetBuffer(Eigen::Vector3d min_pos, Eigen::Vector3d max_pos)
   /* reset occ and dist buffer */
   for (int x = min_id(0); x <= max_id(0); ++x)
     for (int y = min_id(1); y <= max_id(1); ++y)
-      for (int z = min_id(2); z <= max_id(2); ++z)
-      {
+      for (int z = min_id(2); z <= max_id(2); ++z) {
         md_.occupancy_buffer_inflate_[toAddress(x, y, z)] = 0;
       }
 }
 
-int GridMap::setCacheOccupancy(Eigen::Vector3d pos, int occ)
-{
+int GridMap::setCacheOccupancy(Eigen::Vector3d pos, int occ) {
   if (occ != 1 && occ != 0)
     return INVALID_IDX;
 
@@ -246,8 +258,7 @@ int GridMap::setCacheOccupancy(Eigen::Vector3d pos, int occ)
 
   md_.count_hit_and_miss_[idx_ctns] += 1;
 
-  if (md_.count_hit_and_miss_[idx_ctns] == 1)
-  {
+  if (md_.count_hit_and_miss_[idx_ctns] == 1) {
     md_.cache_voxel_.push(id);
   }
 
@@ -257,8 +268,7 @@ int GridMap::setCacheOccupancy(Eigen::Vector3d pos, int occ)
   return idx_ctns;
 }
 
-void GridMap::projectDepthImage()
-{
+void GridMap::projectDepthImage() {
   // md_.proj_points_.clear();
   md_.proj_points_cnt = 0;
 
@@ -272,15 +282,11 @@ void GridMap::projectDepthImage()
 
   Eigen::Matrix3d camera_r = md_.camera_r_m_;
 
-  if (!mp_.use_depth_filter_)
-  {
-    for (int v = 0; v < rows; v += skip_pix)
-    {
+  if (!mp_.use_depth_filter_) {
+    for (int v = 0; v < rows; v += skip_pix) {
       row_ptr = md_.depth_image_.ptr<uint16_t>(v);
 
-      for (int u = 0; u < cols; u += skip_pix)
-      {
-
+      for (int u = 0; u < cols; u += skip_pix) {
         Eigen::Vector3d proj_pt;
         depth = (*row_ptr++) / mp_.k_depth_scaling_factor_;
         proj_pt(0) = (u - mp_.cx_) * depth / mp_.fx_;
@@ -296,27 +302,22 @@ void GridMap::projectDepthImage()
     }
   }
   /* use depth filter */
-  else
-  {
-
+  else {
     if (!md_.has_first_depth_)
       md_.has_first_depth_ = true;
-    else
-    {
+    else {
       Eigen::Vector3d pt_cur, pt_world, pt_reproj;
 
       Eigen::Matrix3d last_camera_r_inv;
       last_camera_r_inv = md_.last_camera_r_m_.inverse();
       const double inv_factor = 1.0 / mp_.k_depth_scaling_factor_;
 
-      for (int v = mp_.depth_filter_margin_; v < rows - mp_.depth_filter_margin_; v += mp_.skip_pixel_)
-      {
+      for (int v = mp_.depth_filter_margin_;
+           v < rows - mp_.depth_filter_margin_; v += mp_.skip_pixel_) {
         row_ptr = md_.depth_image_.ptr<uint16_t>(v) + mp_.depth_filter_margin_;
 
-        for (int u = mp_.depth_filter_margin_; u < cols - mp_.depth_filter_margin_;
-             u += mp_.skip_pixel_)
-        {
-
+        for (int u = mp_.depth_filter_margin_;
+             u < cols - mp_.depth_filter_margin_; u += mp_.skip_pixel_) {
           depth = (*row_ptr) * inv_factor;
           row_ptr = row_ptr + mp_.skip_pixel_;
 
@@ -324,16 +325,11 @@ void GridMap::projectDepthImage()
           // depth += rand_noise_(eng_);
           // if (depth > 0.01) depth += rand_noise2_(eng_);
 
-          if (*row_ptr == 0)
-          {
+          if (*row_ptr == 0) {
             depth = mp_.max_ray_length_ + 0.1;
-          }
-          else if (depth < mp_.depth_filter_mindist_)
-          {
+          } else if (depth < mp_.depth_filter_mindist_) {
             continue;
-          }
-          else if (depth > mp_.depth_filter_maxdist_)
-          {
+          } else if (depth > mp_.depth_filter_maxdist_) {
             depth = mp_.max_ray_length_ + 0.1;
           }
 
@@ -350,22 +346,18 @@ void GridMap::projectDepthImage()
           md_.proj_points_[md_.proj_points_cnt++] = pt_world;
 
           // check consistency with last image, disabled...
-          if (false)
-          {
+          if (false) {
             pt_reproj = last_camera_r_inv * (pt_world - md_.last_camera_pos_);
             double uu = pt_reproj.x() * mp_.fx_ / pt_reproj.z() + mp_.cx_;
             double vv = pt_reproj.y() * mp_.fy_ / pt_reproj.z() + mp_.cy_;
 
-            if (uu >= 0 && uu < cols && vv >= 0 && vv < rows)
-            {
-              if (fabs(md_.last_depth_image_.at<uint16_t>((int)vv, (int)uu) * inv_factor -
-                       pt_reproj.z()) < mp_.depth_filter_tolerance_)
-              {
+            if (uu >= 0 && uu < cols && vv >= 0 && vv < rows) {
+              if (fabs(md_.last_depth_image_.at<uint16_t>((int)vv, (int)uu) *
+                           inv_factor -
+                       pt_reproj.z()) < mp_.depth_filter_tolerance_) {
                 md_.proj_points_[md_.proj_points_cnt++] = pt_world;
               }
-            }
-            else
-            {
+            } else {
               md_.proj_points_[md_.proj_points_cnt++] = pt_world;
             }
           }
@@ -381,8 +373,7 @@ void GridMap::projectDepthImage()
   md_.last_depth_image_ = md_.depth_image_;
 }
 
-void GridMap::raycastProcess()
-{
+void GridMap::raycastProcess() {
   // if (md_.proj_points_.size() == 0)
   if (md_.proj_points_cnt == 0)
     return;
@@ -407,34 +398,28 @@ void GridMap::raycastProcess()
   Eigen::Vector3d half = Eigen::Vector3d(0.5, 0.5, 0.5);
   Eigen::Vector3d ray_pt, pt_w;
 
-  for (int i = 0; i < md_.proj_points_cnt; ++i)
-  {
+  for (int i = 0; i < md_.proj_points_cnt; ++i) {
     pt_w = md_.proj_points_[i];
 
     // set flag for projected point
 
-    if (!isInMap(pt_w))
-    {
+    if (!isInMap(pt_w)) {
       pt_w = closetPointInMap(pt_w, md_.camera_pos_);
 
       length = (pt_w - md_.camera_pos_).norm();
-      if (length > mp_.max_ray_length_)
-      {
-        pt_w = (pt_w - md_.camera_pos_) / length * mp_.max_ray_length_ + md_.camera_pos_;
+      if (length > mp_.max_ray_length_) {
+        pt_w = (pt_w - md_.camera_pos_) / length * mp_.max_ray_length_ +
+               md_.camera_pos_;
       }
       vox_idx = setCacheOccupancy(pt_w, 0);
-    }
-    else
-    {
+    } else {
       length = (pt_w - md_.camera_pos_).norm();
 
-      if (length > mp_.max_ray_length_)
-      {
-        pt_w = (pt_w - md_.camera_pos_) / length * mp_.max_ray_length_ + md_.camera_pos_;
+      if (length > mp_.max_ray_length_) {
+        pt_w = (pt_w - md_.camera_pos_) / length * mp_.max_ray_length_ +
+               md_.camera_pos_;
         vox_idx = setCacheOccupancy(pt_w, 0);
-      }
-      else
-      {
+      } else {
         vox_idx = setCacheOccupancy(pt_w, 1);
       }
     }
@@ -449,22 +434,18 @@ void GridMap::raycastProcess()
 
     // raycasting between camera center and point
 
-    if (vox_idx != INVALID_IDX)
-    {
-      if (md_.flag_rayend_[vox_idx] == md_.raycast_num_)
-      {
+    if (vox_idx != INVALID_IDX) {
+      if (md_.flag_rayend_[vox_idx] == md_.raycast_num_) {
         continue;
-      }
-      else
-      {
+      } else {
         md_.flag_rayend_[vox_idx] = md_.raycast_num_;
       }
     }
 
-    raycaster.setInput(pt_w / mp_.resolution_, md_.camera_pos_ / mp_.resolution_);
+    raycaster.setInput(pt_w / mp_.resolution_,
+                       md_.camera_pos_ / mp_.resolution_);
 
-    while (raycaster.step(ray_pt))
-    {
+    while (raycaster.step(ray_pt)) {
       Eigen::Vector3d tmp = (ray_pt + half) * mp_.resolution_;
       length = (tmp - md_.camera_pos_).norm();
 
@@ -472,14 +453,10 @@ void GridMap::raycastProcess()
 
       vox_idx = setCacheOccupancy(tmp, 0);
 
-      if (vox_idx != INVALID_IDX)
-      {
-        if (md_.flag_traverse_[vox_idx] == md_.raycast_num_)
-        {
+      if (vox_idx != INVALID_IDX) {
+        if (md_.flag_traverse_[vox_idx] == md_.raycast_num_) {
           break;
-        }
-        else
-        {
+        } else {
           md_.flag_traverse_[vox_idx] = md_.raycast_num_;
         }
       }
@@ -514,54 +491,52 @@ void GridMap::raycastProcess()
 
   // std::cout << "cache all: " << md_.cache_voxel_.size() << std::endl;
 
-  while (!md_.cache_voxel_.empty())
-  {
-
+  while (!md_.cache_voxel_.empty()) {
     Eigen::Vector3i idx = md_.cache_voxel_.front();
     int idx_ctns = toAddress(idx);
     md_.cache_voxel_.pop();
 
     double log_odds_update =
-        md_.count_hit_[idx_ctns] >= md_.count_hit_and_miss_[idx_ctns] - md_.count_hit_[idx_ctns] ? mp_.prob_hit_log_ : mp_.prob_miss_log_;
+        md_.count_hit_[idx_ctns] >=
+                md_.count_hit_and_miss_[idx_ctns] - md_.count_hit_[idx_ctns]
+            ? mp_.prob_hit_log_
+            : mp_.prob_miss_log_;
 
     md_.count_hit_[idx_ctns] = md_.count_hit_and_miss_[idx_ctns] = 0;
 
-    if (log_odds_update >= 0 && md_.occupancy_buffer_[idx_ctns] >= mp_.clamp_max_log_)
-    {
+    if (log_odds_update >= 0 &&
+        md_.occupancy_buffer_[idx_ctns] >= mp_.clamp_max_log_) {
       continue;
-    }
-    else if (log_odds_update <= 0 && md_.occupancy_buffer_[idx_ctns] <= mp_.clamp_min_log_)
-    {
+    } else if (log_odds_update <= 0 &&
+               md_.occupancy_buffer_[idx_ctns] <= mp_.clamp_min_log_) {
       md_.occupancy_buffer_[idx_ctns] = mp_.clamp_min_log_;
       continue;
     }
 
-    bool in_local = idx(0) >= min_id(0) && idx(0) <= max_id(0) && idx(1) >= min_id(1) &&
-                    idx(1) <= max_id(1) && idx(2) >= min_id(2) && idx(2) <= max_id(2);
-    if (!in_local)
-    {
+    bool in_local = idx(0) >= min_id(0) && idx(0) <= max_id(0) &&
+                    idx(1) >= min_id(1) && idx(1) <= max_id(1) &&
+                    idx(2) >= min_id(2) && idx(2) <= max_id(2);
+    if (!in_local) {
       md_.occupancy_buffer_[idx_ctns] = mp_.clamp_min_log_;
     }
 
     md_.occupancy_buffer_[idx_ctns] =
-        std::min(std::max(md_.occupancy_buffer_[idx_ctns] + log_odds_update, mp_.clamp_min_log_),
+        std::min(std::max(md_.occupancy_buffer_[idx_ctns] + log_odds_update,
+                          mp_.clamp_min_log_),
                  mp_.clamp_max_log_);
   }
 }
 
-Eigen::Vector3d GridMap::closetPointInMap(const Eigen::Vector3d &pt, const Eigen::Vector3d &camera_pt)
-{
+Eigen::Vector3d GridMap::closetPointInMap(const Eigen::Vector3d &pt,
+                                          const Eigen::Vector3d &camera_pt) {
   Eigen::Vector3d diff = pt - camera_pt;
   Eigen::Vector3d max_tc = mp_.map_max_boundary_ - camera_pt;
   Eigen::Vector3d min_tc = mp_.map_min_boundary_ - camera_pt;
 
   double min_t = 1000000;
 
-  for (int i = 0; i < 3; ++i)
-  {
-    if (fabs(diff[i]) > 0)
-    {
-
+  for (int i = 0; i < 3; ++i) {
+    if (fabs(diff[i]) > 0) {
       double t1 = max_tc[i] / diff[i];
       if (t1 > 0 && t1 < min_t)
         min_t = t1;
@@ -575,74 +550,67 @@ Eigen::Vector3d GridMap::closetPointInMap(const Eigen::Vector3d &pt, const Eigen
   return camera_pt + (min_t - 1e-3) * diff;
 }
 
-void GridMap::clearAndInflateLocalMap()
-{
+void GridMap::clearAndInflateLocalMap() {
   /*clear outside local*/
   const int vec_margin = 5;
   // Eigen::Vector3i min_vec_margin = min_vec - Eigen::Vector3i(vec_margin,
   // vec_margin, vec_margin); Eigen::Vector3i max_vec_margin = max_vec +
   // Eigen::Vector3i(vec_margin, vec_margin, vec_margin);
 
-  Eigen::Vector3i min_cut = md_.local_bound_min_ -
-                            Eigen::Vector3i(mp_.local_map_margin_, mp_.local_map_margin_, mp_.local_map_margin_);
-  Eigen::Vector3i max_cut = md_.local_bound_max_ +
-                            Eigen::Vector3i(mp_.local_map_margin_, mp_.local_map_margin_, mp_.local_map_margin_);
+  Eigen::Vector3i min_cut =
+      md_.local_bound_min_ - Eigen::Vector3i(mp_.local_map_margin_,
+                                             mp_.local_map_margin_,
+                                             mp_.local_map_margin_);
+  Eigen::Vector3i max_cut =
+      md_.local_bound_max_ + Eigen::Vector3i(mp_.local_map_margin_,
+                                             mp_.local_map_margin_,
+                                             mp_.local_map_margin_);
   boundIndex(min_cut);
   boundIndex(max_cut);
 
-  Eigen::Vector3i min_cut_m = min_cut - Eigen::Vector3i(vec_margin, vec_margin, vec_margin);
-  Eigen::Vector3i max_cut_m = max_cut + Eigen::Vector3i(vec_margin, vec_margin, vec_margin);
+  Eigen::Vector3i min_cut_m =
+      min_cut - Eigen::Vector3i(vec_margin, vec_margin, vec_margin);
+  Eigen::Vector3i max_cut_m =
+      max_cut + Eigen::Vector3i(vec_margin, vec_margin, vec_margin);
   boundIndex(min_cut_m);
   boundIndex(max_cut_m);
 
   // clear data outside the local range
 
   for (int x = min_cut_m(0); x <= max_cut_m(0); ++x)
-    for (int y = min_cut_m(1); y <= max_cut_m(1); ++y)
-    {
-
-      for (int z = min_cut_m(2); z < min_cut(2); ++z)
-      {
+    for (int y = min_cut_m(1); y <= max_cut_m(1); ++y) {
+      for (int z = min_cut_m(2); z < min_cut(2); ++z) {
         int idx = toAddress(x, y, z);
         md_.occupancy_buffer_[idx] = mp_.clamp_min_log_ - mp_.unknown_flag_;
       }
 
-      for (int z = max_cut(2) + 1; z <= max_cut_m(2); ++z)
-      {
+      for (int z = max_cut(2) + 1; z <= max_cut_m(2); ++z) {
         int idx = toAddress(x, y, z);
         md_.occupancy_buffer_[idx] = mp_.clamp_min_log_ - mp_.unknown_flag_;
       }
     }
 
   for (int z = min_cut_m(2); z <= max_cut_m(2); ++z)
-    for (int x = min_cut_m(0); x <= max_cut_m(0); ++x)
-    {
-
-      for (int y = min_cut_m(1); y < min_cut(1); ++y)
-      {
+    for (int x = min_cut_m(0); x <= max_cut_m(0); ++x) {
+      for (int y = min_cut_m(1); y < min_cut(1); ++y) {
         int idx = toAddress(x, y, z);
         md_.occupancy_buffer_[idx] = mp_.clamp_min_log_ - mp_.unknown_flag_;
       }
 
-      for (int y = max_cut(1) + 1; y <= max_cut_m(1); ++y)
-      {
+      for (int y = max_cut(1) + 1; y <= max_cut_m(1); ++y) {
         int idx = toAddress(x, y, z);
         md_.occupancy_buffer_[idx] = mp_.clamp_min_log_ - mp_.unknown_flag_;
       }
     }
 
   for (int y = min_cut_m(1); y <= max_cut_m(1); ++y)
-    for (int z = min_cut_m(2); z <= max_cut_m(2); ++z)
-    {
-
-      for (int x = min_cut_m(0); x < min_cut(0); ++x)
-      {
+    for (int z = min_cut_m(2); z <= max_cut_m(2); ++z) {
+      for (int x = min_cut_m(0); x < min_cut(0); ++x) {
         int idx = toAddress(x, y, z);
         md_.occupancy_buffer_[idx] = mp_.clamp_min_log_ - mp_.unknown_flag_;
       }
 
-      for (int x = max_cut(0) + 1; x <= max_cut_m(0); ++x)
-      {
+      for (int x = max_cut(0) + 1; x <= max_cut_m(0); ++x) {
         int idx = toAddress(x, y, z);
         md_.occupancy_buffer_[idx] = mp_.clamp_min_log_ - mp_.unknown_flag_;
       }
@@ -659,28 +627,24 @@ void GridMap::clearAndInflateLocalMap()
   // clear outdated data
   for (int x = md_.local_bound_min_(0); x <= md_.local_bound_max_(0); ++x)
     for (int y = md_.local_bound_min_(1); y <= md_.local_bound_max_(1); ++y)
-      for (int z = md_.local_bound_min_(2); z <= md_.local_bound_max_(2); ++z)
-      {
+      for (int z = md_.local_bound_min_(2); z <= md_.local_bound_max_(2); ++z) {
         md_.occupancy_buffer_inflate_[toAddress(x, y, z)] = 0;
       }
 
   // inflate obstacles
   for (int x = md_.local_bound_min_(0); x <= md_.local_bound_max_(0); ++x)
     for (int y = md_.local_bound_min_(1); y <= md_.local_bound_max_(1); ++y)
-      for (int z = md_.local_bound_min_(2); z <= md_.local_bound_max_(2); ++z)
-      {
-
-        if (md_.occupancy_buffer_[toAddress(x, y, z)] > mp_.min_occupancy_log_)
-        {
+      for (int z = md_.local_bound_min_(2); z <= md_.local_bound_max_(2); ++z) {
+        if (md_.occupancy_buffer_[toAddress(x, y, z)] >
+            mp_.min_occupancy_log_) {
           inflatePoint(Eigen::Vector3i(x, y, z), inf_step, inf_pts);
 
-          for (int k = 0; k < (int)inf_pts.size(); ++k)
-          {
+          for (int k = 0; k < (int)inf_pts.size(); ++k) {
             inf_pt = inf_pts[k];
             int idx_inf = toAddress(inf_pt);
-            if (idx_inf < 0 ||
-                idx_inf >= mp_.map_voxel_num_(0) * mp_.map_voxel_num_(1) * mp_.map_voxel_num_(2))
-            {
+            if (idx_inf < 0 || idx_inf >= mp_.map_voxel_num_(0) *
+                                              mp_.map_voxel_num_(1) *
+                                              mp_.map_voxel_num_(2)) {
               continue;
             }
             md_.occupancy_buffer_inflate_[idx_inf] = 1;
@@ -689,37 +653,34 @@ void GridMap::clearAndInflateLocalMap()
       }
 
   // add virtual ceiling to limit flight height
-  if (mp_.virtual_ceil_height_ > -0.5)
-  {
-    int ceil_id = floor((mp_.virtual_ceil_height_ - mp_.map_origin_(2)) * mp_.resolution_inv_) - 1;
+  if (mp_.virtual_ceil_height_ > -0.5) {
+    int ceil_id = floor((mp_.virtual_ceil_height_ - mp_.map_origin_(2)) *
+                        mp_.resolution_inv_) -
+                  1;
     for (int x = md_.local_bound_min_(0); x <= md_.local_bound_max_(0); ++x)
-      for (int y = md_.local_bound_min_(1); y <= md_.local_bound_max_(1); ++y)
-      {
+      for (int y = md_.local_bound_min_(1); y <= md_.local_bound_max_(1); ++y) {
         md_.occupancy_buffer_inflate_[toAddress(x, y, ceil_id)] = 1;
       }
   }
 }
 
-void GridMap::visCallback()
-{
+void GridMap::visCallback() {
   publishMapInflate(true);
   publishMap();
 }
 
-void GridMap::updateOccupancyCallback()
-{
+void GridMap::updateOccupancyCallback() {
   if (md_.last_occ_update_time_.seconds() < 1.0)
     md_.last_occ_update_time_ = node_->now();
 
-  if (!md_.occ_need_update_)
-  {
+  if (!md_.occ_need_update_) {
     if (md_.flag_use_depth_fusion &&
-        (node_->now() - md_.last_occ_update_time_).seconds() > mp_.odom_depth_timeout_)
-    {
+        (node_->now() - md_.last_occ_update_time_).seconds() >
+            mp_.odom_depth_timeout_) {
       RCLCPP_ERROR(node_->get_logger(),
-                   "odom or depth lost! now=%f, last_occ_update_time=%f, odom_depth_timeout=%f",
-                   node_->now().seconds(),
-                   md_.last_occ_update_time_.seconds(),
+                   "odom or depth lost! now=%f, last_occ_update_time=%f, "
+                   "odom_depth_timeout=%f",
+                   node_->now().seconds(), md_.last_occ_update_time_.seconds(),
                    mp_.odom_depth_timeout_);
       md_.flag_depth_odom_timeout_ = true;
     }
@@ -742,57 +703,57 @@ void GridMap::updateOccupancyCallback()
   // t4 = ros::Time::now();
 
   // cout << setprecision(7);
-  // cout << "t2=" << (t2-t1).toSec() << " t3=" << (t3-t2).toSec() << " t4=" << (t4-t3).toSec() << endl;;
+  // cout << "t2=" << (t2-t1).toSec() << " t3=" << (t3-t2).toSec() << " t4=" <<
+  // (t4-t3).toSec() << endl;;
 
   // md_.fuse_time_ += (t2 - t1).toSec();
   // md_.max_fuse_time_ = max(md_.max_fuse_time_, (t2 - t1).toSec());
 
   // if (mp_.show_occ_time_)
-  //   ROS_WARN("Fusion: cur t = %lf, avg t = %lf, max t = %lf", (t2 - t1).toSec(),
+  //   ROS_WARN("Fusion: cur t = %lf, avg t = %lf, max t = %lf", (t2 -
+  //   t1).toSec(),
   //            md_.fuse_time_ / md_.update_num_, md_.max_fuse_time_);
 
   md_.occ_need_update_ = false;
   md_.local_updated_ = false;
 }
 
-void GridMap::depthPoseCallback(const sensor_msgs::msg::Image::ConstPtr &img,
-                                const geometry_msgs::msg::PoseStamped::ConstPtr &pose)
-{
+void GridMap::depthPoseCallback(
+    const sensor_msgs::msg::Image::ConstPtr &img,
+    const geometry_msgs::msg::PoseStamped::ConstPtr &pose) {
   /* get depth image */
   cv_bridge::CvImagePtr cv_ptr;
   cv_ptr = cv_bridge::toCvCopy(img, img->encoding);
 
-  if (img->encoding == sensor_msgs::image_encodings::TYPE_32FC1)
-  {
-    (cv_ptr->image).convertTo(cv_ptr->image, CV_16UC1, mp_.k_depth_scaling_factor_);
+  if (img->encoding == sensor_msgs::image_encodings::TYPE_32FC1) {
+    (cv_ptr->image)
+        .convertTo(cv_ptr->image, CV_16UC1, mp_.k_depth_scaling_factor_);
   }
   cv_ptr->image.copyTo(md_.depth_image_);
 
-  // std::cout << "depth: " << md_.depth_image_.cols << ", " << md_.depth_image_.rows << std::endl;
+  // std::cout << "depth: " << md_.depth_image_.cols << ", " <<
+  // md_.depth_image_.rows << std::endl;
 
   /* get pose */
   md_.camera_pos_(0) = pose->pose.position.x;
   md_.camera_pos_(1) = pose->pose.position.y;
   md_.camera_pos_(2) = pose->pose.position.z;
-  md_.camera_r_m_ = Eigen::Quaterniond(pose->pose.orientation.w, pose->pose.orientation.x,
-                                       pose->pose.orientation.y, pose->pose.orientation.z)
-                        .toRotationMatrix();
-  if (isInMap(md_.camera_pos_))
-  {
+  md_.camera_r_m_ =
+      Eigen::Quaterniond(pose->pose.orientation.w, pose->pose.orientation.x,
+                         pose->pose.orientation.y, pose->pose.orientation.z)
+          .toRotationMatrix();
+  if (isInMap(md_.camera_pos_)) {
     md_.has_odom_ = true;
     md_.update_num_ += 1;
     md_.occ_need_update_ = true;
-  }
-  else
-  {
+  } else {
     md_.occ_need_update_ = false;
   }
 
   md_.flag_use_depth_fusion = true;
 }
 
-void GridMap::odomCallback(const nav_msgs::msg::Odometry::SharedPtr odom)
-{
+void GridMap::odomCallback(const nav_msgs::msg::Odometry::SharedPtr odom) {
   if (md_.has_first_depth_)
     return;
 
@@ -803,16 +764,14 @@ void GridMap::odomCallback(const nav_msgs::msg::Odometry::SharedPtr odom)
   md_.has_odom_ = true;
 }
 
-void GridMap::cloudCallback(const sensor_msgs::msg::PointCloud2::ConstPtr &img)
-{
-
+void GridMap::cloudCallback(
+    const sensor_msgs::msg::PointCloud2::ConstPtr &img) {
   pcl::PointCloud<pcl::PointXYZ> latest_cloud;
   pcl::fromROSMsg(*img, latest_cloud);
 
   md_.has_cloud_ = true;
 
-  if (!md_.has_odom_)
-  {
+  if (!md_.has_odom_) {
     std::cout << "no odom!" << std::endl;
     return;
   }
@@ -820,7 +779,8 @@ void GridMap::cloudCallback(const sensor_msgs::msg::PointCloud2::ConstPtr &img)
   if (latest_cloud.points.size() == 0)
     return;
 
-  if (isnan(md_.camera_pos_(0)) || isnan(md_.camera_pos_(1)) || isnan(md_.camera_pos_(2)))
+  if (isnan(md_.camera_pos_(0)) || isnan(md_.camera_pos_(1)) ||
+      isnan(md_.camera_pos_(2)))
     return;
 
   this->resetBuffer(md_.camera_pos_ - mp_.local_update_range_,
@@ -842,8 +802,7 @@ void GridMap::cloudCallback(const sensor_msgs::msg::PointCloud2::ConstPtr &img)
   max_y = mp_.map_min_boundary_(1);
   max_z = mp_.map_min_boundary_(2);
 
-  for (size_t i = 0; i < latest_cloud.points.size(); ++i)
-  {
+  for (size_t i = 0; i < latest_cloud.points.size(); ++i) {
     pt = latest_cloud.points[i];
     p3d(0) = pt.x, p3d(1) = pt.y, p3d(2) = pt.z;
 
@@ -851,17 +810,14 @@ void GridMap::cloudCallback(const sensor_msgs::msg::PointCloud2::ConstPtr &img)
     Eigen::Vector3d devi = p3d - md_.camera_pos_;
     Eigen::Vector3i inf_pt;
 
-    if (fabs(devi(0)) < mp_.local_update_range_(0) && fabs(devi(1)) < mp_.local_update_range_(1) &&
-        fabs(devi(2)) < mp_.local_update_range_(2))
-    {
-
+    if (fabs(devi(0)) < mp_.local_update_range_(0) &&
+        fabs(devi(1)) < mp_.local_update_range_(1) &&
+        fabs(devi(2)) < mp_.local_update_range_(2)) {
       /* inflate the point */
       // 点云膨胀
       for (int x = -inf_step; x <= inf_step; ++x)
         for (int y = -inf_step; y <= inf_step; ++y)
-          for (int z = -inf_step_z; z <= inf_step_z; ++z)
-          {
-
+          for (int z = -inf_step_z; z <= inf_step_z; ++z) {
             p3d_inf(0) = pt.x + x * mp_.resolution_;
             p3d_inf(1) = pt.y + y * mp_.resolution_;
             p3d_inf(2) = pt.z + z * mp_.resolution_;
@@ -906,7 +862,9 @@ void GridMap::cloudCallback(const sensor_msgs::msg::PointCloud2::ConstPtr &img)
   // add virtual ceiling to limit flight height
   // 添加虚拟天花板控制飞行高度
   if (mp_.virtual_ceil_height_ > -0.5) {
-    int ceil_id = floor((mp_.virtual_ceil_height_ - mp_.map_origin_(2)) * mp_.resolution_inv_) - 1;
+    int ceil_id = floor((mp_.virtual_ceil_height_ - mp_.map_origin_(2)) *
+                        mp_.resolution_inv_) -
+                  1;
     for (int x = md_.local_bound_min_(0); x <= md_.local_bound_max_(0); ++x)
       for (int y = md_.local_bound_min_(1); y <= md_.local_bound_max_(1); ++y) {
         md_.occupancy_buffer_inflate_[toAddress(x, y, ceil_id)] = 1;
@@ -914,9 +872,7 @@ void GridMap::cloudCallback(const sensor_msgs::msg::PointCloud2::ConstPtr &img)
   }
 }
 
-void GridMap::publishMap()
-{
-
+void GridMap::publishMap() {
   if (map_pub_->get_subscription_count() <= 0)
     return;
 
@@ -935,8 +891,7 @@ void GridMap::publishMap()
 
   for (int x = min_cut(0); x <= max_cut(0); ++x)
     for (int y = min_cut(1); y <= max_cut(1); ++y)
-      for (int z = min_cut(2); z <= max_cut(2); ++z)
-      {
+      for (int z = min_cut(2); z <= max_cut(2); ++z) {
         if (md_.occupancy_buffer_[toAddress(x, y, z)] < mp_.min_occupancy_log_)
           continue;
 
@@ -961,10 +916,8 @@ void GridMap::publishMap()
   map_pub_->publish(cloud_msg);
 }
 
-void GridMap::publishMapInflate(bool all_info)
-{
-
-  if (map_inf_pub_->get_subscription_count()<= 0)
+void GridMap::publishMapInflate(bool all_info) {
+  if (map_inf_pub_->get_subscription_count() <= 0)
     return;
 
   pcl::PointXYZ pt;
@@ -973,8 +926,7 @@ void GridMap::publishMapInflate(bool all_info)
   Eigen::Vector3i min_cut = md_.local_bound_min_;
   Eigen::Vector3i max_cut = md_.local_bound_max_;
 
-  if (all_info)
-  {
+  if (all_info) {
     int lmm = mp_.local_map_margin_;
     min_cut -= Eigen::Vector3i(lmm, lmm, lmm);
     max_cut += Eigen::Vector3i(lmm, lmm, lmm);
@@ -985,8 +937,7 @@ void GridMap::publishMapInflate(bool all_info)
 
   for (int x = min_cut(0); x <= max_cut(0); ++x)
     for (int y = min_cut(1); y <= max_cut(1); ++y)
-      for (int z = min_cut(2); z <= max_cut(2); ++z)
-      {
+      for (int z = min_cut(2); z <= max_cut(2); ++z) {
         if (md_.occupancy_buffer_inflate_[toAddress(x, y, z)] == 0)
           continue;
 
@@ -1013,27 +964,31 @@ void GridMap::publishMapInflate(bool all_info)
   // RCLCPP_INFO(rclcpp::get_logger("publishMapInflate"), "pub map");
 }
 
-bool GridMap::odomValid() { return md_.has_odom_; }
+bool GridMap::odomValid() {
+  return md_.has_odom_;
+}
 
-bool GridMap::hasDepthObservation() { return md_.has_first_depth_; }
+bool GridMap::hasDepthObservation() {
+  return md_.has_first_depth_;
+}
 
-Eigen::Vector3d GridMap::getOrigin() { return mp_.map_origin_; }
+Eigen::Vector3d GridMap::getOrigin() {
+  return mp_.map_origin_;
+}
 
 // int GridMap::getVoxelNum() {
-//   return mp_.map_voxel_num_[0] * mp_.map_voxel_num_[1] * mp_.map_voxel_num_[2];
+//   return mp_.map_voxel_num_[0] * mp_.map_voxel_num_[1] *
+//   mp_.map_voxel_num_[2];
 // }
 
-void GridMap::getRegion(Eigen::Vector3d &ori, Eigen::Vector3d &size)
-{
+void GridMap::getRegion(Eigen::Vector3d &ori, Eigen::Vector3d &size) {
   ori = mp_.map_origin_, size = mp_.map_size_;
 }
 
-void GridMap::extrinsicCallback(const nav_msgs::msg::Odometry::ConstPtr &odom)
-{
-  Eigen::Quaterniond cam2body_q = Eigen::Quaterniond(odom->pose.pose.orientation.w,
-                                                     odom->pose.pose.orientation.x,
-                                                     odom->pose.pose.orientation.y,
-                                                     odom->pose.pose.orientation.z);
+void GridMap::extrinsicCallback(const nav_msgs::msg::Odometry::ConstPtr &odom) {
+  Eigen::Quaterniond cam2body_q = Eigen::Quaterniond(
+      odom->pose.pose.orientation.w, odom->pose.pose.orientation.x,
+      odom->pose.pose.orientation.y, odom->pose.pose.orientation.z);
   Eigen::Matrix3d cam2body_r_m = cam2body_q.toRotationMatrix();
   md_.cam2body_.block<3, 3>(0, 0) = cam2body_r_m;
   md_.cam2body_(0, 3) = odom->pose.pose.position.x;
@@ -1043,13 +998,11 @@ void GridMap::extrinsicCallback(const nav_msgs::msg::Odometry::ConstPtr &odom)
 }
 
 void GridMap::depthOdomCallback(const sensor_msgs::msg::Image::ConstPtr &img,
-                                const nav_msgs::msg::Odometry::ConstPtr &odom)
-{
+                                const nav_msgs::msg::Odometry::ConstPtr &odom) {
   /* get pose */
-  Eigen::Quaterniond body_q = Eigen::Quaterniond(odom->pose.pose.orientation.w,
-                                                 odom->pose.pose.orientation.x,
-                                                 odom->pose.pose.orientation.y,
-                                                 odom->pose.pose.orientation.z);
+  Eigen::Quaterniond body_q = Eigen::Quaterniond(
+      odom->pose.pose.orientation.w, odom->pose.pose.orientation.x,
+      odom->pose.pose.orientation.y, odom->pose.pose.orientation.z);
   Eigen::Matrix3d body_r_m = body_q.toRotationMatrix();
   Eigen::Matrix4d body2world;
   body2world.block<3, 3>(0, 0) = body_r_m;
@@ -1067,9 +1020,9 @@ void GridMap::depthOdomCallback(const sensor_msgs::msg::Image::ConstPtr &img,
   /* get depth image */
   cv_bridge::CvImagePtr cv_ptr;
   cv_ptr = cv_bridge::toCvCopy(img, img->encoding);
-  if (img->encoding == sensor_msgs::image_encodings::TYPE_32FC1)
-  {
-    (cv_ptr->image).convertTo(cv_ptr->image, CV_16UC1, mp_.k_depth_scaling_factor_);
+  if (img->encoding == sensor_msgs::image_encodings::TYPE_32FC1) {
+    (cv_ptr->image)
+        .convertTo(cv_ptr->image, CV_16UC1, mp_.k_depth_scaling_factor_);
   }
   cv_ptr->image.copyTo(md_.depth_image_);
 

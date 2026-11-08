@@ -42,7 +42,7 @@ kinematic_source → PositionCommand → EGO fake_drone → Odometry
 
 输入只有位置、速度、加速度与偏航等运动量，没有力/力矩或推力输入。此演示使用 EGO 的运动学仿真器，不启动完整 EGO 障碍地图、路径规划器或动力学控制器。`odometry_topic`、`command_topic` 可配置；接入已有仿真/实测里程计时可单独运行 `predictor_node --ros-args --params-file <yaml> -r odometry:=<topic>`，没有 truth 时不应把输出误差视作真实精度。
 
-- `trajectory`：`figure8` 三维八字、`straight` 匀速、`acceleration` 恒加速度。
+- `trajectory`：七种解析轨迹，详细参数和公式见下表。默认三维八字与原版一致；旧 YAML 不增加新参数也可运行。
 - `input_csv`：非空时替代内置轨迹，首行为 `t,px,py,pz,vx,vy,vz,ax,ay,az`。世界系、SI 单位、时间从 0 开始严格递增，覆盖整个 `duration`；采样间逐列线性插值。使用运动学一致的数据。
 - `sample_rate`：运动指令频率；EGO 原有里程计输出频率为 100 Hz。
 - `inject_noise`：对位置和世界系速度分别加入独立零均值高斯噪声；`position_noise_std`（m）、`velocity_noise_std`（m/s）、`noise_seed` 可调。种子固定随机序列，ROS 实时调度仍有微小时间差。
@@ -75,3 +75,52 @@ ROS_DOMAIN_ID=65 scripts/acceptance_check.py
 核心测试覆盖长序列有限性、概率归一化、协方差对称/半正定、噪声抑制、CV 外推、CA 模型响应、参数拒绝和预测不修改在线状态。集成检查真实启动 EGO fake_drone，覆盖带噪匀速、恒加速度、无噪三维轨迹、含空格 CSV 输入和自定义嵌套输出路径。
 
 当前噪声参数是演示起点。`metrics.json` 同时输出 NEES 与覆盖率用于协方差校准；默认参数不保证每个运动场景达到标称 2σ 覆盖率。录像记录每帧的实际采集时间，并按可变帧率编码；渲染低于目标帧率时仍保留真实播放时长。`frame_timestamps_file` 和 `video_manifest_file` 可配置时间表与编码清单位置。
+
+
+## 轨迹选择与调参
+
+修改 `config/simulation.yaml`，设置 `trajectory` 并为每次运行选择新的 `output_dir`，然后执行 `scripts/run_simulation.sh --headless`（需要窗口时去掉该选项）。这些参数改变发送给仿真无人机的运动指令，里程计经过原有 IMM 链路完成预测。
+
+所有位置/速度/加速度都在世界坐标系中，采用 m、s、rad。三元组按 x/y/z 排列，必须恰有三个有限数值。
+
+| trajectory | 运动与适用场景 | 有效参数 |
+| --- | --- | --- |
+| `hover` | 固定位置，检验静止时噪声抑制 | `trajectory_origin` |
+| `straight` | 匀速直线，检验 CV 外推 | origin、velocity |
+| `acceleration` | 恒加速度，检验 CA 响应 | origin、velocity、acceleration |
+| `circle` | 水平圆周，检验持续转弯 | origin（圆心）、radius、angular_speed、circle_phase |
+| `helix` | 水平圆周加匀速升降 | 圆周参数、vertical_speed |
+| `figure8` | 三维八字，检验变曲率运动 | origin（中心）、amplitude、frequency、phase；y 频率固定为 x 的两倍 |
+| `sinusoid` | 三轴独立正弦，可配置波浪或 Lissajous 运动 | origin（中心）、amplitude、frequency、phase |
+
+表中缩写均带 `trajectory_` 前缀。`origin` 默认 `[0,0,2]`，匀速的 `velocity` 默认 `[1,0.4,0]`，恒加速度的初速度默认 `[0,0.2,0]`，`acceleration` 默认 `[0.2,0,0]`。显式设置 `trajectory_velocity` 可覆盖初速度。
+
+直线/加速运动满足 `p = origin + velocity*t + acceleration*t²/2`（直线取零加速度）。正弦运动每轴为 `origin + amplitude*sin(frequency*t + phase)`；八字使用 `frequency_y = 2*frequency_x`，忽略配置中的第二个频率。其余频率为独立角频率（rad/s），周期为 `2π/|frequency|`；允许零频率、负频率和零幅值。相位不同或退化幅值可能改变八字的外形。
+
+圆周/螺旋为 `x = origin_x + radius*cos(angular_speed*t + circle_phase)`，`y = origin_y + radius*sin(...)`；圆周保持高度，螺旋为 `z = origin_z + vertical_speed*t`。默认半径 4 m、角速度 0.35 rad/s、相位 0、爬升速度 0.2 m/s。半径必须为正；负角速度反转方向，负爬升速度下降。圆心与起点不同，起点位于圆周上。所有轨迹同步发送解析位置、一阶速度和二阶加速度。
+
+仿真器按所选轨迹在 t=0 的位置初始化（包含相位；CSV 使用首行位置），避免首条指令到达前发布旧起点。初始静止速度在收到首条运动指令后更新。
+
+例如，保持其他参数，改成半径 3 m、每 20 秒一圈、以 0.1 m/s 爬升的螺旋：
+
+```yaml
+    output_dir: ../../../outputs/helix_trial_01
+    trajectory: helix
+    trajectory_origin: [0.0, 0.0, 2.0]
+    trajectory_radius: 3.0
+    trajectory_angular_speed: 0.3141592653589793
+    trajectory_vertical_speed: 0.1
+```
+
+`input_csv` 非空时覆盖内置轨迹，允许忽略的轨迹名称；其格式与线性插值规则保持不变。内置轨迹参数在启动时校验，非法名称、错误向量长度、非有限数值或无效半径会返回非零状态。轨迹不负责避障或高度约束，请按仿真场景选择参数。
+
+## C++ 格式
+
+根目录 `.clang-format` 以 Google C++ 风格为基础，关闭短函数、lambda、条件、循环和代码块的单行压缩，函数及类定义之间自动留空行。控制语句使用大括号，函数内部按逻辑步骤用空行分段。统一使用 clang-format 14，避免不同版本生成额外差异：
+
+```bash
+python3 scripts/format_cpp.py
+python3 scripts/format_cpp.py --check
+```
+
+脚本覆盖项目 C++ 头文件、源文件与 CUDA 文件，排除 `third_party`、bundled ODE/Boost、LBFGS 和 NVIDIA `helper_math.h`。不会改动 Python、YAML 或 CMake。轨迹测试 `trajectory_kinematics` 使用有限差分校验七种轨迹的位置/速度/加速度一致性；集成脚本覆盖七种轨迹、CSV 优先级与非法轨迹参数拒绝。

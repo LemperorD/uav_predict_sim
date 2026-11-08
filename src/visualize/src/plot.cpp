@@ -1,17 +1,21 @@
-#include "matplotlibcpp.h"
 #include <array>
 #include <cmath>
 #include <filesystem>
 #include <fstream>
 #include <sstream>
+
+#include "matplotlibcpp.h"
 namespace plt = matplotlibcpp;
+
 int main(int argc, char **argv) {
   try {
-    if (argc != 3)
+    if (argc != 3) {
       throw std::runtime_error("usage: prediction_plot samples.csv output.png");
+    }
     std::ifstream in(argv[1]);
-    if (!in)
+    if (!in) {
       throw std::runtime_error("cannot open samples CSV");
+    }
     std::string line;
     std::getline(in, line);
     std::array<std::vector<double>, 19> columns;
@@ -20,15 +24,18 @@ int main(int argc, char **argv) {
       std::string cell;
       std::array<double, 19> row{};
       for (int i = 0; i < 19; ++i) {
-        if (!std::getline(s, cell, ','))
+        if (!std::getline(s, cell, ',')) {
           throw std::runtime_error("invalid sample row");
+        }
         row[i] = std::stod(cell);
       }
-      for (int i = 0; i < 19; ++i)
+      for (int i = 0; i < 19; ++i) {
         columns[i].push_back(row[i]);
+      }
     }
-    if (columns[0].empty())
+    if (columns[0].empty()) {
       throw std::runtime_error("no samples to plot");
+    }
     auto &t = columns[0];
     plt::backend("Agg");
     plt::figure_size(1600, 1100);
@@ -53,8 +60,9 @@ int main(int argc, char **argv) {
     plt::title("Position covariance diagonal");
     for (int k = 0; k < 3; ++k) {
       auto variance = columns[10 + k];
-      for (auto &v : variance)
+      for (auto &v : variance) {
         v *= v;
+      }
       plt::named_plot("P" + std::string(2, "xyz"[k]), t, variance);
     }
     plt::xlabel("time (s)");
@@ -71,13 +79,15 @@ int main(int argc, char **argv) {
     plt::grid(true);
     plt::tight_layout();
     auto parent = std::filesystem::path(argv[2]).parent_path();
-    if (!parent.empty())
+    if (!parent.empty()) {
       std::filesystem::create_directories(parent);
+    }
     plt::save(argv[2]);
     plt::close();
   } catch (const std::exception &e) {
-    if (PyErr_Occurred())
+    if (PyErr_Occurred()) {
       PyErr_Print();
+    }
     std::cerr << e.what() << '\n';
     return 1;
   }

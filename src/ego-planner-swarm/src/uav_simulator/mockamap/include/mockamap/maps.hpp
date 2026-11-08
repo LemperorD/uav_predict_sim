@@ -1,16 +1,16 @@
 #ifndef MAPS_HPP
 #define MAPS_HPP
 
-#include <rclcpp/rclcpp.hpp>
-
 #include <pcl/point_cloud.h>
 #include <pcl_conversions/pcl_conversions.h>
+
+#include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
 
 namespace mocka {
 
 class Maps {
-public:
+ public:
   typedef struct BasicInfo {
     rclcpp::Node::SharedPtr node;
     int sizeX;
@@ -25,16 +25,16 @@ public:
   BasicInfo getInfo() const;
   void setInfo(const BasicInfo &value);
 
-public:
+ public:
   Maps();
 
-public:
+ public:
   void generate(int type);
 
-private:
+ private:
   BasicInfo info;
 
-private:
+ private:
   void pcl2ros();
 
   void perlin3D();
@@ -47,7 +47,7 @@ private:
 };
 
 class MazePoint {
-private:
+ private:
   pcl::PointXYZ point;
   double dist1;
   double dist2;
@@ -55,7 +55,7 @@ private:
   int point2;
   bool isdoor;
 
-public:
+ public:
   pcl::PointXYZ getPoint();
   int getPoint1();
   int getPoint2();
@@ -68,6 +68,6 @@ public:
   void setDist2(double set);
 };
 
-} // namespace mocka
+}  // namespace mocka
 
-#endif // MAPS_HPP
+#endif  // MAPS_HPP

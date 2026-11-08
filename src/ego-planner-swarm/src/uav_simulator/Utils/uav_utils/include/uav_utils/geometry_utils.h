@@ -243,6 +243,7 @@ Eigen::Matrix<typename Derived::Scalar, 3, 1> from_skew_symmetric(const Eigen::D
 
 
 }  // end of namespace uav_utils
+
 /* clang-format on */
 
 #endif

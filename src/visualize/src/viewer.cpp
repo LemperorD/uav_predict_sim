@@ -1,26 +1,30 @@
+#include <pangolin/display/default_font.h>
+#include <pangolin/image/image_io.h>
+#include <pangolin/pangolin.h>
+#include <pangolin/plot/plotter.h>
+
 #include <array>
 #include <deque>
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
 #include <nav_msgs/msg/path.hpp>
-#include <pangolin/display/default_font.h>
-#include <pangolin/image/image_io.h>
-#include <pangolin/pangolin.h>
-#include <pangolin/plot/plotter.h>
 #include <rclcpp/rclcpp.hpp>
 #include <sstream>
 #include <std_msgs/msg/float64_multi_array.hpp>
 #include <thread>
 
 using Point = std::array<double, 3>;
+
 void line(const std::deque<Point> &points, float r, float g, float b) {
   glColor3f(r, g, b);
   glBegin(GL_LINE_STRIP);
-  for (auto &p : points)
+  for (auto &p : points) {
     glVertex3dv(p.data());
+  }
   glEnd();
 }
+
 int main(int argc, char **argv) {
   rclcpp::init(argc, argv);
   try {
@@ -37,29 +41,35 @@ int main(int argc, char **argv) {
         node->declare_parameter<std::string>("output_dir", "outputs/demo"));
     auto frames = std::filesystem::path(
         node->declare_parameter<std::string>("frame_dir", "frames"));
-    if (frames.is_relative())
+    if (frames.is_relative()) {
       frames = output / frames;
+    }
     if (width <= 0 || height <= 0 || width % 2 || height % 2 || fps <= 0 ||
-        fps > 120)
+        fps > 120) {
       throw std::invalid_argument("invalid video dimensions/fps");
+    }
     std::ofstream frame_times;
     if (record) {
       std::filesystem::create_directories(frames);
       auto times_path =
           std::filesystem::path(node->declare_parameter<std::string>(
               "frame_timestamps_file", "frame_times.csv"));
-      if (times_path.is_relative())
+      if (times_path.is_relative()) {
         times_path = output / times_path;
-      if (!times_path.parent_path().empty())
+      }
+      if (!times_path.parent_path().empty()) {
         std::filesystem::create_directories(times_path.parent_path());
+      }
       frame_times.open(times_path);
-      if (!frame_times)
+      if (!frame_times) {
         throw std::runtime_error("cannot open frame timestamps file");
+      }
       frame_times << "frame,elapsed_s\n" << std::setprecision(12);
     }
-    pangolin::CreateWindowAndBind("UAV IMM-KF | truth green - observation gray "
-                                  "- estimate blue - forecast orange",
-                                  width, height);
+    pangolin::CreateWindowAndBind(
+        "UAV IMM-KF | truth green - observation gray "
+        "- estimate blue - forecast orange",
+        width, height);
     glEnable(GL_DEPTH_TEST);
     pangolin::OpenGlRenderState camera(
         pangolin::ProjectionMatrix(width * .62, height, 850, 850, width * .31,
@@ -86,11 +96,12 @@ int main(int argc, char **argv) {
                          pangolin::Colour(.2, .7, 1), "position error (m)");
     error_plot.AddSeries("$0", "$2", pangolin::DrawingModeLine,
                          pangolin::Colour(1, .6, .1), "horizon error (m)");
-    for (int i = 1; i <= 3; ++i)
+    for (int i = 1; i <= 3; ++i) {
       cov_plot.AddSeries(
           "$0", "$" + std::to_string(i) + "*$" + std::to_string(i),
           pangolin::DrawingModeLine, pangolin::Colour::Unspecified(),
           "P" + std::string(2, "xyz"[i - 1]) + " (m2)");
+    }
     prob_plot.AddSeries("$0", "$1", pangolin::DrawingModeLine,
                         pangolin::Colour(.2, .9, .4), "P(CV)");
     prob_plot.AddSeries("$0", "$2", pangolin::DrawingModeLine,
@@ -98,15 +109,17 @@ int main(int argc, char **argv) {
     error_plot.SetBounds(.67, 1, .62, 1);
     cov_plot.SetBounds(.34, .67, .62, 1);
     prob_plot.SetBounds(0, .34, .62, 1);
-    for (auto *p : plots)
+    for (auto *p : plots) {
       pangolin::DisplayBase().AddDisplay(*p);
+    }
     std::deque<Point> truth, measure, estimate, future;
     Point stddev = {0, 0, 0};
     double current_time = 0;
     auto metrics = node->create_subscription<std_msgs::msg::Float64MultiArray>(
         "metrics", 100, [&](const std_msgs::msg::Float64MultiArray &m) {
-          if (m.data.size() != 19)
+          if (m.data.size() != 19) {
             return;
+          }
           auto &d = m.data;
           current_time = d[0];
           truth.push_back({d[1], d[2], d[3]});
@@ -125,9 +138,10 @@ int main(int argc, char **argv) {
     auto path = node->create_subscription<nav_msgs::msg::Path>(
         "prediction", 10, [&](const nav_msgs::msg::Path &m) {
           future.clear();
-          for (auto &p : m.poses)
+          for (auto &p : m.poses) {
             future.push_back(
                 {p.pose.position.x, p.pose.position.y, p.pose.position.z});
+          }
         });
     auto next = std::chrono::steady_clock::now();
     int frame = 0;
@@ -155,8 +169,9 @@ int main(int argc, char **argv) {
       glColor3f(.55, .55, .6);
       glPointSize(2);
       glBegin(GL_POINTS);
-      for (auto &p : measure)
+      for (auto &p : measure) {
         glVertex3dv(p.data());
+      }
       glEnd();
       if (!estimate.empty()) {
         // Position marginal 2-sigma radii (axis-aligned; cross-correlation is
@@ -234,16 +249,19 @@ int main(int argc, char **argv) {
       pangolin::FinishFrame();
       next += std::chrono::microseconds(1000000 / fps);
       std::this_thread::sleep_until(next);
-      if (next < std::chrono::steady_clock::now() - std::chrono::seconds(1))
+      if (next < std::chrono::steady_clock::now() - std::chrono::seconds(1)) {
         next = std::chrono::steady_clock::now();
+      }
     }
   } catch (const std::exception &e) {
     RCLCPP_ERROR(rclcpp::get_logger("viewer"), "%s", e.what());
-    if (rclcpp::ok())
+    if (rclcpp::ok()) {
       rclcpp::shutdown();
+    }
     return 1;
   }
-  if (rclcpp::ok())
+  if (rclcpp::ok()) {
     rclcpp::shutdown();
+  }
   return 0;
 }

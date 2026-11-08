@@ -1,11 +1,12 @@
 /**
  * This file is part of Fast-Planner.
  *
- * Copyright 2019 Boyu Zhou, Aerial Robotics Group, Hong Kong University of Science and Technology, <uav.ust.hk>
- * Developed by Boyu Zhou <bzhouai at connect dot ust dot hk>, <uv dot boyuzhou at gmail dot com>
- * for more information see <https://github.com/HKUST-Aerial-Robotics/Fast-Planner>.
- * If you use this code, please cite the respective publications as
- * listed on the above website.
+ * Copyright 2019 Boyu Zhou, Aerial Robotics Group, Hong Kong University of
+ * Science and Technology, <uav.ust.hk> Developed by Boyu Zhou <bzhouai at
+ * connect dot ust dot hk>, <uv dot boyuzhou at gmail dot com> for more
+ * information see <https://github.com/HKUST-Aerial-Robotics/Fast-Planner>. If
+ * you use this code, please cite the respective publications as listed on the
+ * above website.
  *
  * Fast-Planner is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -39,151 +40,148 @@ using std::shared_ptr;
 using std::unique_ptr;
 using std::vector;
 
-namespace fast_planner
-{
-  class PolynomialPrediction;
-  typedef shared_ptr<vector<PolynomialPrediction>> ObjPrediction;
-  typedef shared_ptr<vector<Eigen::Vector3d>> ObjScale;
+namespace fast_planner {
+class PolynomialPrediction;
+typedef shared_ptr<vector<PolynomialPrediction>> ObjPrediction;
+typedef shared_ptr<vector<Eigen::Vector3d>> ObjScale;
 
-  /* ========== prediction polynomial ========== */
-  class PolynomialPrediction
-  {
-  private:
-    vector<Eigen::Matrix<double, 6, 1>> polys;
-    double t1, t2; // start / end
-    rclcpp::Time global_start_time_;
+/* ========== prediction polynomial ========== */
+class PolynomialPrediction {
+ private:
+  vector<Eigen::Matrix<double, 6, 1>> polys;
+  double t1, t2;  // start / end
+  rclcpp::Time global_start_time_;
 
-  public:
-    PolynomialPrediction(/* args */)
-    {
-    }
-    ~PolynomialPrediction()
-    {
-    }
+ public:
+  PolynomialPrediction(/* args */) {
+  }
 
-    void setPolynomial(vector<Eigen::Matrix<double, 6, 1>> &pls)
-    {
-      polys = pls;
-    }
-    void setTime(double t1, double t2)
-    {
-      this->t1 = t1;
-      this->t2 = t2;
-    }
-    void setGlobalStartTime(rclcpp::Time global_start_time)
-    {
-      global_start_time_ = global_start_time;
-    }
+  ~PolynomialPrediction() {
+  }
 
-    bool valid()
-    {
-      return polys.size() == 3;
-    }
+  void setPolynomial(vector<Eigen::Matrix<double, 6, 1>> &pls) {
+    polys = pls;
+  }
 
-    /* note that t should be in [t1, t2] */
-    Eigen::Vector3d evaluate(double t)
-    {
-      Eigen::Matrix<double, 6, 1> tv;
-      tv << 1.0, pow(t, 1), pow(t, 2), pow(t, 3), pow(t, 4), pow(t, 5);
+  void setTime(double t1, double t2) {
+    this->t1 = t1;
+    this->t2 = t2;
+  }
 
-      Eigen::Vector3d pt;
-      pt(0) = tv.dot(polys[0]), pt(1) = tv.dot(polys[1]), pt(2) = tv.dot(polys[2]);
+  void setGlobalStartTime(rclcpp::Time global_start_time) {
+    global_start_time_ = global_start_time;
+  }
 
-      return pt;
-    }
+  bool valid() {
+    return polys.size() == 3;
+  }
 
-    Eigen::Vector3d evaluateConstVel(double t)
-    {
-      Eigen::Matrix<double, 2, 1> tv;
-      tv << 1.0, pow(t - global_start_time_.seconds(), 1);
+  /* note that t should be in [t1, t2] */
+  Eigen::Vector3d evaluate(double t) {
+    Eigen::Matrix<double, 6, 1> tv;
+    tv << 1.0, pow(t, 1), pow(t, 2), pow(t, 3), pow(t, 4), pow(t, 5);
 
-      // cout << t-global_start_time_.toSec() << endl;
+    Eigen::Vector3d pt;
+    pt(0) = tv.dot(polys[0]), pt(1) = tv.dot(polys[1]),
+    pt(2) = tv.dot(polys[2]);
 
-      Eigen::Vector3d pt;
-      pt(0) = tv.dot(polys[0].head(2)), pt(1) = tv.dot(polys[1].head(2)), pt(2) = tv.dot(polys[2].head(2));
+    return pt;
+  }
 
-      return pt;
-    }
-  };
+  Eigen::Vector3d evaluateConstVel(double t) {
+    Eigen::Matrix<double, 2, 1> tv;
+    tv << 1.0, pow(t - global_start_time_.seconds(), 1);
 
-  /* ========== subscribe and record object history ========== */
-  class ObjHistory
-  {
-  public:
-    int skip_num_;
-    int queue_size_;
-    rclcpp::Time global_start_time_;
+    // cout << t-global_start_time_.toSec() << endl;
 
-    ObjHistory()
-    {
-    }
-    ~ObjHistory()
-    {
-    }
+    Eigen::Vector3d pt;
+    pt(0) = tv.dot(polys[0].head(2)), pt(1) = tv.dot(polys[1].head(2)),
+    pt(2) = tv.dot(polys[2].head(2));
 
-    void init(int id, int skip_num, int queue_size, rclcpp::Time global_start_time);
+    return pt;
+  }
+};
 
-    void poseCallback(const geometry_msgs::msg::PoseStamped::ConstPtr &msg);
+/* ========== subscribe and record object history ========== */
+class ObjHistory {
+ public:
+  int skip_num_;
+  int queue_size_;
+  rclcpp::Time global_start_time_;
 
-    void clear()
-    {
-      history_.clear();
-    }
+  ObjHistory() {
+  }
 
-    void getHistory(list<Eigen::Vector4d> &his)
-    {
-      his = history_;
-    }
+  ~ObjHistory() {
+  }
 
-  private:
-    list<Eigen::Vector4d> history_; // x,y,z;t
-    int skip_;
-    int obj_idx_;
-    Eigen::Vector3d scale_;
-  };
+  void init(int id, int skip_num, int queue_size,
+            rclcpp::Time global_start_time);
 
-  /* ========== predict future trajectory using history ========== */
-  class ObjPredictor : public rclcpp::Node
-  {
-  private:
-    int obj_num_;
-    double lambda_;
-    double predict_rate_;
+  void poseCallback(const geometry_msgs::msg::PoseStamped::ConstPtr &msg);
 
-    vector<rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr> pose_subs_;
-    rclcpp::Subscription<visualization_msgs::msg::Marker>::SharedPtr marker_sub_;
-    rclcpp::TimerBase::SharedPtr predict_timer_;
-    vector<std::shared_ptr<ObjHistory>> obj_histories_;
+  void clear() {
+    history_.clear();
+  }
 
-    /* share data with planner */
-    ObjPrediction predict_trajs_;
-    ObjScale obj_scale_;
-    vector<bool> scale_init_;
+  void getHistory(list<Eigen::Vector4d> &his) {
+    his = history_;
+  }
 
-    void markerCallback(const visualization_msgs::msg::Marker::ConstPtr &msg);
+ private:
+  list<Eigen::Vector4d> history_;  // x,y,z;t
+  int skip_;
+  int obj_idx_;
+  Eigen::Vector3d scale_;
+};
 
-    void predictCallback(); // ROS2 的定时器回调不需要 TimerEvent
-    void predictPolyFit();
-    void predictConstVel();
+/* ========== predict future trajectory using history ========== */
+class ObjPredictor : public rclcpp::Node {
+ private:
+  int obj_num_;
+  double lambda_;
+  double predict_rate_;
 
-  public:
-    ObjPredictor(const std::string &node_name = "obj_predictor")
-        : Node(node_name) {}
+  vector<rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr>
+      pose_subs_;
+  rclcpp::Subscription<visualization_msgs::msg::Marker>::SharedPtr marker_sub_;
+  rclcpp::TimerBase::SharedPtr predict_timer_;
+  vector<std::shared_ptr<ObjHistory>> obj_histories_;
 
-    ~ObjPredictor() {}
+  /* share data with planner */
+  ObjPrediction predict_trajs_;
+  ObjScale obj_scale_;
+  vector<bool> scale_init_;
 
-    void init();
+  void markerCallback(const visualization_msgs::msg::Marker::ConstPtr &msg);
 
-    ObjPrediction getPredictionTraj();
-    ObjScale getObjScale();
-    int getObjNums() { return obj_num_; }
+  void predictCallback();  // ROS2 的定时器回调不需要 TimerEvent
+  void predictPolyFit();
+  void predictConstVel();
 
-    Eigen::Vector3d evaluatePoly(int obs_id, double time);
-    Eigen::Vector3d evaluateConstVel(int obs_id, double time);
+ public:
+  ObjPredictor(const std::string &node_name = "obj_predictor")
+      : Node(node_name) {
+  }
 
-    typedef std::shared_ptr<ObjPredictor> Ptr;
-  };
+  ~ObjPredictor() {
+  }
 
-} // namespace fast_planner
+  void init();
+
+  ObjPrediction getPredictionTraj();
+  ObjScale getObjScale();
+
+  int getObjNums() {
+    return obj_num_;
+  }
+
+  Eigen::Vector3d evaluatePoly(int obs_id, double time);
+  Eigen::Vector3d evaluateConstVel(int obs_id, double time);
+
+  typedef std::shared_ptr<ObjPredictor> Ptr;
+};
+
+}  // namespace fast_planner
 
 #endif
