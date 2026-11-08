@@ -1,11 +1,26 @@
+# 基础风格
 BasedOnStyle: Google
-DeriveLineEnding: false
-UseCRLF: false
-AllowShortBlocksOnASingleLine: Never
-AllowShortEnumsOnASingleLine: false
-AllowShortFunctionsOnASingleLine: None
-AllowShortLambdasOnASingleLine: None
-AllowShortIfStatementsOnASingleLine: Never
-AllowShortLoopsOnASingleLine: false
-AllowShortCaseLabelsOnASingleLine: false
-SeparateDefinitionBlocks: Always
+IndentWidth: 4              # 缩进宽度
+TabWidth: 4                 # Tab 显示宽度
+UseTab: Never               # 不使用 Tab，统一用空格
+
+# 换行与空格
+ColumnLimit: 100            # 每行最大字符数（超过会自动换行）
+BreakBeforeBraces: Allman   # 大括号换行风格（Allman: 每个大括号单独一行）
+SpacesBeforeTrailingComments: 2  # 行尾注释前空格数
+SpaceAfterCStyleCast: true  # C风格类型转换后加空格
+
+# 对齐与缩进
+AlignConsecutiveAssignments: true  # 对齐连续赋值
+AlignConsecutiveDeclarations: true # 对齐连续声明
+AlignTrailingComments: true        # 对齐行尾注释
+IndentCaseLabels: true              # switch case 缩进
+
+# 指针与引用
+PointerAlignment: Left              # 指针符号靠近变量名
+ReferenceAlignment: Left            # 引用符号靠近变量名
+
+# 其他
+SortIncludes: true                  # 自动排序 #include
+IncludeBlocks: Preserve             # 保留原有 include 分组
+NamespaceIndentation: All           # 命名空间内全部缩进

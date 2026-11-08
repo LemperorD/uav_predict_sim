@@ -17,72 +17,65 @@
 // disable checked iterator warning for msvc
 #include <boost/config.hpp>
 #ifdef BOOST_MSVC
-    #pragma warning(disable:4996)
+#pragma warning(disable : 4996)
 #endif
 
 #define BOOST_TEST_MODULE odeint_is_resizeable
 
-#include <vector>
 #include <cmath>
+#include <vector>
 
 #include <boost/test/unit_test.hpp>
 
-#include <boost/numeric/odeint/util/is_resizeable.hpp>
 #include <boost/fusion/include/vector.hpp>
+#include <boost/numeric/odeint/util/is_resizeable.hpp>
+#include <boost/units/systems/si/acceleration.hpp>
+#include <boost/units/systems/si/io.hpp>
 #include <boost/units/systems/si/length.hpp>
 #include <boost/units/systems/si/time.hpp>
 #include <boost/units/systems/si/velocity.hpp>
-#include <boost/units/systems/si/acceleration.hpp>
-#include <boost/units/systems/si/io.hpp>
-
 
 using namespace boost::unit_test;
 using namespace boost::numeric::odeint;
 
-BOOST_AUTO_TEST_CASE( test_vector )
+BOOST_AUTO_TEST_CASE(test_vector) { BOOST_CHECK(is_resizeable<std::vector<int> >::value); }
+
+BOOST_AUTO_TEST_CASE(test_double) { BOOST_CHECK(!(is_resizeable<double>::value)); }
+
+BOOST_AUTO_TEST_CASE(test_fusion_vector_of_vector)
 {
-    BOOST_CHECK( is_resizeable< std::vector< int > >::value );
+    typedef boost::fusion::vector<std::vector<double>, std::vector<double> > state_type;
+    BOOST_CHECK(is_resizeable<state_type>::value);
 }
 
-BOOST_AUTO_TEST_CASE( test_double )
+BOOST_AUTO_TEST_CASE(test_fusion_vector_of_double)
 {
-    BOOST_CHECK( !( is_resizeable< double >::value ) );
+    typedef boost::fusion::vector<double, double> state_type;
+    BOOST_CHECK(!(is_resizeable<state_type>::value));
 }
 
-BOOST_AUTO_TEST_CASE( test_fusion_vector_of_vector )
+BOOST_AUTO_TEST_CASE(test_fusion_vector_mixed1)
 {
-    typedef boost::fusion::vector< std::vector< double > , std::vector< double > > state_type;
-    BOOST_CHECK( is_resizeable< state_type >::value );
+    typedef boost::fusion::vector<double, std::vector<double> > state_type;
+    BOOST_CHECK(is_resizeable<state_type>::value);
 }
 
-BOOST_AUTO_TEST_CASE( test_fusion_vector_of_double )
+BOOST_AUTO_TEST_CASE(test_fusion_vector_mixed2)
 {
-    typedef boost::fusion::vector< double , double > state_type;
-    BOOST_CHECK( !( is_resizeable< state_type >::value ) );
+    typedef boost::fusion::vector<std::vector<double>, double> state_type;
+    BOOST_CHECK(is_resizeable<state_type>::value);
 }
 
-BOOST_AUTO_TEST_CASE( test_fusion_vector_mixed1 )
-{
-    typedef boost::fusion::vector< double , std::vector< double > > state_type;
-    BOOST_CHECK( is_resizeable< state_type >::value);
-}
-
-BOOST_AUTO_TEST_CASE( test_fusion_vector_mixed2 )
-{
-    typedef boost::fusion::vector< std::vector< double > , double > state_type;
-    BOOST_CHECK( is_resizeable< state_type >::value );
-}
-
-BOOST_AUTO_TEST_CASE( test_fusion_quantity_sequence )
+BOOST_AUTO_TEST_CASE(test_fusion_quantity_sequence)
 {
     namespace units = boost::units;
-    namespace si = boost::units::si;
+    namespace si    = boost::units::si;
 
-    typedef double value_type;
-    typedef units::quantity< si::time , value_type > time_type;
-    typedef units::quantity< si::length , value_type > length_type;
-    typedef units::quantity< si::velocity , value_type > velocity_type;
-    typedef boost::fusion::vector< length_type , velocity_type > state_type;
+    typedef double                                            value_type;
+    typedef units::quantity<si::time, value_type>             time_type;
+    typedef units::quantity<si::length, value_type>           length_type;
+    typedef units::quantity<si::velocity, value_type>         velocity_type;
+    typedef boost::fusion::vector<length_type, velocity_type> state_type;
 
-    BOOST_CHECK( !( is_resizeable< state_type >::value ) );
+    BOOST_CHECK(!(is_resizeable<state_type>::value));
 }

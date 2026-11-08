@@ -14,37 +14,25 @@
   copy at http://www.boost.org/LICENSE_1_0.txt)
 */
 
-
 #ifndef LIBS_NUMERIC_ODEINT_TEST_CONST_RANGE_HPP_DEFINED
 #define LIBS_NUMERIC_ODEINT_TEST_CONST_RANGE_HPP_DEFINED
 
 #include <boost/mpl/copy.hpp>
-#include <boost/mpl/inserter.hpp>
-#include <boost/mpl/insert.hpp>
 #include <boost/mpl/end.hpp>
-#include <boost/mpl/vector.hpp>
-#include <boost/mpl/range_c.hpp>
+#include <boost/mpl/insert.hpp>
+#include <boost/mpl/inserter.hpp>
 #include <boost/mpl/placeholders.hpp>
-
+#include <boost/mpl/range_c.hpp>
+#include <boost/mpl/vector.hpp>
 
 namespace mpl = boost::mpl;
 
-
-
-template< class N , class T >
+template <class N, class T>
 struct const_range
 {
     typedef typename mpl::copy<
-        mpl::range_c< typename N::value_type , 0 , N::value > ,
-        mpl::inserter<
-            mpl::vector0<> ,
-            mpl::insert<
-                mpl::_1 ,
-                mpl::end< mpl::_1 > ,
-                T
-                >
-            >
-        >::type type;
+        mpl::range_c<typename N::value_type, 0, N::value>,
+        mpl::inserter<mpl::vector0<>, mpl::insert<mpl::_1, mpl::end<mpl::_1>, T> > >::type type;
 };
 
-#endif // LIBS_NUMERIC_ODEINT_TEST_CONST_RANGE_HPP_DEFINED
+#endif  // LIBS_NUMERIC_ODEINT_TEST_CONST_RANGE_HPP_DEFINED

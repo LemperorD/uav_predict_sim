@@ -1,11 +1,11 @@
 #ifndef LBFGS_HPP
 #define LBFGS_HPP
 
+#include <cmath>
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <cmath>
 
 namespace lbfgs
 {
@@ -13,7 +13,7 @@ namespace lbfgs
 
     /**
      *  Return values of lbfgs_optimize().
-     * 
+     *
      * Roughly speaking, a negative value indicates an error.
      */
 
@@ -175,7 +175,7 @@ namespace lbfgs
          *  iteration (which is sometimes the case when solving very large
          *  problems) it may be advantageous to set this parameter to a small
          *  value. A typical small value is 0.1. This parameter shuold be
-         *  greater than the f_dec_coeff parameter (1e-4) 
+         *  greater than the f_dec_coeff parameter (1e-4)
          *  and smaller than 1.0.
          */
         double s_curv_coeff;
@@ -197,7 +197,7 @@ namespace lbfgs
      *  function and its gradients when needed. A client program must implement
      *  this function to evaluate the values of the objective function and its
      *  gradients, given current values of variables.
-     *  
+     *
      *  @param  instance    The user data sent for lbfgs_optimize() function by the client.
      *  @param  x           The current values of variables.
      *  @param  g           The gradient vector. The callback function must compute
@@ -206,20 +206,17 @@ namespace lbfgs
      *  @retval double      The value of the objective function for the current
      *                          variables.
      */
-    typedef double (*lbfgs_evaluate_t)(void *instance,
-                                       const double *x,
-                                       double *g,
-                                       const int n);
+    typedef double (*lbfgs_evaluate_t)(void *instance, const double *x, double *g, const int n);
 
     /**
      * Callback interface to provide an upper bound at the beginning of current linear search.
      *
      *  The lbfgs_optimize() function call this function to obtain the values of the
      *  upperbound of the stepsize to search in, provided with the beginning values of
-     *  variables before the linear search, and the current step vector (can be descent direction). 
-     *  A client program can implement this function for more efficient linesearch. 
+     *  variables before the linear search, and the current step vector (can be descent direction).
+     *  A client program can implement this function for more efficient linesearch.
      *  If it is not used, just set it NULL or nullptr.
-     *  
+     *
      *  @param  instance    The user data sent for lbfgs_optimize() function by the client.
      *  @param  xp          The values of variables before current line search.
      *  @param  d           The step vector. It can be the descent direction.
@@ -227,9 +224,7 @@ namespace lbfgs
      *  @retval double      The upperboud of the step in current line search routine,
      *                      such that stpbound*d is the maximum reasonable step.
      */
-    typedef double (*lbfgs_stepbound_t)(void *instance,
-                                        const double *xp,
-                                        const double *d,
+    typedef double (*lbfgs_stepbound_t)(void *instance, const double *xp, const double *d,
                                         const int n);
 
     /**
@@ -252,16 +247,9 @@ namespace lbfgs
      *  @retval int         Zero to continue the optimization process. Returning a
      *                      non-zero value will cancel the optimization process.
      */
-    typedef int (*lbfgs_progress_t)(void *instance,
-                                    const double *x,
-                                    const double *g,
-                                    const double fx,
-                                    const double xnorm,
-                                    const double gnorm,
-                                    const double step,
-                                    int n,
-                                    int k,
-                                    int ls);
+    typedef int (*lbfgs_progress_t)(void *instance, const double *x, const double *g,
+                                    const double fx, const double xnorm, const double gnorm,
+                                    const double step, int n, int k, int ls);
 
     /**
      * Callback data struct
@@ -269,11 +257,11 @@ namespace lbfgs
 
     struct callback_data_t
     {
-        int n;
-        void *instance;
-        lbfgs_evaluate_t proc_evaluate;
+        int               n;
+        void             *instance;
+        lbfgs_evaluate_t  proc_evaluate;
         lbfgs_stepbound_t proc_stepbound;
-        lbfgs_progress_t proc_progress;
+        lbfgs_progress_t  proc_progress;
     };
 
     /**
@@ -281,10 +269,10 @@ namespace lbfgs
      */
     struct iteration_data_t
     {
-        double alpha;
-        double *s; /* [n] */
-        double *y; /* [n] */
-        double ys; /* vecdot(y, s) */
+        double  alpha;
+        double *s;  /* [n] */
+        double *y;  /* [n] */
+        double  ys; /* vecdot(y, s) */
     };
 
     // ----------------------- Arithmetic Part -----------------------
@@ -292,8 +280,7 @@ namespace lbfgs
 /**
  * Define the local variables for computing minimizers.
  */
-#define USES_MINIMIZER_LBFGS \
-    double a, d, gamm, theta, p, q, r, s;
+#define USES_MINIMIZER_LBFGS double a, d, gamm, theta, p, q, r, s;
 
 /**
  * Find a minimizer of an interpolated cubic function.
@@ -306,21 +293,20 @@ namespace lbfgs
  *  @param  du      The value of f'(v).
  */
 #define CUBIC_MINIMIZER_LBFGS(cm, u, fu, du, v, fv, dv) \
-    d = (v) - (u);                                      \
+    d     = (v) - (u);                                  \
     theta = ((fu) - (fv)) * 3 / d + (du) + (dv);        \
-    p = fabs(theta);                                    \
-    q = fabs(du);                                       \
-    r = fabs(dv);                                       \
-    s = p >= q ? p : q;                                 \
-    s = s >= r ? s : r;                                 \
+    p     = fabs(theta);                                \
+    q     = fabs(du);                                   \
+    r     = fabs(dv);                                   \
+    s     = p >= q ? p : q;                             \
+    s     = s >= r ? s : r;                             \
     /* gamm = s*sqrt((theta/s)**2 - (du/s) * (dv/s)) */ \
-    a = theta / s;                                      \
+    a    = theta / s;                                   \
     gamm = s * sqrt(a * a - ((du) / s) * ((dv) / s));   \
-    if ((v) < (u))                                      \
-        gamm = -gamm;                                   \
-    p = gamm - (du) + theta;                            \
-    q = gamm - (du) + gamm + (dv);                      \
-    r = p / q;                                          \
+    if ((v) < (u)) gamm = -gamm;                        \
+    p    = gamm - (du) + theta;                         \
+    q    = gamm - (du) + gamm + (dv);                   \
+    r    = p / q;                                       \
     (cm) = (u) + r * d;
 
 /**
@@ -336,25 +322,24 @@ namespace lbfgs
  *  @param  xmin    The minimum value.
  */
 #define CUBIC_MINIMIZER2_LBFGS(cm, u, fu, du, v, fv, dv, xmin, xmax) \
-    d = (v) - (u);                                                   \
+    d     = (v) - (u);                                               \
     theta = ((fu) - (fv)) * 3 / d + (du) + (dv);                     \
-    p = fabs(theta);                                                 \
-    q = fabs(du);                                                    \
-    r = fabs(dv);                                                    \
-    s = p >= q ? p : q;                                              \
-    s = s >= r ? s : r;                                              \
+    p     = fabs(theta);                                             \
+    q     = fabs(du);                                                \
+    r     = fabs(dv);                                                \
+    s     = p >= q ? p : q;                                          \
+    s     = s >= r ? s : r;                                          \
     /* gamm = s*sqrt((theta/s)**2 - (du/s) * (dv/s)) */              \
-    a = theta / s;                                                   \
+    a    = theta / s;                                                \
     gamm = a * a - ((du) / s) * ((dv) / s);                          \
     gamm = gamm > 0 ? s * sqrt(gamm) : 0;                            \
-    if ((u) < (v))                                                   \
-        gamm = -gamm;                                                \
+    if ((u) < (v)) gamm = -gamm;                                     \
     p = gamm - (dv) + theta;                                         \
     q = gamm - (dv) + gamm + (du);                                   \
     r = p / q;                                                       \
     if (r < 0. && gamm != 0.)                                        \
     {                                                                \
-        (cm) = (v)-r * d;                                            \
+        (cm) = (v) -r * d;                                           \
     }                                                                \
     else if (a < 0)                                                  \
     {                                                                \
@@ -375,7 +360,7 @@ namespace lbfgs
  *  @param  fv      The value of f(v).
  */
 #define QUARD_MINIMIZER_LBFGS(qm, u, fu, du, v, fv) \
-    a = (v) - (u);                                  \
+    a    = (v) - (u);                               \
     (qm) = (u) + (du) / (((fu) - (fv)) / a + (du)) / 2 * a;
 
 /**
@@ -387,7 +372,7 @@ namespace lbfgs
  *  @param  dv      The value of f'(v).
  */
 #define QUARD_MINIMIZER2_LBFGS(qm, u, du, v, dv) \
-    a = (u) - (v);                               \
+    a    = (u) - (v);                            \
     (qm) = (v) + (dv) / ((dv) - (du)) * a;
 
     inline void *vecalloc(size_t size)
@@ -400,10 +385,7 @@ namespace lbfgs
         return memblock;
     }
 
-    inline void vecfree(void *memblock)
-    {
-        free(memblock);
-    }
+    inline void vecfree(void *memblock) { free(memblock); }
 
     inline void veccpy(double *y, const double *x, const int n)
     {
@@ -463,13 +445,13 @@ namespace lbfgs
     inline void vec2norm(double *s, const double *x, const int n)
     {
         vecdot(s, x, x, n);
-        *s = (double)sqrt(*s);
+        *s = (double) sqrt(*s);
     }
 
     inline void vec2norminv(double *s, const double *x, const int n)
     {
         vec2norm(s, x, n);
-        *s = (double)(1.0 / *s);
+        *s = (double) (1.0 / *s);
     }
 
     // ----------------------- L-BFGS Part -----------------------
@@ -497,27 +479,18 @@ namespace lbfgs
      *  @param  brackt  The pointer to the predicate if the trial value is
      *                  bracketed.
      *  @retval int     Status value. Zero indicates a normal termination.
-     *  
+     *
      *  @see
      *      Jorge J. More and David J. Thuente. Line search algorithm with
      *      guaranteed sufficient decrease. ACM Transactions on Mathematical
      *      Software (TOMS), Vol 20, No 3, pp. 286-307, 1994.
      */
-    inline int update_trial_interval(double *x,
-                                     double *fx,
-                                     double *dx,
-                                     double *y,
-                                     double *fy,
-                                     double *dy,
-                                     double *t,
-                                     double *ft,
-                                     double *dt,
-                                     const double tmin,
-                                     const double tmax,
-                                     int *brackt)
+    inline int update_trial_interval(double *x, double *fx, double *dx, double *y, double *fy,
+                                     double *dy, double *t, double *ft, double *dt,
+                                     const double tmin, const double tmax, int *brackt)
     {
-        int bound;
-        int dsign = *dt * (*dx / fabs(*dx)) < 0.;
+        int    bound;
+        int    dsign = *dt * (*dx / fabs(*dx)) < 0.;
         double mc;            /* minimizer of an interpolated cubic. */
         double mq;            /* minimizer of an interpolated quadratic. */
         double newt;          /* new trial value. */
@@ -555,7 +528,7 @@ namespace lbfgs
             the average of the minimizers is taken.
             */
             *brackt = 1;
-            bound = 1;
+            bound   = 1;
             CUBIC_MINIMIZER_LBFGS(mc, *x, *fx, *dx, *t, *ft, *dt);
             QUARD_MINIMIZER_LBFGS(mq, *x, *fx, *dx, *t, *ft);
             if (fabs(mc - *x) < fabs(mq - *x))
@@ -576,7 +549,7 @@ namespace lbfgs
             the cubic one is taken, else the quadratic one is taken.
             */
             *brackt = 1;
-            bound = 0;
+            bound   = 0;
             CUBIC_MINIMIZER_LBFGS(mc, *x, *fx, *dx, *t, *ft, *dt);
             QUARD_MINIMIZER2_LBFGS(mq, *x, *dx, *t, *dt);
             if (fabs(mc - *t) > fabs(mq - *t))
@@ -658,13 +631,13 @@ namespace lbfgs
             x <- x, y <- t.
         - Case b: if f(t) <= f(x) && f'(t)*f'(x) > 0,
             x <- t, y <- y.
-        - Case c: if f(t) <= f(x) && f'(t)*f'(x) < 0, 
+        - Case c: if f(t) <= f(x) && f'(t)*f'(x) < 0,
             x <- t, y <- x.
          */
         if (*fx < *ft)
         {
             /* Case a */
-            *y = *t;
+            *y  = *t;
             *fy = *ft;
             *dy = *dt;
         }
@@ -673,21 +646,19 @@ namespace lbfgs
             /* Case c */
             if (dsign)
             {
-                *y = *x;
+                *y  = *x;
                 *fy = *fx;
                 *dy = *dx;
             }
             /* Cases b and c */
-            *x = *t;
+            *x  = *t;
             *fx = *ft;
             *dx = *dt;
         }
 
         /* Clip the new trial value in [tmin, tmax]. */
-        if (tmax < newt)
-            newt = tmax;
-        if (newt < tmin)
-            newt = tmin;
+        if (tmax < newt) newt = tmax;
+        if (newt < tmin) newt = tmin;
 
         /*
         Redefine the new trial value if it is close to the upper bound
@@ -698,13 +669,11 @@ namespace lbfgs
             mq = *x + 0.66 * (*y - *x);
             if (*x < *y)
             {
-                if (mq < newt)
-                    newt = mq;
+                if (mq < newt) newt = mq;
             }
             else
             {
-                if (newt < mq)
-                    newt = mq;
+                if (newt < mq) newt = mq;
             }
         }
 
@@ -713,21 +682,13 @@ namespace lbfgs
         return 0;
     }
 
-    inline int line_search_morethuente(int n,
-                                       double *x,
-                                       double *f,
-                                       double *g,
-                                       double *s,
-                                       double *stp,
-                                       const double *xp,
-                                       const double *gp,
-                                       const double *stpmin,
-                                       const double *stpmax,
-                                       callback_data_t *cd,
-                                       const lbfgs_parameter_t *param)
+    inline int line_search_morethuente(int n, double *x, double *f, double *g, double *s,
+                                       double *stp, const double *xp, const double *gp,
+                                       const double *stpmin, const double *stpmax,
+                                       callback_data_t *cd, const lbfgs_parameter_t *param)
     {
-        int count = 0;
-        int brackt, stage1, uinfo = 0;
+        int    count = 0;
+        int    brackt, stage1, uinfo = 0;
         double dg;
         double stx, fx, dgx;
         double sty, fy, dgy;
@@ -752,11 +713,11 @@ namespace lbfgs
         }
 
         /* Initialize local variables. */
-        brackt = 0;
-        stage1 = 1;
-        finit = *f;
-        dgtest = param->f_dec_coeff * dginit;
-        width = *stpmax - *stpmin;
+        brackt     = 0;
+        stage1     = 1;
+        finit      = *f;
+        dgtest     = param->f_dec_coeff * dginit;
+        width      = *stpmax - *stpmin;
         prev_width = 2.0 * width;
 
         /*
@@ -803,16 +764,16 @@ namespace lbfgs
             }
 
             /* Clip the step in the range of [stpmin, stpmax]. */
-            if (*stp < *stpmin)
-                *stp = *stpmin;
-            if (*stpmax < *stp)
-                *stp = *stpmax;
+            if (*stp < *stpmin) *stp = *stpmin;
+            if (*stpmax < *stp) *stp = *stpmax;
 
             /*
             If an unusual termination is to occur then let
             stp be the lowest point obtained so far.
             */
-            if ((brackt && ((*stp <= stmin || stmax <= *stp) || param->max_linesearch <= count + 1 || uinfo != 0)) || (brackt && (stmax - stmin <= param->xtol * stmax)))
+            if ((brackt && ((*stp <= stmin || stmax <= *stp) ||
+                            param->max_linesearch <= count + 1 || uinfo != 0)) ||
+                (brackt && (stmax - stmin <= param->xtol * stmax)))
             {
                 *stp = stx;
             }
@@ -868,7 +829,10 @@ namespace lbfgs
             function has a nonpositive value and nonnegative derivative.
             */
             if (stage1 && *f <= ftest1 &&
-                (param->f_dec_coeff <= param->s_curv_coeff ? param->f_dec_coeff : param->s_curv_coeff) * dginit <= dg)
+                (param->f_dec_coeff <= param->s_curv_coeff ? param->f_dec_coeff
+                                                           : param->s_curv_coeff) *
+                        dginit <=
+                    dg)
             {
                 stage1 = 0;
             }
@@ -883,10 +847,10 @@ namespace lbfgs
             if (stage1 && ftest1 < *f && *f <= fx)
             {
                 /* Define the modified function and derivative values. */
-                fm = *f - *stp * dgtest;
-                fxm = fx - stx * dgtest;
-                fym = fy - sty * dgtest;
-                dgm = dg - dgtest;
+                fm   = *f - *stp * dgtest;
+                fxm  = fx - stx * dgtest;
+                fym  = fy - sty * dgtest;
+                dgm  = dg - dgtest;
                 dgxm = dgx - dgtest;
                 dgym = dgy - dgtest;
 
@@ -894,15 +858,12 @@ namespace lbfgs
                 Call update_trial_interval() to update the interval of
                 uncertainty and to compute the new step.
                 */
-                uinfo = update_trial_interval(
-                    &stx, &fxm, &dgxm,
-                    &sty, &fym, &dgym,
-                    stp, &fm, &dgm,
-                    stmin, stmax, &brackt);
+                uinfo = update_trial_interval(&stx, &fxm, &dgxm, &sty, &fym, &dgym, stp, &fm, &dgm,
+                                              stmin, stmax, &brackt);
 
                 /* Reset the function and gradient values for f. */
-                fx = fxm + stx * dgtest;
-                fy = fym + sty * dgtest;
+                fx  = fxm + stx * dgtest;
+                fy  = fym + sty * dgtest;
                 dgx = dgxm + dgtest;
                 dgy = dgym + dgtest;
             }
@@ -912,11 +873,8 @@ namespace lbfgs
                 Call update_trial_interval() to update the interval of
                 uncertainty and to compute the new step.
                 */
-                uinfo = update_trial_interval(
-                    &stx, &fx, &dgx,
-                    &sty, &fy, &dgy,
-                    stp, f, &dg,
-                    stmin, stmax, &brackt);
+                uinfo = update_trial_interval(&stx, &fx, &dgx, &sty, &fy, &dgy, stp, f, &dg, stmin,
+                                              stmax, &brackt);
             }
 
             /*
@@ -929,7 +887,7 @@ namespace lbfgs
                     *stp = stx + 0.5 * (sty - stx);
                 }
                 prev_width = width;
-                width = fabs(sty - stx);
+                width      = fabs(sty - stx);
             }
         }
 
@@ -940,17 +898,7 @@ namespace lbfgs
      * Default L-BFGS parameters.
      */
     static const lbfgs_parameter_t _default_param = {
-        8,
-        1e-5,
-        0,
-        1e-5,
-        0,
-        40,
-        1e-20,
-        1e20,
-        1e-4,
-        0.9,
-        1.0e-16,
+        8, 1e-5, 0, 1e-5, 0, 40, 1e-20, 1e20, 1e-4, 0.9, 1.0e-16,
     };
 
     /**
@@ -969,19 +917,19 @@ namespace lbfgs
     /**
      * Start a L-BFGS optimization.
      * A user must implement a function compatible with ::lbfgs_evaluate_t (evaluation
-     * callback) and pass the pointer to the callback function to lbfgs_optimize() 
-     * arguments. Similarly, a user can implement a function compatible with 
-     * ::lbfgs_stepbound_t to provide an external upper bound for stepsize, and 
-     * ::lbfgs_progress_t (progress callback) to obtain the current progress 
-     * (e.g., variables, function value, ||G||, etc) and to cancel the iteration 
-     * process if necessary. Implementation of the stepbound and the progress callback 
+     * callback) and pass the pointer to the callback function to lbfgs_optimize()
+     * arguments. Similarly, a user can implement a function compatible with
+     * ::lbfgs_stepbound_t to provide an external upper bound for stepsize, and
+     * ::lbfgs_progress_t (progress callback) to obtain the current progress
+     * (e.g., variables, function value, ||G||, etc) and to cancel the iteration
+     * process if necessary. Implementation of the stepbound and the progress callback
      * is optional: a user can pass NULL if progress notification is not necessary.
-     * 
+     *
      * This algorithm terminates an optimization
      * when:
      *
      *   ||G|| < g_epsilon \cdot \max(1, ||x||) .
-     * 
+     *
      * In this formula, ||.|| denotes the Euclidean norm.
      *
      *  @param  n           The number of variables.
@@ -995,13 +943,13 @@ namespace lbfgs
      *  @param  proc_evaluate   The callback function to provide function and
      *                          gradient evaluations given a current values of
      *                          variables. A client program must implement a
-     *                          callback function compatible with 
+     *                          callback function compatible with
      *                          lbfgs_evaluate_t and pass the pointer to the
      *                          callback function.
      *  @param  proc_stepbound  The callback function to provide values of the
      *                          upperbound of the stepsize to search in, provided
-     *                          with the beginning values of variables before the 
-     *                          linear search, and the current step vector (can 
+     *                          with the beginning values of variables before the
+     *                          linear search, and the current step vector (can
      *                          be negative gradient). A client program can implement
      *                          this function for more efficient linesearch. If it is
      *                          not used, just set it NULL or nullptr.
@@ -1015,47 +963,42 @@ namespace lbfgs
      *  @param  param       The pointer to a structure representing parameters for
      *                      L-BFGS optimization. A client program can set this
      *                      parameter to NULL to use the default parameters.
-     *                      Call lbfgs_load_default_parameters() function to 
+     *                      Call lbfgs_load_default_parameters() function to
      *                      fill a structure with the default values.
      *  @retval int         The status code. This function returns zero if the
      *                      minimization process terminates without an error. A
      *                      non-zero value indicates an error.
      */
-    inline int lbfgs_optimize(int n,
-                              double *x,
-                              double *ptr_fx,
-                              lbfgs_evaluate_t proc_evaluate,
-                              lbfgs_stepbound_t proc_stepbound,
-                              lbfgs_progress_t proc_progress,
-                              void *instance,
-                              lbfgs_parameter_t *_param)
+    inline int lbfgs_optimize(int n, double *x, double *ptr_fx, lbfgs_evaluate_t proc_evaluate,
+                              lbfgs_stepbound_t proc_stepbound, lbfgs_progress_t proc_progress,
+                              void *instance, lbfgs_parameter_t *_param)
     {
-        int ret;
-        int i, j, k, ls, end, bound;
+        int    ret;
+        int    i, j, k, ls, end, bound;
         double step;
-        int loop;
+        int    loop;
         double step_min, step_max;
 
         /* Constant parameters and their default values. */
         lbfgs_parameter_t param = (_param != NULL) ? (*_param) : _default_param;
-        const int m = param.mem_size;
+        const int         m     = param.mem_size;
 
-        double *xp = NULL;
-        double *g = NULL, *gp = NULL;
-        double *d = NULL, *pf = NULL;
+        double           *xp = NULL;
+        double           *g = NULL, *gp = NULL;
+        double           *d = NULL, *pf = NULL;
         iteration_data_t *lm = NULL, *it = NULL;
-        double ys, yy;
-        double xnorm, gnorm, beta;
-        double fx = 0.;
-        double rate = 0.;
+        double            ys, yy;
+        double            xnorm, gnorm, beta;
+        double            fx   = 0.;
+        double            rate = 0.;
 
         /* Construct a callback data. */
         callback_data_t cd;
-        cd.n = n;
-        cd.instance = instance;
-        cd.proc_evaluate = proc_evaluate;
+        cd.n              = n;
+        cd.instance       = instance;
+        cd.proc_evaluate  = proc_evaluate;
         cd.proc_stepbound = proc_stepbound;
-        cd.proc_progress = proc_progress;
+        cd.proc_progress  = proc_progress;
 
         /* Check the input parameters for errors. */
         if (n <= 0)
@@ -1104,28 +1047,28 @@ namespace lbfgs
         }
 
         /* Allocate working space. */
-        xp = (double *)vecalloc(n * sizeof(double));
-        g = (double *)vecalloc(n * sizeof(double));
-        gp = (double *)vecalloc(n * sizeof(double));
-        d = (double *)vecalloc(n * sizeof(double));
+        xp = (double *) vecalloc(n * sizeof(double));
+        g  = (double *) vecalloc(n * sizeof(double));
+        gp = (double *) vecalloc(n * sizeof(double));
+        d  = (double *) vecalloc(n * sizeof(double));
 
         /* Allocate limited memory storage. */
-        lm = (iteration_data_t *)vecalloc(m * sizeof(iteration_data_t));
+        lm = (iteration_data_t *) vecalloc(m * sizeof(iteration_data_t));
 
         /* Initialize the limited memory. */
         for (i = 0; i < m; ++i)
         {
-            it = &lm[i];
+            it        = &lm[i];
             it->alpha = 0;
-            it->ys = 0;
-            it->s = (double *)vecalloc(n * sizeof(double));
-            it->y = (double *)vecalloc(n * sizeof(double));
+            it->ys    = 0;
+            it->s     = (double *) vecalloc(n * sizeof(double));
+            it->y     = (double *) vecalloc(n * sizeof(double));
         }
 
         /* Allocate an array for storing previous values of the objective function. */
         if (0 < param.past)
         {
-            pf = (double *)vecalloc(param.past * sizeof(double));
+            pf = (double *) vecalloc(param.past * sizeof(double));
         }
 
         /* Evaluate the function value and its gradient. */
@@ -1149,8 +1092,7 @@ namespace lbfgs
         vec2norm(&xnorm, x, n);
         vec2norm(&gnorm, g, n);
 
-        if (xnorm < 1.0)
-            xnorm = 1.0;
+        if (xnorm < 1.0) xnorm = 1.0;
         if (gnorm / xnorm <= param.g_epsilon)
         {
             ret = LBFGS_ALREADY_MINIMIZED;
@@ -1162,8 +1104,8 @@ namespace lbfgs
             */
             vec2norminv(&step, d, n);
 
-            k = 1;
-            end = 0;
+            k    = 1;
+            end  = 0;
             loop = 1;
 
             while (loop == 1)
@@ -1179,19 +1121,19 @@ namespace lbfgs
                 {
                     step_max = cd.proc_stepbound(cd.instance, xp, d, cd.n);
                     step_max = step_max < param.max_step ? step_max : param.max_step;
-                    if (step >= step_max)
-                        step = step_max / 2.0;
+                    if (step >= step_max) step = step_max / 2.0;
                 }
 
                 /* Search for an optimal step. */
-                ls = line_search_morethuente(n, x, &fx, g, d, &step, xp, gp, &step_min, &step_max, &cd, &param);
+                ls = line_search_morethuente(n, x, &fx, g, d, &step, xp, gp, &step_min, &step_max,
+                                             &cd, &param);
 
                 if (ls < 0)
                 {
                     /* Revert to the previous point. */
                     veccpy(x, xp, n);
                     veccpy(g, gp, n);
-                    ret = ls;
+                    ret  = ls;
                     loop = 0;
                     continue;
                 }
@@ -1203,7 +1145,8 @@ namespace lbfgs
                 // /* Report the progress. */
                 // if (cd.proc_progress)
                 // {
-                //     if ((ret = cd.proc_progress(cd.instance, x, g, fx, xnorm, gnorm, step, cd.n, k, ls)))
+                //     if ((ret = cd.proc_progress(cd.instance, x, g, fx, xnorm, gnorm, step, cd.n,
+                //     k, ls)))
                 //     {
                 //         loop = 0;
                 //         continue;
@@ -1215,8 +1158,7 @@ namespace lbfgs
                 The criterion is given by the following formula:
                 |g(x)| / \max(1, |x|) < g_epsilon
                 */
-                if (xnorm < 1.0)
-                    xnorm = 1.0;
+                if (xnorm < 1.0) xnorm = 1.0;
                 if (gnorm / xnorm <= param.g_epsilon)
                 {
                     /* Convergence. */
@@ -1293,7 +1235,7 @@ namespace lbfgs
                 j = end;
                 for (i = 0; i < bound; ++i)
                 {
-                    j = (j + m - 1) % m; /* if (--j == -1) j = m-1; */
+                    j  = (j + m - 1) % m; /* if (--j == -1) j = m-1; */
                     it = &lm[j];
                     /* \alpha_{j} = \rho_{j} s^{t}_{j} \cdot q_{k+1}. */
                     vecdot(&it->alpha, it->s, d, n);
@@ -1357,95 +1299,95 @@ namespace lbfgs
     {
         switch (err)
         {
-        case LBFGS_CONVERGENCE:
-            return "Success: reached convergence (g_epsilon).";
+            case LBFGS_CONVERGENCE:
+                return "Success: reached convergence (g_epsilon).";
 
-        case LBFGS_STOP:
-            return "Success: met stopping criteria (past f decrease less than delta).";
+            case LBFGS_STOP:
+                return "Success: met stopping criteria (past f decrease less than delta).";
 
-        case LBFGS_ALREADY_MINIMIZED:
-            return "The initial variables already minimize the objective function.";
+            case LBFGS_ALREADY_MINIMIZED:
+                return "The initial variables already minimize the objective function.";
 
-        case LBFGSERR_UNKNOWNERROR:
-            return "Unknown error.";
+            case LBFGSERR_UNKNOWNERROR:
+                return "Unknown error.";
 
-        case LBFGSERR_LOGICERROR:
-            return "Logic error.";
+            case LBFGSERR_LOGICERROR:
+                return "Logic error.";
 
-        case LBFGSERR_CANCELED:
-            return "The minimization process has been canceled.";
+            case LBFGSERR_CANCELED:
+                return "The minimization process has been canceled.";
 
-        case LBFGSERR_INVALID_N:
-            return "Invalid number of variables specified.";
+            case LBFGSERR_INVALID_N:
+                return "Invalid number of variables specified.";
 
-        case LBFGSERR_INVALID_MEMSIZE:
-            return "Invalid parameter lbfgs_parameter_t::mem_size specified.";
+            case LBFGSERR_INVALID_MEMSIZE:
+                return "Invalid parameter lbfgs_parameter_t::mem_size specified.";
 
-        case LBFGSERR_INVALID_GEPSILON:
-            return "Invalid parameter lbfgs_parameter_t::g_epsilon specified.";
+            case LBFGSERR_INVALID_GEPSILON:
+                return "Invalid parameter lbfgs_parameter_t::g_epsilon specified.";
 
-        case LBFGSERR_INVALID_TESTPERIOD:
-            return "Invalid parameter lbfgs_parameter_t::past specified.";
+            case LBFGSERR_INVALID_TESTPERIOD:
+                return "Invalid parameter lbfgs_parameter_t::past specified.";
 
-        case LBFGSERR_INVALID_DELTA:
-            return "Invalid parameter lbfgs_parameter_t::delta specified.";
+            case LBFGSERR_INVALID_DELTA:
+                return "Invalid parameter lbfgs_parameter_t::delta specified.";
 
-        case LBFGSERR_INVALID_MINSTEP:
-            return "Invalid parameter lbfgs_parameter_t::min_step specified.";
+            case LBFGSERR_INVALID_MINSTEP:
+                return "Invalid parameter lbfgs_parameter_t::min_step specified.";
 
-        case LBFGSERR_INVALID_MAXSTEP:
-            return "Invalid parameter lbfgs_parameter_t::max_step specified.";
+            case LBFGSERR_INVALID_MAXSTEP:
+                return "Invalid parameter lbfgs_parameter_t::max_step specified.";
 
-        case LBFGSERR_INVALID_FDECCOEFF:
-            return "Invalid parameter lbfgs_parameter_t::f_dec_coeff specified.";
+            case LBFGSERR_INVALID_FDECCOEFF:
+                return "Invalid parameter lbfgs_parameter_t::f_dec_coeff specified.";
 
-        case LBFGSERR_INVALID_SCURVCOEFF:
-            return "Invalid parameter lbfgs_parameter_t::s_curv_coeff specified.";
+            case LBFGSERR_INVALID_SCURVCOEFF:
+                return "Invalid parameter lbfgs_parameter_t::s_curv_coeff specified.";
 
-        case LBFGSERR_INVALID_XTOL:
-            return "Invalid parameter lbfgs_parameter_t::xtol specified.";
+            case LBFGSERR_INVALID_XTOL:
+                return "Invalid parameter lbfgs_parameter_t::xtol specified.";
 
-        case LBFGSERR_INVALID_MAXLINESEARCH:
-            return "Invalid parameter lbfgs_parameter_t::max_linesearch specified.";
+            case LBFGSERR_INVALID_MAXLINESEARCH:
+                return "Invalid parameter lbfgs_parameter_t::max_linesearch specified.";
 
-        case LBFGSERR_OUTOFINTERVAL:
-            return "The line-search step went out of the interval of uncertainty.";
+            case LBFGSERR_OUTOFINTERVAL:
+                return "The line-search step went out of the interval of uncertainty.";
 
-        case LBFGSERR_INCORRECT_TMINMAX:
-            return "A logic error occurred; alternatively, the interval of uncertainty"
-                   " became too small.";
+            case LBFGSERR_INCORRECT_TMINMAX:
+                return "A logic error occurred; alternatively, the interval of uncertainty"
+                       " became too small.";
 
-        case LBFGSERR_ROUNDING_ERROR:
-            return "A rounding error occurred; alternatively, no line-search step"
-                   " satisfies the sufficient decrease and curvature conditions.";
+            case LBFGSERR_ROUNDING_ERROR:
+                return "A rounding error occurred; alternatively, no line-search step"
+                       " satisfies the sufficient decrease and curvature conditions.";
 
-        case LBFGSERR_MINIMUMSTEP:
-            return "The line-search step became smaller than lbfgs_parameter_t::min_step.";
+            case LBFGSERR_MINIMUMSTEP:
+                return "The line-search step became smaller than lbfgs_parameter_t::min_step.";
 
-        case LBFGSERR_MAXIMUMSTEP:
-            return "The line-search step became larger than lbfgs_parameter_t::max_step.";
+            case LBFGSERR_MAXIMUMSTEP:
+                return "The line-search step became larger than lbfgs_parameter_t::max_step.";
 
-        case LBFGSERR_MAXIMUMLINESEARCH:
-            return "The line-search routine reaches the maximum number of evaluations.";
+            case LBFGSERR_MAXIMUMLINESEARCH:
+                return "The line-search routine reaches the maximum number of evaluations.";
 
-        case LBFGSERR_MAXIMUMITERATION:
-            return "The algorithm routine reaches the maximum number of iterations.";
+            case LBFGSERR_MAXIMUMITERATION:
+                return "The algorithm routine reaches the maximum number of iterations.";
 
-        case LBFGSERR_WIDTHTOOSMALL:
-            return "Relative width of the interval of uncertainty is at most"
-                   " lbfgs_parameter_t::xtol.";
+            case LBFGSERR_WIDTHTOOSMALL:
+                return "Relative width of the interval of uncertainty is at most"
+                       " lbfgs_parameter_t::xtol.";
 
-        case LBFGSERR_INVALIDPARAMETERS:
-            return "A logic error (negative line-search step) occurred.";
+            case LBFGSERR_INVALIDPARAMETERS:
+                return "A logic error (negative line-search step) occurred.";
 
-        case LBFGSERR_INCREASEGRADIENT:
-            return "The current search direction increases the objective function value.";
+            case LBFGSERR_INCREASEGRADIENT:
+                return "The current search direction increases the objective function value.";
 
-        default:
-            return "(unknown)";
+            default:
+                return "(unknown)";
         }
     }
 
-} // namespace lbfgs
+}  // namespace lbfgs
 
 #endif

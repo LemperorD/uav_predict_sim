@@ -14,7 +14,6 @@
  copy at http://www.boost.org/LICENSE_1_0.txt)
  */
 
-
 #ifndef BOOST_NUMERIC_ODEINT_STEPPER_GENERATION_HPP_INCLUDED
 #define BOOST_NUMERIC_ODEINT_STEPPER_GENERATION_HPP_INCLUDED
 
@@ -24,13 +23,11 @@
 #include <boost/numeric/odeint/stepper/generation/generation_controlled_runge_kutta.hpp>
 #include <boost/numeric/odeint/stepper/generation/generation_dense_output_runge_kutta.hpp>
 
-#include <boost/numeric/odeint/stepper/generation/generation_runge_kutta_cash_karp54_classic.hpp>
 #include <boost/numeric/odeint/stepper/generation/generation_runge_kutta_cash_karp54.hpp>
+#include <boost/numeric/odeint/stepper/generation/generation_runge_kutta_cash_karp54_classic.hpp>
 #include <boost/numeric/odeint/stepper/generation/generation_runge_kutta_dopri5.hpp>
 #include <boost/numeric/odeint/stepper/generation/generation_runge_kutta_fehlberg78.hpp>
 
-
 #include <boost/numeric/odeint/stepper/generation/generation_rosenbrock4.hpp>
 
-
-#endif // BOOST_NUMERIC_ODEINT_STEPPER_GENERATION_HPP_INCLUDED
+#endif  // BOOST_NUMERIC_ODEINT_STEPPER_GENERATION_HPP_INCLUDED
