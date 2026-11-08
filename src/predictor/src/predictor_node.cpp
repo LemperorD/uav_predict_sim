@@ -14,296 +14,295 @@
 
 class Predictor : public rclcpp::Node
 {
-   public:
-    Predictor() : Node("predictor_node")
+ public:
+  Predictor() : Node("predictor_node")
+  {
+    predictor::Settings s;
+    s.position_std     = declare_parameter("position_noise_std", 0.15);
+    s.velocity_std     = declare_parameter("velocity_noise_std", 0.1);
+    s.cv_accel_density = declare_parameter("cv_accel_density", 0.3);
+    s.ca_jerk_density  = declare_parameter("ca_jerk_density", 1.0);
+    s.stay_probability = declare_parameter("stay_probability", 0.98);
+    filter_            = std::make_unique<predictor::Imm>(s);
+    settings_          = s;
+
+    noise_ = declare_parameter("inject_noise", true);
+    rng_.seed(declare_parameter("noise_seed", 42));
+
+    step_    = declare_parameter("prediction_step", 0.05);
+    count_   = declare_parameter("prediction_steps", 20);
+    max_gap_ = declare_parameter("max_time_gap", 1.0);
+    if (!std::isfinite(step_) || step_ <= 0 || count_ <= 0 || count_ > 10000 ||
+        !std::isfinite(max_gap_) || max_gap_ <= 0)
     {
-        predictor::Settings s;
-        s.position_std     = declare_parameter("position_noise_std", 0.15);
-        s.velocity_std     = declare_parameter("velocity_noise_std", 0.1);
-        s.cv_accel_density = declare_parameter("cv_accel_density", 0.3);
-        s.ca_jerk_density  = declare_parameter("ca_jerk_density", 1.0);
-        s.stay_probability = declare_parameter("stay_probability", 0.98);
-        filter_            = std::make_unique<predictor::Imm>(s);
-        settings_          = s;
-
-        noise_ = declare_parameter("inject_noise", true);
-        rng_.seed(declare_parameter("noise_seed", 42));
-
-        step_    = declare_parameter("prediction_step", 0.05);
-        count_   = declare_parameter("prediction_steps", 20);
-        max_gap_ = declare_parameter("max_time_gap", 1.0);
-        if (!std::isfinite(step_) || step_ <= 0 || count_ <= 0 || count_ > 10000 ||
-            !std::isfinite(max_gap_) || max_gap_ <= 0)
-        {
-            throw std::invalid_argument("invalid prediction step/count or max_time_gap");
-        }
-
-        auto dir =
-            std::filesystem::path(declare_parameter<std::string>("output_dir", "outputs/demo"));
-        std::filesystem::create_directories(dir);
-        auto sample_path =
-            std::filesystem::path(declare_parameter<std::string>("samples_file", "samples.csv"));
-        auto prediction_path = std::filesystem::path(
-            declare_parameter<std::string>("predictions_file", "predictions.csv"));
-        if (sample_path.is_relative())
-        {
-            sample_path = dir / sample_path;
-        }
-        if (prediction_path.is_relative())
-        {
-            prediction_path = dir / prediction_path;
-        }
-        if (!sample_path.parent_path().empty())
-        {
-            std::filesystem::create_directories(sample_path.parent_path());
-        }
-        if (!prediction_path.parent_path().empty())
-        {
-            std::filesystem::create_directories(prediction_path.parent_path());
-        }
-
-        samples_.open(sample_path);
-        predictions_.open(prediction_path);
-        if (!samples_ || !predictions_)
-        {
-            throw std::runtime_error("cannot open output CSV files");
-        }
-
-        samples_ << std::setprecision(12);
-        predictions_ << std::setprecision(12);
-        samples_ << "t,truth_x,truth_y,truth_z,measurement_x,measurement_y,measurement_"
-                    "z,estimate_x,estimate_y,estimate_z,std_x,std_y,std_z,p_cv,p_ca,"
-                    "position_error,horizon_error,velocity_error,position_nees\n";
-        predictions_ << "origin_t,target_t,pred_x,pred_y,pred_z,truth_x,truth_y,"
-                        "truth_z,error,std_x,std_y,std_z\n";
-
-        estimate_pub_ = create_publisher<nav_msgs::msg::Odometry>("estimate", 10);
-        path_pub_     = create_publisher<nav_msgs::msg::Path>("prediction", 10);
-        metrics_pub_  = create_publisher<std_msgs::msg::Float64MultiArray>("metrics", 10);
-        done_         = create_subscription<std_msgs::msg::Bool>("simulation_done",
-                                                         rclcpp::QoS(1).transient_local(),
-                                                         [this](const std_msgs::msg::Bool &message)
-                                                         {
-                                                             if (message.data)
-                                                             {
-                                                                 finished_ = true;
-                                                                 samples_.flush();
-                                                                 predictions_.flush();
-                                                             }
-                                                         });
-        sub_          = create_subscription<nav_msgs::msg::Odometry>(
-            "odometry", rclcpp::QoS(50),
-            [this](nav_msgs::msg::Odometry::ConstSharedPtr m) { receive(*m); });
+      throw std::invalid_argument("invalid prediction step/count or max_time_gap");
     }
 
-   private:
-    struct Pending
+    auto dir = std::filesystem::path(declare_parameter<std::string>("output_dir", "outputs/demo"));
+    std::filesystem::create_directories(dir);
+    auto sample_path =
+        std::filesystem::path(declare_parameter<std::string>("samples_file", "samples.csv"));
+    auto prediction_path = std::filesystem::path(
+        declare_parameter<std::string>("predictions_file", "predictions.csv"));
+    if (sample_path.is_relative())
     {
-        double          origin, target;
-        Eigen::Vector3d p, std;
-    };
-
-    void receive(const nav_msgs::msg::Odometry &m)
+      sample_path = dir / sample_path;
+    }
+    if (prediction_path.is_relative())
     {
-        if (finished_)
-        {
-            return;
-        }
-
-        const double stamp = rclcpp::Time(m.header.stamp).seconds();
-        if (!std::isfinite(stamp))
-        {
-            return;
-        }
-
-        predictor::Measurement truth;
-        truth << m.pose.pose.position.x, m.pose.pose.position.y, m.pose.pose.position.z,
-            m.twist.twist.linear.x, m.twist.twist.linear.y, m.twist.twist.linear.z;
-        if (!truth.allFinite())
-        {
-            RCLCPP_WARN(get_logger(), "Skipping nonfinite odometry");
-            return;
-        }
-
-        if (start_stamp_ < 0)
-        {
-            start_stamp_ = stamp;
-        }
-        double t = stamp - start_stamp_, dt = last_stamp_ < 0 ? 0.01 : stamp - last_stamp_;
-        if (dt <= 0)
-        {
-            RCLCPP_WARN(get_logger(), "Skipping duplicate/out-of-order stamp");
-            return;
-        }
-        if (dt > max_gap_)
-        {
-            filter_ = std::make_unique<predictor::Imm>(settings_);
-            pending_.clear();
-            RCLCPP_WARN(get_logger(), "Reset IMM after time gap %.3f", dt);
-        }
-
-        predictor::Measurement z = truth;
-        if (noise_)
-        {
-            for (int i = 0; i < 6; ++i)
-            {
-                z(i) += normal_(rng_) * (i < 3 ? settings_.position_std : settings_.velocity_std);
-            }
-        }
-
-        auto e = filter_->update(z, dt);
-
-        double horizon_error = std::numeric_limits<double>::quiet_NaN();
-        while (!pending_.empty() && pending_.front().target <= t)
-        {
-            auto p = pending_.front();
-            pending_.pop_front();
-            if (last_stamp_ < 0 || p.target < last_stamp_ - start_stamp_)
-            {
-                continue;
-            }
-            double          a      = (p.target - (last_stamp_ - start_stamp_)) / dt;
-            Eigen::Vector3d target = (1 - a) * last_truth_ + a * truth.head<3>();
-            horizon_error          = (p.p - target).norm();
-            predictions_ << p.origin << ',' << p.target;
-            for (double v : p.p)
-            {
-                predictions_ << ',' << v;
-            }
-            for (double v : target)
-            {
-                predictions_ << ',' << v;
-            }
-            predictions_ << ',' << horizon_error;
-            for (double v : p.std)
-            {
-                predictions_ << ',' << v;
-            }
-            predictions_ << '\n';
-        }
-
-        const auto future = filter_->forecast(step_, count_);
-        pending_.push_back({t, t + step_ * count_, future.back().mean.head<3>(),
-                            future.back().covariance.diagonal().head<3>().cwiseMax(0).cwiseSqrt()});
-
-        nav_msgs::msg::Odometry odom;
-        odom.header                  = m.header;
-        odom.child_frame_id          = "prediction";
-        odom.pose.pose.position.x    = e.mean(0);
-        odom.pose.pose.position.y    = e.mean(1);
-        odom.pose.pose.position.z    = e.mean(2);
-        odom.pose.pose.orientation.w = 1;
-        odom.twist.twist.linear.x    = e.mean(3);
-        odom.twist.twist.linear.y    = e.mean(4);
-        odom.twist.twist.linear.z    = e.mean(5);
-        for (int i = 0; i < 3; ++i)
-        {
-            for (int j = 0; j < 3; ++j)
-            {
-                odom.pose.covariance[6 * i + j]  = e.covariance(i, j);
-                odom.twist.covariance[6 * i + j] = e.covariance(i + 3, j + 3);
-            }
-        }
-        estimate_pub_->publish(odom);
-
-        nav_msgs::msg::Path path;
-        path.header = m.header;
-        for (int i = 0; i < count_; ++i)
-        {
-            geometry_msgs::msg::PoseStamped p;
-            p.header = m.header;
-            p.header.stamp =
-                rclcpp::Time(m.header.stamp) + rclcpp::Duration::from_seconds((i + 1) * step_);
-            p.pose.position.x    = future[i].mean(0);
-            p.pose.position.y    = future[i].mean(1);
-            p.pose.position.z    = future[i].mean(2);
-            p.pose.orientation.w = 1;
-            path.poses.push_back(p);
-        }
-        path_pub_->publish(path);
-
-        Eigen::Vector3d error = e.mean.head<3>() - truth.head<3>();
-        double          nees  = error.dot(e.covariance.topLeftCorner<3, 3>().ldlt().solve(error));
-
-        std_msgs::msg::Float64MultiArray metrics;
-        metrics.data.push_back(t);
-        for (double v : truth.head<3>())
-        {
-            metrics.data.push_back(v);
-        }
-        for (double v : z.head<3>())
-        {
-            metrics.data.push_back(v);
-        }
-        for (double v : e.mean.head<3>())
-        {
-            metrics.data.push_back(v);
-        }
-        for (double v : e.covariance.diagonal().head<3>().cwiseMax(0).cwiseSqrt())
-        {
-            metrics.data.push_back(v);
-        }
-        metrics.data.push_back(e.probability(0));
-        metrics.data.push_back(e.probability(1));
-        metrics.data.push_back(error.norm());
-        metrics.data.push_back(horizon_error);
-        metrics.data.push_back((e.mean.segment<3>(3) - truth.tail<3>()).norm());
-        metrics.data.push_back(nees);
-        metrics_pub_->publish(metrics);
-
-        for (size_t i = 0; i < metrics.data.size(); ++i)
-        {
-            if (i)
-            {
-                samples_ << ',';
-            }
-            samples_ << metrics.data[i];
-        }
-        samples_ << '\n';
-        if (++received_ % 100 == 0)
-        {
-            samples_.flush();
-            predictions_.flush();
-        }
-
-        last_truth_ = truth.head<3>();
-        last_stamp_ = stamp;
+      prediction_path = dir / prediction_path;
+    }
+    if (!sample_path.parent_path().empty())
+    {
+      std::filesystem::create_directories(sample_path.parent_path());
+    }
+    if (!prediction_path.parent_path().empty())
+    {
+      std::filesystem::create_directories(prediction_path.parent_path());
     }
 
-    predictor::Settings                                  settings_;
-    std::unique_ptr<predictor::Imm>                      filter_;
-    bool                                                 noise_;
-    bool                                                 finished_ = false;
-    rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr done_;
-    std::mt19937                                         rng_;
-    std::normal_distribution<double>                     normal_;
-    double              step_, max_gap_, start_stamp_ = -1, last_stamp_ = -1;
-    int                 count_, received_ = 0;
-    Eigen::Vector3d     last_truth_ = Eigen::Vector3d::Zero();
-    std::deque<Pending> pending_;
-    std::ofstream       samples_, predictions_;
-    rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr       sub_;
-    rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr          estimate_pub_;
-    rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr              path_pub_;
-    rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr metrics_pub_;
+    samples_.open(sample_path);
+    predictions_.open(prediction_path);
+    if (!samples_ || !predictions_)
+    {
+      throw std::runtime_error("cannot open output CSV files");
+    }
+
+    samples_ << std::setprecision(12);
+    predictions_ << std::setprecision(12);
+    samples_ << "t,truth_x,truth_y,truth_z,measurement_x,measurement_y,measurement_"
+                "z,estimate_x,estimate_y,estimate_z,std_x,std_y,std_z,p_cv,p_ca,"
+                "position_error,horizon_error,velocity_error,position_nees\n";
+    predictions_ << "origin_t,target_t,pred_x,pred_y,pred_z,truth_x,truth_y,"
+                    "truth_z,error,std_x,std_y,std_z\n";
+
+    estimate_pub_ = create_publisher<nav_msgs::msg::Odometry>("estimate", 10);
+    path_pub_     = create_publisher<nav_msgs::msg::Path>("prediction", 10);
+    metrics_pub_  = create_publisher<std_msgs::msg::Float64MultiArray>("metrics", 10);
+    done_         = create_subscription<std_msgs::msg::Bool>("simulation_done",
+                                                     rclcpp::QoS(1).transient_local(),
+                                                     [this](const std_msgs::msg::Bool &message)
+                                                     {
+                                                       if (message.data)
+                                                       {
+                                                         finished_ = true;
+                                                         samples_.flush();
+                                                         predictions_.flush();
+                                                       }
+                                                     });
+    sub_          = create_subscription<nav_msgs::msg::Odometry>(
+        "odometry", rclcpp::QoS(50),
+        [this](nav_msgs::msg::Odometry::ConstSharedPtr m) { receive(*m); });
+  }
+
+ private:
+  struct Pending
+  {
+    double          origin, target;
+    Eigen::Vector3d p, std;
+  };
+
+  void receive(const nav_msgs::msg::Odometry &m)
+  {
+    if (finished_)
+    {
+      return;
+    }
+
+    const double stamp = rclcpp::Time(m.header.stamp).seconds();
+    if (!std::isfinite(stamp))
+    {
+      return;
+    }
+
+    predictor::Measurement truth;
+    truth << m.pose.pose.position.x, m.pose.pose.position.y, m.pose.pose.position.z,
+        m.twist.twist.linear.x, m.twist.twist.linear.y, m.twist.twist.linear.z;
+    if (!truth.allFinite())
+    {
+      RCLCPP_WARN(get_logger(), "Skipping nonfinite odometry");
+      return;
+    }
+
+    if (start_stamp_ < 0)
+    {
+      start_stamp_ = stamp;
+    }
+    double t = stamp - start_stamp_, dt = last_stamp_ < 0 ? 0.01 : stamp - last_stamp_;
+    if (dt <= 0)
+    {
+      RCLCPP_WARN(get_logger(), "Skipping duplicate/out-of-order stamp");
+      return;
+    }
+    if (dt > max_gap_)
+    {
+      filter_ = std::make_unique<predictor::Imm>(settings_);
+      pending_.clear();
+      RCLCPP_WARN(get_logger(), "Reset IMM after time gap %.3f", dt);
+    }
+
+    predictor::Measurement z = truth;
+    if (noise_)
+    {
+      for (int i = 0; i < 6; ++i)
+      {
+        z(i) += normal_(rng_) * (i < 3 ? settings_.position_std : settings_.velocity_std);
+      }
+    }
+
+    auto e = filter_->update(z, dt);
+
+    double horizon_error = std::numeric_limits<double>::quiet_NaN();
+    while (!pending_.empty() && pending_.front().target <= t)
+    {
+      auto p = pending_.front();
+      pending_.pop_front();
+      if (last_stamp_ < 0 || p.target < last_stamp_ - start_stamp_)
+      {
+        continue;
+      }
+      double          a      = (p.target - (last_stamp_ - start_stamp_)) / dt;
+      Eigen::Vector3d target = (1 - a) * last_truth_ + a * truth.head<3>();
+      horizon_error          = (p.p - target).norm();
+      predictions_ << p.origin << ',' << p.target;
+      for (double v : p.p)
+      {
+        predictions_ << ',' << v;
+      }
+      for (double v : target)
+      {
+        predictions_ << ',' << v;
+      }
+      predictions_ << ',' << horizon_error;
+      for (double v : p.std)
+      {
+        predictions_ << ',' << v;
+      }
+      predictions_ << '\n';
+    }
+
+    const auto future = filter_->forecast(step_, count_);
+    pending_.push_back({t, t + step_ * count_, future.back().mean.head<3>(),
+                        future.back().covariance.diagonal().head<3>().cwiseMax(0).cwiseSqrt()});
+
+    nav_msgs::msg::Odometry odom;
+    odom.header                  = m.header;
+    odom.child_frame_id          = "prediction";
+    odom.pose.pose.position.x    = e.mean(0);
+    odom.pose.pose.position.y    = e.mean(1);
+    odom.pose.pose.position.z    = e.mean(2);
+    odom.pose.pose.orientation.w = 1;
+    odom.twist.twist.linear.x    = e.mean(3);
+    odom.twist.twist.linear.y    = e.mean(4);
+    odom.twist.twist.linear.z    = e.mean(5);
+    for (int i = 0; i < 3; ++i)
+    {
+      for (int j = 0; j < 3; ++j)
+      {
+        odom.pose.covariance[6 * i + j]  = e.covariance(i, j);
+        odom.twist.covariance[6 * i + j] = e.covariance(i + 3, j + 3);
+      }
+    }
+    estimate_pub_->publish(odom);
+
+    nav_msgs::msg::Path path;
+    path.header = m.header;
+    for (int i = 0; i < count_; ++i)
+    {
+      geometry_msgs::msg::PoseStamped p;
+      p.header = m.header;
+      p.header.stamp =
+          rclcpp::Time(m.header.stamp) + rclcpp::Duration::from_seconds((i + 1) * step_);
+      p.pose.position.x    = future[i].mean(0);
+      p.pose.position.y    = future[i].mean(1);
+      p.pose.position.z    = future[i].mean(2);
+      p.pose.orientation.w = 1;
+      path.poses.push_back(p);
+    }
+    path_pub_->publish(path);
+
+    Eigen::Vector3d error = e.mean.head<3>() - truth.head<3>();
+    double          nees  = error.dot(e.covariance.topLeftCorner<3, 3>().ldlt().solve(error));
+
+    std_msgs::msg::Float64MultiArray metrics;
+    metrics.data.push_back(t);
+    for (double v : truth.head<3>())
+    {
+      metrics.data.push_back(v);
+    }
+    for (double v : z.head<3>())
+    {
+      metrics.data.push_back(v);
+    }
+    for (double v : e.mean.head<3>())
+    {
+      metrics.data.push_back(v);
+    }
+    for (double v : e.covariance.diagonal().head<3>().cwiseMax(0).cwiseSqrt())
+    {
+      metrics.data.push_back(v);
+    }
+    metrics.data.push_back(e.probability(0));
+    metrics.data.push_back(e.probability(1));
+    metrics.data.push_back(error.norm());
+    metrics.data.push_back(horizon_error);
+    metrics.data.push_back((e.mean.segment<3>(3) - truth.tail<3>()).norm());
+    metrics.data.push_back(nees);
+    metrics_pub_->publish(metrics);
+
+    for (size_t i = 0; i < metrics.data.size(); ++i)
+    {
+      if (i)
+      {
+        samples_ << ',';
+      }
+      samples_ << metrics.data[i];
+    }
+    samples_ << '\n';
+    if (++received_ % 100 == 0)
+    {
+      samples_.flush();
+      predictions_.flush();
+    }
+
+    last_truth_ = truth.head<3>();
+    last_stamp_ = stamp;
+  }
+
+  predictor::Settings                                  settings_;
+  std::unique_ptr<predictor::Imm>                      filter_;
+  bool                                                 noise_;
+  bool                                                 finished_ = false;
+  rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr done_;
+  std::mt19937                                         rng_;
+  std::normal_distribution<double>                     normal_;
+  double              step_, max_gap_, start_stamp_ = -1, last_stamp_ = -1;
+  int                 count_, received_ = 0;
+  Eigen::Vector3d     last_truth_ = Eigen::Vector3d::Zero();
+  std::deque<Pending> pending_;
+  std::ofstream       samples_, predictions_;
+  rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr       sub_;
+  rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr          estimate_pub_;
+  rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr              path_pub_;
+  rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr metrics_pub_;
 };
 
 int main(int argc, char **argv)
 {
-    rclcpp::init(argc, argv);
-    try
-    {
-        rclcpp::spin(std::make_shared<Predictor>());
-    }
-    catch (const std::exception &e)
-    {
-        RCLCPP_ERROR(rclcpp::get_logger("predictor"), "%s", e.what());
-        rclcpp::shutdown();
-        return 1;
-    }
-    if (rclcpp::ok())
-    {
-        rclcpp::shutdown();
-    }
-    return 0;
+  rclcpp::init(argc, argv);
+  try
+  {
+    rclcpp::spin(std::make_shared<Predictor>());
+  }
+  catch (const std::exception &e)
+  {
+    RCLCPP_ERROR(rclcpp::get_logger("predictor"), "%s", e.what());
+    rclcpp::shutdown();
+    return 1;
+  }
+  if (rclcpp::ok())
+  {
+    rclcpp::shutdown();
+  }
+  return 0;
 }

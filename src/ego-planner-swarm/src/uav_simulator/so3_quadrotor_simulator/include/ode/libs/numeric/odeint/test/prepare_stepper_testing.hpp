@@ -44,22 +44,22 @@ typedef mpl::vector<vector_type, vector_space_type, array_type>::type container_
 template <class State>
 struct algebra_dispatcher
 {
-    typedef range_algebra type;
+  typedef range_algebra type;
 };
 template <>
 struct algebra_dispatcher<array_type>
 {
-    typedef array_algebra type;
+  typedef array_algebra type;
 };
 template <>
 struct algebra_dispatcher<vector_space_type>
 {
-    typedef vector_space_algebra type;
+  typedef vector_space_algebra type;
 };
 template <>
 struct algebra_dispatcher<double>
 {
-    typedef vector_space_algebra type;
+  typedef vector_space_algebra type;
 };
 
 /*

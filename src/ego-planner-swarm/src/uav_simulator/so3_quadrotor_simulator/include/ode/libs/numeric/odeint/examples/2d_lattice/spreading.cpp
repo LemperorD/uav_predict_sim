@@ -68,52 +68,52 @@ typedef boost::numeric::odeint::symplectic_rkn_sb3a_mclachlan<
 
 double time_diff_in_ms(timeval &t1, timeval &t2)
 {
-    return (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0 + 0.5;
+  return (t2.tv_sec - t1.tv_sec) * 1000.0 + (t2.tv_usec - t1.tv_usec) / 1000.0 + 0.5;
 }
 
 int main(int argc, const char *argv[])
 {
-    srand(time(NULL));
+  srand(time(NULL));
 
-    lattice2d<KAPPA, LAMBDA> lattice(beta);
+  lattice2d<KAPPA, LAMBDA> lattice(beta);
 
-    lattice.generate_pot(W, gap, MAX_N);
+  lattice.generate_pot(W, gap, MAX_N);
 
-    state_type q(MAX_N, vector<double>(MAX_N, 0.0));
+  state_type q(MAX_N, vector<double>(MAX_N, 0.0));
 
-    state_type p(q);
+  state_type p(q);
 
-    state_type energy(q);
+  state_type energy(q);
 
-    p[MAX_N / 2][MAX_N / 2]         = sqrt(0.5 * initial_e);
-    p[MAX_N / 2 + 1][MAX_N / 2]     = sqrt(0.5 * initial_e);
-    p[MAX_N / 2][MAX_N / 2 + 1]     = sqrt(0.5 * initial_e);
-    p[MAX_N / 2 + 1][MAX_N / 2 + 1] = sqrt(0.5 * initial_e);
+  p[MAX_N / 2][MAX_N / 2]         = sqrt(0.5 * initial_e);
+  p[MAX_N / 2 + 1][MAX_N / 2]     = sqrt(0.5 * initial_e);
+  p[MAX_N / 2][MAX_N / 2 + 1]     = sqrt(0.5 * initial_e);
+  p[MAX_N / 2 + 1][MAX_N / 2 + 1] = sqrt(0.5 * initial_e);
 
-    cout.precision(10);
+  cout.precision(10);
 
-    lattice.local_energy(q, p, energy);
-    double e = 0.0;
-    for (size_t i = 0; i < energy.size(); ++i)
-        for (size_t j = 0; j < energy[i].size(); ++j)
-        {
-            e += energy[i][j];
-        }
-
-    cout << "initial energy: " << lattice.energy(q, p) << endl;
-
-    timeval elapsed_time_start, elapsed_time_end;
-    gettimeofday(&elapsed_time_start, NULL);
-
-    stepper_type stepper;
-
-    for (size_t step = 0; step <= steps; ++step)
+  lattice.local_energy(q, p, energy);
+  double e = 0.0;
+  for (size_t i = 0; i < energy.size(); ++i)
+    for (size_t j = 0; j < energy[i].size(); ++j)
     {
-        stepper.do_step(boost::ref(lattice), make_pair(boost::ref(q), boost::ref(p)), 0.0, 0.1);
+      e += energy[i][j];
     }
 
-    gettimeofday(&elapsed_time_end, NULL);
-    double elapsed_time = time_diff_in_ms(elapsed_time_start, elapsed_time_end);
-    cout << steps << " steps in " << elapsed_time / 1000 << " s (energy: " << lattice.energy(q, p)
-         << ")" << endl;
+  cout << "initial energy: " << lattice.energy(q, p) << endl;
+
+  timeval elapsed_time_start, elapsed_time_end;
+  gettimeofday(&elapsed_time_start, NULL);
+
+  stepper_type stepper;
+
+  for (size_t step = 0; step <= steps; ++step)
+  {
+    stepper.do_step(boost::ref(lattice), make_pair(boost::ref(q), boost::ref(p)), 0.0, 0.1);
+  }
+
+  gettimeofday(&elapsed_time_end, NULL);
+  double elapsed_time = time_diff_in_ms(elapsed_time_start, elapsed_time_end);
+  cout << steps << " steps in " << elapsed_time / 1000 << " s (energy: " << lattice.energy(q, p)
+       << ")" << endl;
 }

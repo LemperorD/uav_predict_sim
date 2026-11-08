@@ -22,23 +22,23 @@
 
 namespace boost
 {
-    namespace numeric
+  namespace numeric
+  {
+    namespace odeint
     {
-        namespace odeint
-        {
 
-            template <class T>
-            struct is_pair : public boost::mpl::false_
-            {
-            };
+      template <class T>
+      struct is_pair : public boost::mpl::false_
+      {
+      };
 
-            template <class T1, class T2>
-            struct is_pair<std::pair<T1, T2> > : public boost::mpl::true_
-            {
-            };
+      template <class T1, class T2>
+      struct is_pair<std::pair<T1, T2> > : public boost::mpl::true_
+      {
+      };
 
-        }  // namespace odeint
-    }      // namespace numeric
+    }  // namespace odeint
+  }    // namespace numeric
 }  // namespace boost
 
 #endif  // BOOST_NUMERIC_ODEINT_UTIL_IS_PAIR_HPP_INCLUDED

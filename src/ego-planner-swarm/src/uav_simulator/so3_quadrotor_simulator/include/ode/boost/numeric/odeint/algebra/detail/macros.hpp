@@ -23,7 +23,7 @@
 #include <boost/type_traits.hpp>
 
 #define BOOST_ODEINT_CHECK_CONTAINER_TYPE(Type1, Type2) \
-    BOOST_STATIC_ASSERT((boost::is_same<typename boost::remove_const<Type1>::type, Type2>::value))
+  BOOST_STATIC_ASSERT((boost::is_same<typename boost::remove_const<Type1>::type, Type2>::value))
 
 #else
 // empty macro for nvcc

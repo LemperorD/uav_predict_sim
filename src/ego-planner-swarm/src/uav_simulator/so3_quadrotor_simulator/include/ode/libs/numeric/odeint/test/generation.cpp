@@ -30,7 +30,7 @@ using namespace boost::numeric::odeint;
 template <class Stepper1, class Stepper2>
 void check_stepper_type(const Stepper1 &s1, const Stepper2 &s2)
 {
-    BOOST_STATIC_ASSERT((boost::is_same<Stepper1, Stepper2>::value));
+  BOOST_STATIC_ASSERT((boost::is_same<Stepper1, Stepper2>::value));
 }
 
 BOOST_AUTO_TEST_SUITE(generation_test)
@@ -45,52 +45,52 @@ typedef rosenbrock4<double>                         rosenbrock4_type;
 
 BOOST_AUTO_TEST_CASE(test_generation_dopri5)
 {
-    check_stepper_type(make_controlled(1.0e-6, 1.0e-10, dopri5_type()),
-                       controlled_runge_kutta<dopri5_type>());
-    check_stepper_type(make_controlled<dopri5_type>(1.0e-6, 1.0e-10),
-                       controlled_runge_kutta<dopri5_type>());
+  check_stepper_type(make_controlled(1.0e-6, 1.0e-10, dopri5_type()),
+                     controlled_runge_kutta<dopri5_type>());
+  check_stepper_type(make_controlled<dopri5_type>(1.0e-6, 1.0e-10),
+                     controlled_runge_kutta<dopri5_type>());
 
-    check_stepper_type(make_dense_output(1.0e-6, 1.0e-10, dopri5_type()),
-                       dense_output_runge_kutta<controlled_runge_kutta<dopri5_type> >());
-    check_stepper_type(make_dense_output<dopri5_type>(1.0e-6, 1.0e-10),
-                       dense_output_runge_kutta<controlled_runge_kutta<dopri5_type> >());
+  check_stepper_type(make_dense_output(1.0e-6, 1.0e-10, dopri5_type()),
+                     dense_output_runge_kutta<controlled_runge_kutta<dopri5_type> >());
+  check_stepper_type(make_dense_output<dopri5_type>(1.0e-6, 1.0e-10),
+                     dense_output_runge_kutta<controlled_runge_kutta<dopri5_type> >());
 }
 
 BOOST_AUTO_TEST_CASE(test_generation_cash_karp54)
 {
-    check_stepper_type(make_controlled(1.0e-6, 1.0e-10, rk54_type()),
-                       controlled_runge_kutta<rk54_type>());
-    check_stepper_type(make_controlled<rk54_type>(1.0e-6, 1.0e-10),
-                       controlled_runge_kutta<rk54_type>());
+  check_stepper_type(make_controlled(1.0e-6, 1.0e-10, rk54_type()),
+                     controlled_runge_kutta<rk54_type>());
+  check_stepper_type(make_controlled<rk54_type>(1.0e-6, 1.0e-10),
+                     controlled_runge_kutta<rk54_type>());
 }
 
 BOOST_AUTO_TEST_CASE(test_generation_cash_karp54_classic)
 {
-    check_stepper_type(make_controlled(1.0e-6, 1.0e-10, rk54_classic_type()),
-                       controlled_runge_kutta<rk54_classic_type>());
-    check_stepper_type(make_controlled<rk54_classic_type>(1.0e-6, 1.0e-10),
-                       controlled_runge_kutta<rk54_classic_type>());
+  check_stepper_type(make_controlled(1.0e-6, 1.0e-10, rk54_classic_type()),
+                     controlled_runge_kutta<rk54_classic_type>());
+  check_stepper_type(make_controlled<rk54_classic_type>(1.0e-6, 1.0e-10),
+                     controlled_runge_kutta<rk54_classic_type>());
 }
 
 BOOST_AUTO_TEST_CASE(test_generation_fehlberg78)
 {
-    check_stepper_type(make_controlled(1.0e-6, 1.0e-10, fehlberg78_type()),
-                       controlled_runge_kutta<fehlberg78_type>());
-    check_stepper_type(make_controlled<fehlberg78_type>(1.0e-6, 1.0e-10),
-                       controlled_runge_kutta<fehlberg78_type>());
+  check_stepper_type(make_controlled(1.0e-6, 1.0e-10, fehlberg78_type()),
+                     controlled_runge_kutta<fehlberg78_type>());
+  check_stepper_type(make_controlled<fehlberg78_type>(1.0e-6, 1.0e-10),
+                     controlled_runge_kutta<fehlberg78_type>());
 }
 
 BOOST_AUTO_TEST_CASE(test_generation_rosenbrock4)
 {
-    check_stepper_type(make_controlled(1.0e-6, 1.0e-10, rosenbrock4_type()),
-                       rosenbrock4_controller<rosenbrock4_type>());
-    check_stepper_type(make_controlled<rosenbrock4_type>(1.0e-6, 1.0e-10),
-                       rosenbrock4_controller<rosenbrock4_type>());
+  check_stepper_type(make_controlled(1.0e-6, 1.0e-10, rosenbrock4_type()),
+                     rosenbrock4_controller<rosenbrock4_type>());
+  check_stepper_type(make_controlled<rosenbrock4_type>(1.0e-6, 1.0e-10),
+                     rosenbrock4_controller<rosenbrock4_type>());
 
-    check_stepper_type(make_dense_output(1.0e-6, 1.0e-10, rosenbrock4_type()),
-                       rosenbrock4_dense_output<rosenbrock4_controller<rosenbrock4_type> >());
-    check_stepper_type(make_dense_output<rosenbrock4_type>(1.0e-6, 1.0e-10),
-                       rosenbrock4_dense_output<rosenbrock4_controller<rosenbrock4_type> >());
+  check_stepper_type(make_dense_output(1.0e-6, 1.0e-10, rosenbrock4_type()),
+                     rosenbrock4_dense_output<rosenbrock4_controller<rosenbrock4_type> >());
+  check_stepper_type(make_dense_output<rosenbrock4_type>(1.0e-6, 1.0e-10),
+                     rosenbrock4_dense_output<rosenbrock4_controller<rosenbrock4_type> >());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

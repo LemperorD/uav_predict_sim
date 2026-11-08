@@ -26,29 +26,29 @@
 
 namespace boost
 {
-    namespace numeric
+  namespace numeric
+  {
+    namespace odeint
     {
-        namespace odeint
-        {
-            namespace detail
-            {
+      namespace detail
+      {
 
 #if BOOST_NUMERIC_ODEINT_CXX11
 
-                using ::std::bind;
-                using namespace ::std::placeholders;
+        using ::std::bind;
+        using namespace ::std::placeholders;
 
 #else
 
-                using ::_1;
-                using ::_2;
-                using ::boost::bind;
+        using ::_1;
+        using ::_2;
+        using ::boost::bind;
 
 #endif
 
-            }  // namespace detail
-        }      // namespace odeint
-    }          // namespace numeric
+      }  // namespace detail
+    }    // namespace odeint
+  }      // namespace numeric
 }  // namespace boost
 
 #endif  // BOOST_NUMERIC_ODEINT_UTIL_BIND_HPP_INCLUDED

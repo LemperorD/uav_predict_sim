@@ -37,51 +37,51 @@ typedef mpf_class state_type;
 // provide min, max and pow functions for mpf types - required for controlled steppers
 value_type min(const value_type a, const value_type b)
 {
-    if (a < b)
-        return a;
-    else
-        return b;
+  if (a < b)
+    return a;
+  else
+    return b;
 }
 value_type max(const value_type a, const value_type b)
 {
-    if (a > b)
-        return a;
-    else
-        return b;
+  if (a > b)
+    return a;
+  else
+    return b;
 }
 value_type pow(const value_type a, const value_type b)
 {
-    // do calculation in double precision
-    return value_type(std::pow(a.get_d(), b.get_d()));
+  // do calculation in double precision
+  return value_type(std::pow(a.get_d(), b.get_d()));
 }
 
 // provide vector_space reduce:
 
 namespace boost
 {
-    namespace numeric
+  namespace numeric
+  {
+    namespace odeint
     {
-        namespace odeint
+
+      template <>
+      struct vector_space_reduce<state_type>
+      {
+        template <class Op>
+        state_type operator()(state_type x, Op op, state_type init) const
         {
+          init = op(init, x);
+          return init;
+        }
+      };
 
-            template <>
-            struct vector_space_reduce<state_type>
-            {
-                template <class Op>
-                state_type operator()(state_type x, Op op, state_type init) const
-                {
-                    init = op(init, x);
-                    return init;
-                }
-            };
-
-        }  // namespace odeint
-    }      // namespace numeric
+    }  // namespace odeint
+  }    // namespace numeric
 }  // namespace boost
 
 void constant_system(const state_type &x, state_type &dxdt, value_type t)
 {
-    dxdt = value_type(1.0, precision);
+  dxdt = value_type(1.0, precision);
 }
 
 /* check runge kutta stepers */
@@ -100,34 +100,34 @@ typedef mpl::vector<
 template <class Stepper>
 struct perform_runge_kutta_test
 {
-    void operator()(void)
-    {
-        /* We have to specify the desired precision in advance! */
-        mpf_set_default_prec(precision);
+  void operator()(void)
+  {
+    /* We have to specify the desired precision in advance! */
+    mpf_set_default_prec(precision);
 
-        mpf_t eps_, unity;
-        mpf_init(eps_);
-        mpf_init(unity);
-        mpf_set_d(unity, 1.0);
-        mpf_div_2exp(eps_, unity, precision - 1);  // 2^(-precision+1) : smallest number that can be
-                                                   // represented with used precision
-        value_type eps(eps_);
+    mpf_t eps_, unity;
+    mpf_init(eps_);
+    mpf_init(unity);
+    mpf_set_d(unity, 1.0);
+    mpf_div_2exp(eps_, unity, precision - 1);  // 2^(-precision+1) : smallest number that can be
+                                               // represented with used precision
+    value_type eps(eps_);
 
-        Stepper    stepper;
-        state_type x;
-        x = 0.0;
+    Stepper    stepper;
+    state_type x;
+    x = 0.0;
 
-        stepper.do_step(constant_system, x, 0.0, 0.1);
+    stepper.do_step(constant_system, x, 0.0, 0.1);
 
-        BOOST_MESSAGE(eps);
-        BOOST_CHECK_MESSAGE(abs(x - value_type(0.1, precision)) < eps, x - 0.1);
-    }
+    BOOST_MESSAGE(eps);
+    BOOST_CHECK_MESSAGE(abs(x - value_type(0.1, precision)) < eps, x - 0.1);
+  }
 };
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(runge_kutta_stepper_test, Stepper, stepper_types)
 {
-    perform_runge_kutta_test<Stepper> tester;
-    tester();
+  perform_runge_kutta_test<Stepper> tester;
+  tester();
 }
 
 /* check controlled steppers */
@@ -144,34 +144,34 @@ typedef mpl::vector<
 template <class Stepper>
 struct perform_controlled_test
 {
-    void operator()(void)
-    {
-        mpf_set_default_prec(precision);
+  void operator()(void)
+  {
+    mpf_set_default_prec(precision);
 
-        mpf_t eps_, unity;
-        mpf_init(eps_);
-        mpf_init(unity);
-        mpf_set_d(unity, 1.0);
-        mpf_div_2exp(eps_, unity, precision - 1);  // 2^(-precision+1) : smallest number that can be
-                                                   // represented with used precision
-        value_type eps(eps_);
+    mpf_t eps_, unity;
+    mpf_init(eps_);
+    mpf_init(unity);
+    mpf_set_d(unity, 1.0);
+    mpf_div_2exp(eps_, unity, precision - 1);  // 2^(-precision+1) : smallest number that can be
+                                               // represented with used precision
+    value_type eps(eps_);
 
-        Stepper    stepper;
-        state_type x;
-        x = 0.0;
+    Stepper    stepper;
+    state_type x;
+    x = 0.0;
 
-        value_type t(0.0);
-        value_type dt(0.1);
+    value_type t(0.0);
+    value_type dt(0.1);
 
-        stepper.try_step(constant_system, x, t, dt);
+    stepper.try_step(constant_system, x, t, dt);
 
-        BOOST_MESSAGE(eps);
-        BOOST_CHECK_MESSAGE(abs(x - value_type(0.1, precision)) < eps, x - 0.1);
-    }
+    BOOST_MESSAGE(eps);
+    BOOST_CHECK_MESSAGE(abs(x - value_type(0.1, precision)) < eps, x - 0.1);
+  }
 };
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(controlled_stepper_test, Stepper, controlled_stepper_types)
 {
-    perform_controlled_test<Stepper> tester;
-    tester();
+  perform_controlled_test<Stepper> tester;
+  tester();
 }

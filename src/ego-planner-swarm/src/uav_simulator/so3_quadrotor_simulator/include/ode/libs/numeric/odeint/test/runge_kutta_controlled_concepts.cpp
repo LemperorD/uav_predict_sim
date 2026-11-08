@@ -70,19 +70,19 @@ template <class Stepper, class System>
 void check_controlled_stepper_concept(Stepper &stepper, System system,
                                       typename Stepper::state_type &x)
 {
-    typedef Stepper                           stepper_type;
-    typedef typename stepper_type::deriv_type container_type;
-    // typedef typename stepper_type::order_type order_type;  controlled_error_stepper don't
-    // necessarily have a order (burlish-stoer)
-    typedef typename stepper_type::time_type time_type;
+  typedef Stepper                           stepper_type;
+  typedef typename stepper_type::deriv_type container_type;
+  // typedef typename stepper_type::order_type order_type;  controlled_error_stepper don't
+  // necessarily have a order (burlish-stoer)
+  typedef typename stepper_type::time_type time_type;
 
-    time_type              t = 0.0, dt = 0.1;
-    controlled_step_result step_result = stepper.try_step(system, x, t, dt);
+  time_type              t = 0.0, dt = 0.1;
+  controlled_step_result step_result = stepper.try_step(system, x, t, dt);
 
-    BOOST_CHECK_MESSAGE(
-        step_result == success,
-        "step result: "
-            << step_result);  // error = 0 for constant system -> step size is always too small
+  BOOST_CHECK_MESSAGE(
+      step_result == success,
+      "step result: "
+          << step_result);  // error = 0 for constant system -> step size is always too small
 }
 
 template <class ControlledStepper, class State>
@@ -91,64 +91,64 @@ struct perform_controlled_stepper_test;
 template <class ControlledStepper>
 struct perform_controlled_stepper_test<ControlledStepper, vector_type>
 {
-    void operator()(void)
-    {
-        vector_type x(1, 2.0);
-        // typename ControlledStepper::stepper_type error_stepper;
-        // default_error_checker< typename ControlledStepper::value_type ,
-        //                              typename ControlledStepper::algebra_type ,
-        //                              typename ControlledStepper::operations_type > error_checker;
-        // ControlledStepper controlled_stepper( error_stepper , error_checker );
-        ControlledStepper controlled_stepper;
-        check_controlled_stepper_concept(
-            controlled_stepper, constant_system_standard<vector_type, vector_type, double>, x);
-        check_controlled_stepper_concept(controlled_stepper,
-                                         boost::cref(constant_system_functor_standard()), x);
-        BOOST_CHECK_SMALL(fabs(x[0] - result), eps);
-    }
+  void operator()(void)
+  {
+    vector_type x(1, 2.0);
+    // typename ControlledStepper::stepper_type error_stepper;
+    // default_error_checker< typename ControlledStepper::value_type ,
+    //                              typename ControlledStepper::algebra_type ,
+    //                              typename ControlledStepper::operations_type > error_checker;
+    // ControlledStepper controlled_stepper( error_stepper , error_checker );
+    ControlledStepper controlled_stepper;
+    check_controlled_stepper_concept(controlled_stepper,
+                                     constant_system_standard<vector_type, vector_type, double>, x);
+    check_controlled_stepper_concept(controlled_stepper,
+                                     boost::cref(constant_system_functor_standard()), x);
+    BOOST_CHECK_SMALL(fabs(x[0] - result), eps);
+  }
 };
 
 template <class ControlledStepper>
 struct perform_controlled_stepper_test<ControlledStepper, vector_space_type>
 {
-    void operator()(void) const
-    {
-        vector_space_type x;
-        x.m_x = 2.0;
-        /*typename ControlledStepper::stepper_type error_stepper;
-          default_error_checker< typename ControlledStepper::value_type ,
-          typename ControlledStepper::algebra_type ,
-          typename ControlledStepper::operations_type > error_checker;
-          ControlledStepper controlled_stepper( error_stepper , error_checker );*/
-        ControlledStepper controlled_stepper;
-        check_controlled_stepper_concept(
-            controlled_stepper,
-            constant_system_vector_space<vector_space_type, vector_space_type, double>, x);
-        check_controlled_stepper_concept(controlled_stepper,
-                                         boost::cref(constant_system_functor_vector_space()), x);
-        BOOST_CHECK_SMALL(fabs(x.m_x - result), eps);
-    }
+  void operator()(void) const
+  {
+    vector_space_type x;
+    x.m_x = 2.0;
+    /*typename ControlledStepper::stepper_type error_stepper;
+      default_error_checker< typename ControlledStepper::value_type ,
+      typename ControlledStepper::algebra_type ,
+      typename ControlledStepper::operations_type > error_checker;
+      ControlledStepper controlled_stepper( error_stepper , error_checker );*/
+    ControlledStepper controlled_stepper;
+    check_controlled_stepper_concept(
+        controlled_stepper,
+        constant_system_vector_space<vector_space_type, vector_space_type, double>, x);
+    check_controlled_stepper_concept(controlled_stepper,
+                                     boost::cref(constant_system_functor_vector_space()), x);
+    BOOST_CHECK_SMALL(fabs(x.m_x - result), eps);
+  }
 };
 
 template <class ControlledStepper>
 struct perform_controlled_stepper_test<ControlledStepper, array_type>
 {
-    void operator()(void)
-    {
-        array_type x;
-        x[0] = 2.0;
-        /*typename ControlledStepper::stepper_type error_stepper;
-          default_error_checker< typename ControlledStepper::value_type ,
-          typename ControlledStepper::algebra_type ,
-          typename ControlledStepper::operations_type > error_checker;
-          ControlledStepper controlled_stepper( error_stepper , error_checker );*/
-        ControlledStepper controlled_stepper;
-        check_controlled_stepper_concept(
-            controlled_stepper, constant_system_standard<array_type, array_type, double>, x);
-        check_controlled_stepper_concept(controlled_stepper,
-                                         boost::cref(constant_system_functor_standard()), x);
-        BOOST_CHECK_SMALL(fabs(x[0] - result), eps);
-    }
+  void operator()(void)
+  {
+    array_type x;
+    x[0] = 2.0;
+    /*typename ControlledStepper::stepper_type error_stepper;
+      default_error_checker< typename ControlledStepper::value_type ,
+      typename ControlledStepper::algebra_type ,
+      typename ControlledStepper::operations_type > error_checker;
+      ControlledStepper controlled_stepper( error_stepper , error_checker );*/
+    ControlledStepper controlled_stepper;
+    check_controlled_stepper_concept(controlled_stepper,
+                                     constant_system_standard<array_type, array_type, double>, x);
+    check_controlled_stepper_concept(controlled_stepper,
+                                     boost::cref(constant_system_functor_standard()), x);
+    BOOST_CHECK_SMALL(fabs(x[0] - result), eps);
+  }
 };
 
 template <class State>
@@ -175,9 +175,8 @@ BOOST_AUTO_TEST_SUITE(controlled_runge_kutta_concept_test)
 BOOST_AUTO_TEST_CASE_TEMPLATE(controlled_stepper_test, ControlledStepper,
                               all_controlled_stepper_methods)
 {
-    perform_controlled_stepper_test<ControlledStepper, typename ControlledStepper::state_type>
-        tester;
-    tester();
+  perform_controlled_stepper_test<ControlledStepper, typename ControlledStepper::state_type> tester;
+  tester();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

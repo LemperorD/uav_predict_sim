@@ -12,12 +12,12 @@
 namespace quadrotor_msgs
 {
 
-    void encodeSO3Command(const quadrotor_msgs::msg::SO3Command &so3_command,
-                          std::vector<uint8_t>                  &output);
-    void encodeTRPYCommand(const quadrotor_msgs::msg::TRPYCommand &trpy_command,
-                           std::vector<uint8_t>                   &output);
+  void encodeSO3Command(const quadrotor_msgs::msg::SO3Command &so3_command,
+                        std::vector<uint8_t>                  &output);
+  void encodeTRPYCommand(const quadrotor_msgs::msg::TRPYCommand &trpy_command,
+                         std::vector<uint8_t>                   &output);
 
-    void encodePPRGains(const quadrotor_msgs::msg::Gains &gains, std::vector<uint8_t> &output);
+  void encodePPRGains(const quadrotor_msgs::msg::Gains &gains, std::vector<uint8_t> &output);
 }  // namespace quadrotor_msgs
 
 #endif

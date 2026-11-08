@@ -44,38 +44,38 @@ BOOST_AUTO_TEST_CASE(test_double) { BOOST_CHECK(!(is_resizeable<double>::value))
 
 BOOST_AUTO_TEST_CASE(test_fusion_vector_of_vector)
 {
-    typedef boost::fusion::vector<std::vector<double>, std::vector<double> > state_type;
-    BOOST_CHECK(is_resizeable<state_type>::value);
+  typedef boost::fusion::vector<std::vector<double>, std::vector<double> > state_type;
+  BOOST_CHECK(is_resizeable<state_type>::value);
 }
 
 BOOST_AUTO_TEST_CASE(test_fusion_vector_of_double)
 {
-    typedef boost::fusion::vector<double, double> state_type;
-    BOOST_CHECK(!(is_resizeable<state_type>::value));
+  typedef boost::fusion::vector<double, double> state_type;
+  BOOST_CHECK(!(is_resizeable<state_type>::value));
 }
 
 BOOST_AUTO_TEST_CASE(test_fusion_vector_mixed1)
 {
-    typedef boost::fusion::vector<double, std::vector<double> > state_type;
-    BOOST_CHECK(is_resizeable<state_type>::value);
+  typedef boost::fusion::vector<double, std::vector<double> > state_type;
+  BOOST_CHECK(is_resizeable<state_type>::value);
 }
 
 BOOST_AUTO_TEST_CASE(test_fusion_vector_mixed2)
 {
-    typedef boost::fusion::vector<std::vector<double>, double> state_type;
-    BOOST_CHECK(is_resizeable<state_type>::value);
+  typedef boost::fusion::vector<std::vector<double>, double> state_type;
+  BOOST_CHECK(is_resizeable<state_type>::value);
 }
 
 BOOST_AUTO_TEST_CASE(test_fusion_quantity_sequence)
 {
-    namespace units = boost::units;
-    namespace si    = boost::units::si;
+  namespace units = boost::units;
+  namespace si    = boost::units::si;
 
-    typedef double                                            value_type;
-    typedef units::quantity<si::time, value_type>             time_type;
-    typedef units::quantity<si::length, value_type>           length_type;
-    typedef units::quantity<si::velocity, value_type>         velocity_type;
-    typedef boost::fusion::vector<length_type, velocity_type> state_type;
+  typedef double                                            value_type;
+  typedef units::quantity<si::time, value_type>             time_type;
+  typedef units::quantity<si::length, value_type>           length_type;
+  typedef units::quantity<si::velocity, value_type>         velocity_type;
+  typedef boost::fusion::vector<length_type, velocity_type> state_type;
 
-    BOOST_CHECK(!(is_resizeable<state_type>::value));
+  BOOST_CHECK(!(is_resizeable<state_type>::value));
 }

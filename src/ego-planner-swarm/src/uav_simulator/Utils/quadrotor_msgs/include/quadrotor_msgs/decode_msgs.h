@@ -12,14 +12,12 @@
 namespace quadrotor_msgs
 {
 
-    bool decodeOutputData(const std::vector<uint8_t>      &data,
-                          quadrotor_msgs::msg::OutputData &output);
+  bool decodeOutputData(const std::vector<uint8_t> &data, quadrotor_msgs::msg::OutputData &output);
 
-    bool decodeStatusData(const std::vector<uint8_t>      &data,
-                          quadrotor_msgs::msg::StatusData &status);
+  bool decodeStatusData(const std::vector<uint8_t> &data, quadrotor_msgs::msg::StatusData &status);
 
-    bool decodePPROutputData(const std::vector<uint8_t>         &data,
-                             quadrotor_msgs::msg::PPROutputData &output);
+  bool decodePPROutputData(const std::vector<uint8_t>         &data,
+                           quadrotor_msgs::msg::PPROutputData &output);
 }  // namespace quadrotor_msgs
 
 #endif

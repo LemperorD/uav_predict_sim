@@ -8,17 +8,17 @@ using namespace ego_planner;
 
 int main(int argc, char **argv)
 {
-    rclcpp::init(argc, argv);
-    auto node = std::make_shared<rclcpp::Node>("ego_planner_node");
+  rclcpp::init(argc, argv);
+  auto node = std::make_shared<rclcpp::Node>("ego_planner_node");
 
-    EGOReplanFSM rebo_replan;
+  EGOReplanFSM rebo_replan;
 
-    rebo_replan.init(node);
+  rebo_replan.init(node);
 
-    rclcpp::spin(node);
-    rclcpp::shutdown();
+  rclcpp::spin(node);
+  rclcpp::shutdown();
 
-    return 0;
+  return 0;
 }
 
 // #include <ros/ros.h>

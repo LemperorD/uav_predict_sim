@@ -37,54 +37,54 @@ typedef boost::numeric::ublas::matrix<value_type> matrix_type;
 // harmonic oscillator, analytic solution x[0] = sin( t )
 struct sys
 {
-    void operator()(const state_type &x, state_type &dxdt, const value_type &t) const
-    {
-        dxdt(0) = x(1);
-        dxdt(1) = -x(0);
-    }
+  void operator()(const state_type &x, state_type &dxdt, const value_type &t) const
+  {
+    dxdt(0) = x(1);
+    dxdt(1) = -x(0);
+  }
 };
 
 struct jacobi
 {
-    void operator()(const state_type &x, matrix_type &jacobi, const value_type &t,
-                    state_type &dfdt) const
-    {
-        jacobi(0, 0) = 0;
-        jacobi(0, 1) = 1;
-        jacobi(1, 0) = -1;
-        jacobi(1, 1) = 0;
-        dfdt(0)      = 0.0;
-        dfdt(1)      = 0.0;
-    }
+  void operator()(const state_type &x, matrix_type &jacobi, const value_type &t,
+                  state_type &dfdt) const
+  {
+    jacobi(0, 0) = 0;
+    jacobi(0, 1) = 1;
+    jacobi(1, 0) = -1;
+    jacobi(1, 1) = 0;
+    dfdt(0)      = 0.0;
+    dfdt(1)      = 0.0;
+  }
 };
 
 BOOST_AUTO_TEST_SUITE(numeric_rosenbrock4)
 
 BOOST_AUTO_TEST_CASE(rosenbrock4_numeric_test)
 {
-    typedef rosenbrock4<value_type> stepper_type;
-    stepper_type                    stepper;
+  typedef rosenbrock4<value_type> stepper_type;
+  stepper_type                    stepper;
 
-    const int o = stepper.order() + 1;
+  const int o = stepper.order() + 1;
 
-    state_type x0(2), x1(2);
-    x0(0) = 0.0;
-    x0(1) = 1.0;
+  state_type x0(2), x1(2);
+  x0(0) = 0.0;
+  x0(1) = 1.0;
 
-    double dt = 0.5;
+  double dt = 0.5;
 
+  stepper.do_step(std::make_pair(sys(), jacobi()), x0, 0.0, x1, dt);
+  const double f = 2.0 * std::abs(sin(dt) - x1(0)) / std::pow(dt, o);
+
+  std::cout << o << " , " << f << std::endl;
+
+  while (f * std::pow(dt, o) > 1E-16)
+  {
     stepper.do_step(std::make_pair(sys(), jacobi()), x0, 0.0, x1, dt);
-    const double f = 2.0 * std::abs(sin(dt) - x1(0)) / std::pow(dt, o);
-
-    std::cout << o << " , " << f << std::endl;
-
-    while (f * std::pow(dt, o) > 1E-16)
-    {
-        stepper.do_step(std::make_pair(sys(), jacobi()), x0, 0.0, x1, dt);
-        std::cout << "Testing dt=" << dt << std::endl;
-        BOOST_CHECK_SMALL(std::abs(sin(dt) - x1(0)), f * std::pow(dt, o));
-        dt *= 0.5;
-    }
+    std::cout << "Testing dt=" << dt << std::endl;
+    BOOST_CHECK_SMALL(std::abs(sin(dt) - x1(0)), f * std::pow(dt, o));
+    dt *= 0.5;
+  }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

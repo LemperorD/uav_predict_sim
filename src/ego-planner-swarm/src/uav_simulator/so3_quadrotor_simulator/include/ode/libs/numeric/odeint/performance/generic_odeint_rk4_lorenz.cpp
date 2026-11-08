@@ -42,35 +42,35 @@ typedef runge_kutta4<state_type, double, state_type, double, array_algebra> rk4_
 
 class rk4_wrapper
 {
-   public:
-    rk4_wrapper()
-    //        : m_stepper( a , b , c )
-    {
-    }
+ public:
+  rk4_wrapper()
+  //        : m_stepper( a , b , c )
+  {
+  }
 
-    void reset_init_cond()
-    {
-        m_x[0] = 10.0 * rand() / RAND_MAX;
-        m_x[1] = 10.0 * rand() / RAND_MAX;
-        m_x[2] = 10.0 * rand() / RAND_MAX;
-        m_t    = 0.0;
-    }
+  void reset_init_cond()
+  {
+    m_x[0] = 10.0 * rand() / RAND_MAX;
+    m_x[1] = 10.0 * rand() / RAND_MAX;
+    m_x[2] = 10.0 * rand() / RAND_MAX;
+    m_t    = 0.0;
+  }
 
-    inline void do_step(const double dt) { m_stepper.do_step(lorenz(), m_x, m_t, dt); }
+  inline void do_step(const double dt) { m_stepper.do_step(lorenz(), m_x, m_t, dt); }
 
-    double state(const size_t i) const { return m_x[i]; }
+  double state(const size_t i) const { return m_x[i]; }
 
-   private:
-    state_type m_x;
-    double     m_t;
-    rk4_type   m_stepper;
+ private:
+  state_type m_x;
+  double     m_t;
+  rk4_type   m_stepper;
 };
 
 int main()
 {
-    srand(12312354);
+  srand(12312354);
 
-    rk4_wrapper stepper;
+  rk4_wrapper stepper;
 
-    run(stepper);
+  run(stepper);
 }

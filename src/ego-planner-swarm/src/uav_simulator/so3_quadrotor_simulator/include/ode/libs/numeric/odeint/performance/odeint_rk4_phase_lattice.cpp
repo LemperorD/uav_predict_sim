@@ -30,32 +30,32 @@ typedef boost::numeric::odeint::runge_kutta4_classic<state_type, double, state_t
 
 class odeint_wrapper
 {
-   public:
-    void reset_init_cond()
-    {
-        for (size_t i = 0; i < N; ++i) m_x[i] = 2.0 * 3.1415927 * rand() / RAND_MAX;
-        m_t = 0.0;
-    }
+ public:
+  void reset_init_cond()
+  {
+    for (size_t i = 0; i < N; ++i) m_x[i] = 2.0 * 3.1415927 * rand() / RAND_MAX;
+    m_t = 0.0;
+  }
 
-    inline void do_step(const double dt)
-    {
-        m_stepper.do_step(phase_lattice<N>(), m_x, m_t, dt);
-        // m_t += dt;
-    }
+  inline void do_step(const double dt)
+  {
+    m_stepper.do_step(phase_lattice<N>(), m_x, m_t, dt);
+    // m_t += dt;
+  }
 
-    double state(const size_t i) const { return m_x[i]; }
+  double state(const size_t i) const { return m_x[i]; }
 
-   private:
-    state_type      m_x;
-    double          m_t;
-    rk4_odeint_type m_stepper;
+ private:
+  state_type      m_x;
+  double          m_t;
+  rk4_odeint_type m_stepper;
 };
 
 int main()
 {
-    srand(12312354);
+  srand(12312354);
 
-    odeint_wrapper stepper;
+  odeint_wrapper stepper;
 
-    run(stepper, 10000, 1E-6);
+  run(stepper, 10000, 1E-6);
 }

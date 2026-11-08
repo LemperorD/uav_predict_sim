@@ -23,24 +23,23 @@
 
 namespace boost
 {
-    namespace numeric
+  namespace numeric
+  {
+    namespace odeint
     {
-        namespace odeint
-        {
 
-            template <class State, class Value, class Deriv, class Time, class Algebra,
-                      class Operations, class Resize>
-            struct get_controller<
-                runge_kutta_fehlberg78<State, Value, Deriv, Time, Algebra, Operations, Resize> >
-            {
-                typedef runge_kutta_fehlberg78<State, Value, Deriv, Time, Algebra, Operations,
-                                               Resize>
-                                                             stepper_type;
-                typedef controlled_runge_kutta<stepper_type> type;
-            };
+      template <class State, class Value, class Deriv, class Time, class Algebra, class Operations,
+                class Resize>
+      struct get_controller<
+          runge_kutta_fehlberg78<State, Value, Deriv, Time, Algebra, Operations, Resize> >
+      {
+        typedef runge_kutta_fehlberg78<State, Value, Deriv, Time, Algebra, Operations, Resize>
+                                                     stepper_type;
+        typedef controlled_runge_kutta<stepper_type> type;
+      };
 
-        }  // namespace odeint
-    }      // namespace numeric
+    }  // namespace odeint
+  }    // namespace numeric
 }  // namespace boost
 
 #endif  // BOOST_NUMERIC_ODEINT_STEPPER_GENERATION_GENERATION_RUNGE_KUTTA_FEHLBERG78_HPP_INCLUDED

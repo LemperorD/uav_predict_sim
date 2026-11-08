@@ -9,51 +9,51 @@
 namespace uav_utils
 {
 
-    /* 判断 value 是否在 [low, high] 范围内 */
-    template <typename T, typename T2>
-    bool in_range(T value, const T2& low, const T2& high)
+  /* 判断 value 是否在 [low, high] 范围内 */
+  template <typename T, typename T2>
+  bool in_range(T value, const T2& low, const T2& high)
+  {
+    RCLCPP_ASSERT(rclcpp::get_logger("uav_utils"), low < high, "%f < %f?", static_cast<double>(low),
+                  static_cast<double>(high));
+    return (low <= value) && (value <= high);
+  }
+
+  /* 判断 value 是否在 [-limit, limit] 范围内 */
+  template <typename T, typename T2>
+  bool in_range(T value, const T2& limit)
+  {
+    RCLCPP_ASSERT(rclcpp::get_logger("uav_utils"), limit > 0, "%f > 0?",
+                  static_cast<double>(limit));
+    return in_range(value, -limit, limit);
+  }
+
+  template <typename T, typename T2>
+  void limit_range(T& value, const T2& low, const T2& high)
+  {
+    RCLCPP_ASSERT(rclcpp::get_logger("uav_utils"), low < high, "%f < %f?", static_cast<double>(low),
+                  static_cast<double>(high));
+    if (value < low)
     {
-        RCLCPP_ASSERT(rclcpp::get_logger("uav_utils"), low < high, "%f < %f?",
-                      static_cast<double>(low), static_cast<double>(high));
-        return (low <= value) && (value <= high);
+      value = low;
     }
 
-    /* 判断 value 是否在 [-limit, limit] 范围内 */
-    template <typename T, typename T2>
-    bool in_range(T value, const T2& limit)
+    if (value > high)
     {
-        RCLCPP_ASSERT(rclcpp::get_logger("uav_utils"), limit > 0, "%f > 0?",
-                      static_cast<double>(limit));
-        return in_range(value, -limit, limit);
+      value = high;
     }
 
-    template <typename T, typename T2>
-    void limit_range(T& value, const T2& low, const T2& high)
-    {
-        RCLCPP_ASSERT(rclcpp::get_logger("uav_utils"), low < high, "%f < %f?",
-                      static_cast<double>(low), static_cast<double>(high));
-        if (value < low)
-        {
-            value = low;
-        }
+    return;
+  }
 
-        if (value > high)
-        {
-            value = high;
-        }
+  template <typename T, typename T2>
+  void limit_range(T& value, const T2& limit)
+  {
+    RCLCPP_ASSERT(rclcpp::get_logger("uav_utils"), limit > 0, "%f > 0?",
+                  static_cast<double>(limit));
+    limit_range(value, -limit, limit);
+  }
 
-        return;
-    }
-
-    template <typename T, typename T2>
-    void limit_range(T& value, const T2& limit)
-    {
-        RCLCPP_ASSERT(rclcpp::get_logger("uav_utils"), limit > 0, "%f > 0?",
-                      static_cast<double>(limit));
-        limit_range(value, -limit, limit);
-    }
-
-    typedef std::stringstream DebugSS_t;
+  typedef std::stringstream DebugSS_t;
 }  // namespace uav_utils
 
 #endif

@@ -43,26 +43,26 @@
 template <class T, size_t Dim>
 class test_array
 {
-   public:
-    const static size_t       dim = Dim;
-    typedef T                 value_type;
-    typedef value_type*       iterator;
-    typedef const value_type* const_iterator;
+ public:
+  const static size_t       dim = Dim;
+  typedef T                 value_type;
+  typedef value_type*       iterator;
+  typedef const value_type* const_iterator;
 
-    value_type& operator[](size_t i) { return m_data[i]; }
+  value_type& operator[](size_t i) { return m_data[i]; }
 
-    const value_type& operator[](size_t i) const { return m_data[i]; }
+  const value_type& operator[](size_t i) const { return m_data[i]; }
 
-    iterator begin(void) { return m_data; }
+  iterator begin(void) { return m_data; }
 
-    iterator end(void) { return m_data + dim; }
+  iterator end(void) { return m_data + dim; }
 
-    const_iterator begin(void) const { return m_data; }
+  const_iterator begin(void) const { return m_data; }
 
-    const_iterator end(void) const { return m_data + dim; }
+  const_iterator end(void) const { return m_data + dim; }
 
-   private:
-    value_type m_data[dim];
+ private:
+  value_type m_data[dim];
 };
 
 template <class T, size_t Dim>
@@ -86,89 +86,89 @@ size_t copy2_count      = 0;
 
 void reset_counter(void)
 {
-    construct_count  = 0;
-    construct2_count = 0;
-    destruct_count   = 0;
-    destruct2_count  = 0;
-    copy_count       = 0;
-    copy2_count      = 0;
+  construct_count  = 0;
+  construct2_count = 0;
+  destruct_count   = 0;
+  destruct2_count  = 0;
+  copy_count       = 0;
+  copy2_count      = 0;
 }
 
 namespace boost
 {
-    namespace numeric
+  namespace numeric
+  {
+    namespace odeint
     {
-        namespace odeint
+
+      // provide the state_wrapper
+      template <class T, size_t Dim>
+      struct state_wrapper<test_array<T, Dim> >
+      {
+        typedef state_wrapper<test_array<T, Dim> > state_wrapper_type;
+        typedef test_array<T, Dim>                 state_type;
+        typedef T                                  value_type;
+
+        state_type m_v;
+
+        state_wrapper() : m_v() { construct_count++; }
+
+        state_wrapper(const state_type& v) : m_v(v)
         {
+          construct_count++;
+          copy_count++;
+        }
 
-            // provide the state_wrapper
-            template <class T, size_t Dim>
-            struct state_wrapper<test_array<T, Dim> >
-            {
-                typedef state_wrapper<test_array<T, Dim> > state_wrapper_type;
-                typedef test_array<T, Dim>                 state_type;
-                typedef T                                  value_type;
+        state_wrapper(const state_wrapper_type& x) : m_v(x.m_v)
+        {
+          construct_count++;
+          copy_count++;
+        }
 
-                state_type m_v;
+        state_wrapper_type& operator=(const state_wrapper_type& x)
+        {
+          copy_count++;
+          return *this;
+        }
 
-                state_wrapper() : m_v() { construct_count++; }
+        ~state_wrapper() { destruct_count++; }
+      };
 
-                state_wrapper(const state_type& v) : m_v(v)
-                {
-                    construct_count++;
-                    copy_count++;
-                }
+      // provide the state_wrapper
+      template <class T, size_t Dim>
+      struct state_wrapper<test_array2<T, Dim> >
+      {
+        typedef state_wrapper<test_array2<T, Dim> > state_wrapper_type;
+        typedef test_array2<T, Dim>                 state_type;
+        typedef T                                   value_type;
 
-                state_wrapper(const state_wrapper_type& x) : m_v(x.m_v)
-                {
-                    construct_count++;
-                    copy_count++;
-                }
+        state_type m_v;
 
-                state_wrapper_type& operator=(const state_wrapper_type& x)
-                {
-                    copy_count++;
-                    return *this;
-                }
+        state_wrapper() : m_v() { construct2_count++; }
 
-                ~state_wrapper() { destruct_count++; }
-            };
+        state_wrapper(const state_type& v) : m_v(v)
+        {
+          construct2_count++;
+          copy2_count++;
+        }
 
-            // provide the state_wrapper
-            template <class T, size_t Dim>
-            struct state_wrapper<test_array2<T, Dim> >
-            {
-                typedef state_wrapper<test_array2<T, Dim> > state_wrapper_type;
-                typedef test_array2<T, Dim>                 state_type;
-                typedef T                                   value_type;
+        state_wrapper(const state_wrapper_type& x) : m_v(x.m_v)
+        {
+          construct2_count++;
+          copy2_count++;
+        }
 
-                state_type m_v;
+        state_wrapper_type& operator=(const state_wrapper_type& x)
+        {
+          copy2_count++;
+          return *this;
+        }
 
-                state_wrapper() : m_v() { construct2_count++; }
+        ~state_wrapper() { destruct2_count++; }
+      };
 
-                state_wrapper(const state_type& v) : m_v(v)
-                {
-                    construct2_count++;
-                    copy2_count++;
-                }
-
-                state_wrapper(const state_wrapper_type& x) : m_v(x.m_v)
-                {
-                    construct2_count++;
-                    copy2_count++;
-                }
-
-                state_wrapper_type& operator=(const state_wrapper_type& x)
-                {
-                    copy2_count++;
-                    return *this;
-                }
-
-                ~state_wrapper() { destruct2_count++; }
-            };
-
-        }  // namespace odeint
-    }      // namespace numeric
+    }  // namespace odeint
+  }    // namespace numeric
 }  // namespace boost
 
 typedef test_array<double, 3>                                                        state_type;
@@ -189,13 +189,13 @@ typedef boost::numeric::odeint::dense_output_runge_kutta<euler_type> dense_outpu
 typedef boost::numeric::odeint::dense_output_runge_kutta<controlled_dopri5_type>
     dense_output_dopri5_type;
 
-#define CHECK_COUNTERS(c1, c2, c3, c4, c5, c6)       \
-    BOOST_CHECK_EQUAL(construct_count, size_t(c1));  \
-    BOOST_CHECK_EQUAL(construct2_count, size_t(c2)); \
-    BOOST_CHECK_EQUAL(destruct_count, size_t(c3));   \
-    BOOST_CHECK_EQUAL(destruct2_count, size_t(c4));  \
-    BOOST_CHECK_EQUAL(copy_count, size_t(c5));       \
-    BOOST_CHECK_EQUAL(copy2_count, size_t(c6))
+#define CHECK_COUNTERS(c1, c2, c3, c4, c5, c6)     \
+  BOOST_CHECK_EQUAL(construct_count, size_t(c1));  \
+  BOOST_CHECK_EQUAL(construct2_count, size_t(c2)); \
+  BOOST_CHECK_EQUAL(destruct_count, size_t(c3));   \
+  BOOST_CHECK_EQUAL(destruct2_count, size_t(c4));  \
+  BOOST_CHECK_EQUAL(copy_count, size_t(c5));       \
+  BOOST_CHECK_EQUAL(copy2_count, size_t(c6))
 
 BOOST_AUTO_TEST_SUITE(stepper_copying)
 
@@ -205,11 +205,11 @@ BOOST_AUTO_TEST_SUITE(stepper_copying)
  */
 BOOST_AUTO_TEST_CASE(explicit_euler_construct)
 {
-    reset_counter();
-    {
-        euler_type euler;
-    }
-    CHECK_COUNTERS(0, 1, 0, 1, 0, 0);
+  reset_counter();
+  {
+    euler_type euler;
+  }
+  CHECK_COUNTERS(0, 1, 0, 1, 0, 0);
 }
 
 /*
@@ -221,12 +221,12 @@ BOOST_AUTO_TEST_CASE(explicit_euler_construct)
  */
 BOOST_AUTO_TEST_CASE(explicit_euler_copy_construct)
 {
-    reset_counter();
-    {
-        euler_type euler;
-        euler_type euler2(euler);
-    }
-    CHECK_COUNTERS(0, 1 + 1, 0, 1 + 1, 0, 1);
+  reset_counter();
+  {
+    euler_type euler;
+    euler_type euler2(euler);
+  }
+  CHECK_COUNTERS(0, 1 + 1, 0, 1 + 1, 0, 1);
 }
 
 /*
@@ -238,13 +238,13 @@ BOOST_AUTO_TEST_CASE(explicit_euler_copy_construct)
  */
 BOOST_AUTO_TEST_CASE(explicit_euler_assign)
 {
-    reset_counter();
-    {
-        euler_type euler;
-        euler_type euler2;
-        euler2 = euler;
-    }
-    CHECK_COUNTERS(0, 2, 0, 2, 0, 1);
+  reset_counter();
+  {
+    euler_type euler;
+    euler_type euler2;
+    euler2 = euler;
+  }
+  CHECK_COUNTERS(0, 2, 0, 2, 0, 1);
 }
 
 /*
@@ -255,11 +255,11 @@ BOOST_AUTO_TEST_CASE(explicit_euler_assign)
  */
 BOOST_AUTO_TEST_CASE(explicit_rk4_construct)
 {
-    reset_counter();
-    {
-        rk4_type rk4;
-    }
-    CHECK_COUNTERS(1, 4, 1, 4, 0, 0);
+  reset_counter();
+  {
+    rk4_type rk4;
+  }
+  CHECK_COUNTERS(1, 4, 1, 4, 0, 0);
 }
 
 /*
@@ -275,12 +275,12 @@ BOOST_AUTO_TEST_CASE(explicit_rk4_construct)
  */
 BOOST_AUTO_TEST_CASE(explicit_rk4_copy_construct)
 {
-    reset_counter();
-    {
-        rk4_type rk4;
-        rk4_type rk4_2(rk4);
-    }
-    CHECK_COUNTERS(2, 8, 2, 8, 1, 4);
+  reset_counter();
+  {
+    rk4_type rk4;
+    rk4_type rk4_2(rk4);
+  }
+  CHECK_COUNTERS(2, 8, 2, 8, 1, 4);
 }
 
 /*
@@ -296,13 +296,13 @@ BOOST_AUTO_TEST_CASE(explicit_rk4_copy_construct)
  */
 BOOST_AUTO_TEST_CASE(explicit_rk4_assign)
 {
-    reset_counter();
-    {
-        rk4_type rk4;
-        rk4_type rk4_2;
-        rk4 = rk4_2;
-    }
-    CHECK_COUNTERS(2, 8, 2, 8, 1, 4);
+  reset_counter();
+  {
+    rk4_type rk4;
+    rk4_type rk4_2;
+    rk4 = rk4_2;
+  }
+  CHECK_COUNTERS(2, 8, 2, 8, 1, 4);
 }
 
 /*
@@ -313,11 +313,11 @@ BOOST_AUTO_TEST_CASE(explicit_rk4_assign)
  */
 BOOST_AUTO_TEST_CASE(explicit_rk4_generic_construct)
 {
-    reset_counter();
-    {
-        rk4_generic_type rk4;
-    }
-    CHECK_COUNTERS(1, 4, 1, 4, 0, 0);
+  reset_counter();
+  {
+    rk4_generic_type rk4;
+  }
+  CHECK_COUNTERS(1, 4, 1, 4, 0, 0);
 }
 
 /*
@@ -333,12 +333,12 @@ BOOST_AUTO_TEST_CASE(explicit_rk4_generic_construct)
  */
 BOOST_AUTO_TEST_CASE(explicit_rk4_generic_copy_construct)
 {
-    reset_counter();
-    {
-        rk4_generic_type rk4;
-        rk4_generic_type rk4_2(rk4);
-    }
-    CHECK_COUNTERS(2, 8, 2, 8, 1, 4);
+  reset_counter();
+  {
+    rk4_generic_type rk4;
+    rk4_generic_type rk4_2(rk4);
+  }
+  CHECK_COUNTERS(2, 8, 2, 8, 1, 4);
 }
 
 /*
@@ -354,13 +354,13 @@ BOOST_AUTO_TEST_CASE(explicit_rk4_generic_copy_construct)
  */
 BOOST_AUTO_TEST_CASE(explicit_rk4_generic_assign)
 {
-    reset_counter();
-    {
-        rk4_generic_type rk4;
-        rk4_generic_type rk4_2;
-        rk4 = rk4_2;
-    }
-    CHECK_COUNTERS(2, 8, 2, 8, 1, 4);
+  reset_counter();
+  {
+    rk4_generic_type rk4;
+    rk4_generic_type rk4_2;
+    rk4 = rk4_2;
+  }
+  CHECK_COUNTERS(2, 8, 2, 8, 1, 4);
 }
 
 /*
@@ -381,11 +381,11 @@ BOOST_AUTO_TEST_CASE(explicit_rk4_generic_assign)
  */
 BOOST_AUTO_TEST_CASE(controlled_rk54_construct)
 {
-    reset_counter();
-    {
-        controlled_rk54_type stepper;
-    }
-    CHECK_COUNTERS(4, 13, 4, 13, 1, 6);
+  reset_counter();
+  {
+    controlled_rk54_type stepper;
+  }
+  CHECK_COUNTERS(4, 13, 4, 13, 1, 6);
 }
 
 /*
@@ -413,12 +413,12 @@ BOOST_AUTO_TEST_CASE(controlled_rk54_construct)
  */
 BOOST_AUTO_TEST_CASE(controlled_rk54_copy_construct)
 {
-    reset_counter();
-    {
-        controlled_rk54_type stepper;
-        controlled_rk54_type stepper2(stepper);
-    }
-    CHECK_COUNTERS(7, 20, 7, 20, 4, 13);
+  reset_counter();
+  {
+    controlled_rk54_type stepper;
+    controlled_rk54_type stepper2(stepper);
+  }
+  CHECK_COUNTERS(7, 20, 7, 20, 4, 13);
 }
 
 /*
@@ -446,13 +446,13 @@ BOOST_AUTO_TEST_CASE(controlled_rk54_copy_construct)
  */
 BOOST_AUTO_TEST_CASE(controlled_rk54_assign)
 {
-    reset_counter();
-    {
-        controlled_rk54_type stepper;
-        controlled_rk54_type stepper2;
-        stepper2 = stepper;
-    }
-    CHECK_COUNTERS(8, 26, 8, 26, 5, 19);
+  reset_counter();
+  {
+    controlled_rk54_type stepper;
+    controlled_rk54_type stepper2;
+    stepper2 = stepper;
+  }
+  CHECK_COUNTERS(8, 26, 8, 26, 5, 19);
 }
 
 /*
@@ -473,11 +473,11 @@ BOOST_AUTO_TEST_CASE(controlled_rk54_assign)
  */
 BOOST_AUTO_TEST_CASE(controlled_rk54_generic_construct)
 {
-    reset_counter();
-    {
-        controlled_rk54_generic_type stepper;
-    }
-    CHECK_COUNTERS(4, 13, 4, 13, 1, 6);
+  reset_counter();
+  {
+    controlled_rk54_generic_type stepper;
+  }
+  CHECK_COUNTERS(4, 13, 4, 13, 1, 6);
 }
 
 /*
@@ -505,12 +505,12 @@ BOOST_AUTO_TEST_CASE(controlled_rk54_generic_construct)
  */
 BOOST_AUTO_TEST_CASE(controlled_rk54_generic_copy_construct)
 {
-    reset_counter();
-    {
-        controlled_rk54_generic_type stepper;
-        controlled_rk54_generic_type stepper2(stepper);
-    }
-    CHECK_COUNTERS(7, 20, 7, 20, 4, 13);
+  reset_counter();
+  {
+    controlled_rk54_generic_type stepper;
+    controlled_rk54_generic_type stepper2(stepper);
+  }
+  CHECK_COUNTERS(7, 20, 7, 20, 4, 13);
 }
 
 /*
@@ -538,13 +538,13 @@ BOOST_AUTO_TEST_CASE(controlled_rk54_generic_copy_construct)
  */
 BOOST_AUTO_TEST_CASE(controlled_rk54_generic_assign)
 {
-    reset_counter();
-    {
-        controlled_rk54_generic_type stepper;
-        controlled_rk54_generic_type stepper2;
-        stepper2 = stepper;
-    }
-    CHECK_COUNTERS(8, 26, 8, 26, 5, 19);
+  reset_counter();
+  {
+    controlled_rk54_generic_type stepper;
+    controlled_rk54_generic_type stepper2;
+    stepper2 = stepper;
+  }
+  CHECK_COUNTERS(8, 26, 8, 26, 5, 19);
 }
 
 /*
@@ -566,11 +566,11 @@ BOOST_AUTO_TEST_CASE(controlled_rk54_generic_assign)
 
 BOOST_AUTO_TEST_CASE(controlled_dopri5_construct)
 {
-    reset_counter();
-    {
-        controlled_dopri5_type dopri5;
-    }
-    CHECK_COUNTERS(2 * 1 + 2, 2 * (6 + 1) + 2, 2 * 1 + 2, 2 * (6 + 1) + 2, 1, 1 + 6);
+  reset_counter();
+  {
+    controlled_dopri5_type dopri5;
+  }
+  CHECK_COUNTERS(2 * 1 + 2, 2 * (6 + 1) + 2, 2 * 1 + 2, 2 * (6 + 1) + 2, 1, 1 + 6);
 }
 
 /*
@@ -598,13 +598,13 @@ BOOST_AUTO_TEST_CASE(controlled_dopri5_construct)
  */
 BOOST_AUTO_TEST_CASE(controlled_dopri5_copy_construct)
 {
-    reset_counter();
-    {
-        controlled_dopri5_type dopri5;
-        controlled_dopri5_type dopri5_2(dopri5);
-    }
-    CHECK_COUNTERS(3 * 1 + 2 * 2, 3 * (6 + 1) + 2 * 2, 3 * 1 + 2 * 2, 3 * (6 + 1) + 2 * 2,
-                   1 + 1 + 2, 1 + 6 + 1 + 6 + 2);
+  reset_counter();
+  {
+    controlled_dopri5_type dopri5;
+    controlled_dopri5_type dopri5_2(dopri5);
+  }
+  CHECK_COUNTERS(3 * 1 + 2 * 2, 3 * (6 + 1) + 2 * 2, 3 * 1 + 2 * 2, 3 * (6 + 1) + 2 * 2, 1 + 1 + 2,
+                 1 + 6 + 1 + 6 + 2);
 }
 
 /*
@@ -632,14 +632,14 @@ BOOST_AUTO_TEST_CASE(controlled_dopri5_copy_construct)
  */
 BOOST_AUTO_TEST_CASE(controlled_dopri5_assign)
 {
-    reset_counter();
-    {
-        controlled_dopri5_type dopri5;
-        controlled_dopri5_type dopri5_2;
-        dopri5_2 = dopri5;
-    }
-    CHECK_COUNTERS(4 * 1 + 2 * 2, 4 * (1 + 6) + 2 * 2, 4 * 1 + 2 * 2, 4 * (1 + 6) + 2 * 2,
-                   2 * 1 + 1 + 2, 2 * (6 + 1) + 1 + 6 + 2);
+  reset_counter();
+  {
+    controlled_dopri5_type dopri5;
+    controlled_dopri5_type dopri5_2;
+    dopri5_2 = dopri5;
+  }
+  CHECK_COUNTERS(4 * 1 + 2 * 2, 4 * (1 + 6) + 2 * 2, 4 * 1 + 2 * 2, 4 * (1 + 6) + 2 * 2,
+                 2 * 1 + 1 + 2, 2 * (6 + 1) + 1 + 6 + 2);
 }
 
 /*
@@ -655,11 +655,11 @@ BOOST_AUTO_TEST_CASE(controlled_dopri5_assign)
  */
 BOOST_AUTO_TEST_CASE(dense_output_euler_construct)
 {
-    reset_counter();
-    {
-        dense_output_euler_type euler;
-    }
-    CHECK_COUNTERS(2, 2 * 1, 2, 2 * 1, 0, 1);
+  reset_counter();
+  {
+    dense_output_euler_type euler;
+  }
+  CHECK_COUNTERS(2, 2 * 1, 2, 2 * 1, 0, 1);
 }
 
 /*
@@ -679,12 +679,12 @@ BOOST_AUTO_TEST_CASE(dense_output_euler_construct)
  */
 BOOST_AUTO_TEST_CASE(dense_output_euler_copy_construct)
 {
-    reset_counter();
-    {
-        dense_output_euler_type euler;
-        dense_output_euler_type euler2(euler);
-    }
-    CHECK_COUNTERS(2 * 2, 3 * 1, 2 * 2, 3 * 1, 2, 1 + 1);
+  reset_counter();
+  {
+    dense_output_euler_type euler;
+    dense_output_euler_type euler2(euler);
+  }
+  CHECK_COUNTERS(2 * 2, 3 * 1, 2 * 2, 3 * 1, 2, 1 + 1);
 }
 
 /*
@@ -704,13 +704,13 @@ BOOST_AUTO_TEST_CASE(dense_output_euler_copy_construct)
  */
 BOOST_AUTO_TEST_CASE(dense_output_euler_assign)
 {
-    reset_counter();
-    {
-        dense_output_euler_type euler;
-        dense_output_euler_type euler2;
-        euler2 = euler;
-    }
-    CHECK_COUNTERS(2 * 2, 4 * 1, 2 * 2, 4 * 1, 2, 2 * 1 + 1);
+  reset_counter();
+  {
+    dense_output_euler_type euler;
+    dense_output_euler_type euler2;
+    euler2 = euler;
+  }
+  CHECK_COUNTERS(2 * 2, 4 * 1, 2 * 2, 4 * 1, 2, 2 * 1 + 1);
 }
 
 /*
@@ -737,12 +737,12 @@ BOOST_AUTO_TEST_CASE(dense_output_euler_assign)
  */
 BOOST_AUTO_TEST_CASE(dense_output_dopri5_construct)
 {
-    reset_counter();
-    {
-        dense_output_dopri5_type dopri5;
-    }
-    CHECK_COUNTERS(3 * 1 + 2 * 2 + 2, 3 * (1 + 6) + 2 * 2 + 2, 3 * 1 + 2 * 2 + 2,
-                   3 * (1 + 6) + 2 * 2 + 2, 2 * 1 + 2, 2 * (1 + 6) + 2);
+  reset_counter();
+  {
+    dense_output_dopri5_type dopri5;
+  }
+  CHECK_COUNTERS(3 * 1 + 2 * 2 + 2, 3 * (1 + 6) + 2 * 2 + 2, 3 * 1 + 2 * 2 + 2,
+                 3 * (1 + 6) + 2 * 2 + 2, 2 * 1 + 2, 2 * (1 + 6) + 2);
 }
 
 /*
@@ -772,13 +772,13 @@ BOOST_AUTO_TEST_CASE(dense_output_dopri5_construct)
  */
 BOOST_AUTO_TEST_CASE(dense_output_dopri5_copy_construct)
 {
-    reset_counter();
-    {
-        dense_output_dopri5_type dopri5;
-        dense_output_dopri5_type dopri5_2(dopri5);
-    }
-    CHECK_COUNTERS(4 * 1 + 3 * 2 + 2 * 2, 4 * (1 + 6) + 3 * 2 + 2 * 2, 4 * 1 + 3 * 2 + 2 * 2,
-                   4 * (1 + 6) + 3 * 2 + 2 * 2, 3 * 1 + 2 * 2 + 1 * 2, 3 * (6 + 1) + 2 * 2 + 2);
+  reset_counter();
+  {
+    dense_output_dopri5_type dopri5;
+    dense_output_dopri5_type dopri5_2(dopri5);
+  }
+  CHECK_COUNTERS(4 * 1 + 3 * 2 + 2 * 2, 4 * (1 + 6) + 3 * 2 + 2 * 2, 4 * 1 + 3 * 2 + 2 * 2,
+                 4 * (1 + 6) + 3 * 2 + 2 * 2, 3 * 1 + 2 * 2 + 1 * 2, 3 * (6 + 1) + 2 * 2 + 2);
 }
 
 /*
@@ -808,14 +808,14 @@ BOOST_AUTO_TEST_CASE(dense_output_dopri5_copy_construct)
  */
 BOOST_AUTO_TEST_CASE(dense_output_dopri5_assign)
 {
-    reset_counter();
-    {
-        dense_output_dopri5_type dopri5;
-        dense_output_dopri5_type dopri5_2;
-        dopri5_2 = dopri5;
-    }
-    CHECK_COUNTERS(6 * 1 + 4 * 2 + 2 * 2, 6 * (6 + 1) + 4 * 2 + 2 * 2, 6 * 1 + 4 * 2 + 2 * 2,
-                   6 * (6 + 1) + 4 * 2 + 2 * 2, 5 * 1 + 3 * 2 + 2, 5 * (6 + 1) + 3 * 2 + 2);
+  reset_counter();
+  {
+    dense_output_dopri5_type dopri5;
+    dense_output_dopri5_type dopri5_2;
+    dopri5_2 = dopri5;
+  }
+  CHECK_COUNTERS(6 * 1 + 4 * 2 + 2 * 2, 6 * (6 + 1) + 4 * 2 + 2 * 2, 6 * 1 + 4 * 2 + 2 * 2,
+                 6 * (6 + 1) + 4 * 2 + 2 * 2, 5 * 1 + 3 * 2 + 2, 5 * (6 + 1) + 3 * 2 + 2);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

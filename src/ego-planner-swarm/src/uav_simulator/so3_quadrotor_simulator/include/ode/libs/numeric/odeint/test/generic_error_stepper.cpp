@@ -43,8 +43,8 @@ typedef boost::array<value_type, 2> state_type;
 
 void sys(const state_type &x, state_type &dxdt, const value_type &t)
 {
-    dxdt[0] = x[0] + 2 * x[1];
-    dxdt[1] = x[1];
+  dxdt[0] = x[0] + 2 * x[1];
+  dxdt[1] = x[1];
 }
 
 typedef explicit_error_generic_rk<6, 5, 4, 5, state_type> error_rk_generic_type;
@@ -71,43 +71,43 @@ BOOST_AUTO_TEST_SUITE(generic_error_stepper_test)
 
 BOOST_AUTO_TEST_CASE(test_generic_error_stepper)
 {
-    // simultaneously test copying
-    error_rk_generic_type rk_generic_(a, b, b2, c);
-    error_rk_generic_type rk_generic = rk_generic_;
+  // simultaneously test copying
+  error_rk_generic_type rk_generic_(a, b, b2, c);
+  error_rk_generic_type rk_generic = rk_generic_;
 
-    error_rk54_ck_generic_type rk54_ck_generic_;
-    error_rk54_ck_generic_type rk54_ck_generic = rk54_ck_generic_;
+  error_rk54_ck_generic_type rk54_ck_generic_;
+  error_rk54_ck_generic_type rk54_ck_generic = rk54_ck_generic_;
 
-    // std::cout << stepper;
+  // std::cout << stepper;
 
-    rk54_ck_type rk54_ck_;
-    rk54_ck_type rk54_ck = rk54_ck_;
+  rk54_ck_type rk54_ck_;
+  rk54_ck_type rk54_ck = rk54_ck_;
 
-    typedef error_rk_generic_type::state_type state_type;
-    typedef error_rk_generic_type::value_type stepper_value_type;
-    typedef error_rk_generic_type::deriv_type deriv_type;
-    typedef error_rk_generic_type::time_type  time_type;
+  typedef error_rk_generic_type::state_type state_type;
+  typedef error_rk_generic_type::value_type stepper_value_type;
+  typedef error_rk_generic_type::deriv_type deriv_type;
+  typedef error_rk_generic_type::time_type  time_type;
 
-    state_type x = {{0.0, 1.0}};
-    state_type y = x;
-    state_type z = x;
-    state_type x_err, y_err, z_err;
+  state_type x = {{0.0, 1.0}};
+  state_type y = x;
+  state_type z = x;
+  state_type x_err, y_err, z_err;
 
-    rk_generic.do_step(sys, x, 0.0, 0.1, x_err);
+  rk_generic.do_step(sys, x, 0.0, 0.1, x_err);
 
-    rk54_ck_generic.do_step(sys, y, 0.0, 0.1, y_err);
+  rk54_ck_generic.do_step(sys, y, 0.0, 0.1, y_err);
 
-    rk54_ck.do_step(sys, z, 0.0, 0.1, z_err);
+  rk54_ck.do_step(sys, z, 0.0, 0.1, z_err);
 
-    BOOST_CHECK_NE(0.0, x[0]);
-    BOOST_CHECK_NE(1.0, x[1]);
-    BOOST_CHECK_NE(0.0, x_err[0]);
-    BOOST_CHECK_NE(0.0, x_err[1]);
-    // compare with analytic solution of above system
-    BOOST_CHECK_EQUAL(x[0], y[0]);
-    BOOST_CHECK_EQUAL(x[1], y[1]);
-    BOOST_CHECK_EQUAL(x[0], z[0]);
-    BOOST_CHECK_EQUAL(x[1], z[1]);
+  BOOST_CHECK_NE(0.0, x[0]);
+  BOOST_CHECK_NE(1.0, x[1]);
+  BOOST_CHECK_NE(0.0, x_err[0]);
+  BOOST_CHECK_NE(0.0, x_err[1]);
+  // compare with analytic solution of above system
+  BOOST_CHECK_EQUAL(x[0], y[0]);
+  BOOST_CHECK_EQUAL(x[1], y[1]);
+  BOOST_CHECK_EQUAL(x[0], z[0]);
+  BOOST_CHECK_EQUAL(x[1], z[1]);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

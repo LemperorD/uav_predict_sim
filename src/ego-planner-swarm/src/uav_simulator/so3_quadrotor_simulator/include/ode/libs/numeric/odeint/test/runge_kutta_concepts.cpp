@@ -70,12 +70,12 @@ const double eps = 1.0e-14;
 template <class Stepper, class System>
 void check_stepper_concept(Stepper &stepper, System system, typename Stepper::deriv_type &x)
 {
-    typedef Stepper                           stepper_type;
-    typedef typename stepper_type::deriv_type container_type;
-    typedef typename stepper_type::order_type order_type;
-    typedef typename stepper_type::time_type  time_type;
+  typedef Stepper                           stepper_type;
+  typedef typename stepper_type::deriv_type container_type;
+  typedef typename stepper_type::order_type order_type;
+  typedef typename stepper_type::time_type  time_type;
 
-    stepper.do_step(system, x, 0.0, 0.1);
+  stepper.do_step(system, x, 0.0, 0.1);
 }
 
 template <class Stepper, class State>
@@ -84,47 +84,46 @@ struct perform_stepper_test;
 template <class Stepper>
 struct perform_stepper_test<Stepper, vector_type>
 {
-    void operator()(void)
-    {
-        vector_type x(1, 2.0);
-        Stepper     stepper;
-        check_stepper_concept(stepper, constant_system_standard<vector_type, vector_type, double>,
-                              x);
-        check_stepper_concept(stepper, boost::cref(constant_system_functor_standard()), x);
-        std::cout << x[0] << " ?= " << result << std::endl;
-        BOOST_CHECK_SMALL(fabs(x[0] - result), eps);
-    }
+  void operator()(void)
+  {
+    vector_type x(1, 2.0);
+    Stepper     stepper;
+    check_stepper_concept(stepper, constant_system_standard<vector_type, vector_type, double>, x);
+    check_stepper_concept(stepper, boost::cref(constant_system_functor_standard()), x);
+    std::cout << x[0] << " ?= " << result << std::endl;
+    BOOST_CHECK_SMALL(fabs(x[0] - result), eps);
+  }
 };
 
 template <class Stepper>
 struct perform_stepper_test<Stepper, vector_space_type>
 {
-    void operator()(void) const
-    {
-        vector_space_type x;
-        x.m_x = 2.0;
-        Stepper stepper;
-        check_stepper_concept(
-            stepper, constant_system_vector_space<vector_space_type, vector_space_type, double>, x);
-        check_stepper_concept(stepper, boost::cref(constant_system_functor_vector_space()), x);
-        std::cout << x.m_x << " ?= " << result << std::endl;
-        BOOST_CHECK_SMALL(fabs(x.m_x - result), eps);
-    }
+  void operator()(void) const
+  {
+    vector_space_type x;
+    x.m_x = 2.0;
+    Stepper stepper;
+    check_stepper_concept(
+        stepper, constant_system_vector_space<vector_space_type, vector_space_type, double>, x);
+    check_stepper_concept(stepper, boost::cref(constant_system_functor_vector_space()), x);
+    std::cout << x.m_x << " ?= " << result << std::endl;
+    BOOST_CHECK_SMALL(fabs(x.m_x - result), eps);
+  }
 };
 
 template <class Stepper>
 struct perform_stepper_test<Stepper, array_type>
 {
-    void operator()(void)
-    {
-        array_type x;
-        x[0] = 2.0;
-        Stepper stepper;
-        check_stepper_concept(stepper, constant_system_standard<array_type, array_type, double>, x);
-        check_stepper_concept(stepper, boost::cref(constant_system_functor_standard()), x);
-        std::cout << x[0] << " ?= " << result << std::endl;
-        BOOST_CHECK_SMALL(fabs(x[0] - result), eps);
-    }
+  void operator()(void)
+  {
+    array_type x;
+    x[0] = 2.0;
+    Stepper stepper;
+    check_stepper_concept(stepper, constant_system_standard<array_type, array_type, double>, x);
+    check_stepper_concept(stepper, boost::cref(constant_system_functor_standard()), x);
+    std::cout << x[0] << " ?= " << result << std::endl;
+    BOOST_CHECK_SMALL(fabs(x[0] - result), eps);
+  }
 };
 
 template <class State>
@@ -156,8 +155,8 @@ BOOST_AUTO_TEST_SUITE(runge_kutta_concept_test)
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(stepper_test, Stepper, all_stepper_methods)
 {
-    perform_stepper_test<Stepper, typename Stepper::deriv_type> tester;
-    tester();
+  perform_stepper_test<Stepper, typename Stepper::deriv_type> tester;
+  tester();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

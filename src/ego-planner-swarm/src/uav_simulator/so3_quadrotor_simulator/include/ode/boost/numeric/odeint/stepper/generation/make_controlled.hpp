@@ -19,52 +19,51 @@
 
 namespace boost
 {
-    namespace numeric
+  namespace numeric
+  {
+    namespace odeint
     {
-        namespace odeint
+
+      // default template for the controller
+      template <class Stepper>
+      struct get_controller
+      {
+      };
+
+      // default controller factory
+      template <class Stepper, class Controller>
+      struct controller_factory
+      {
+        Controller operator()(typename Stepper::value_type abs_error,
+                              typename Stepper::value_type rel_error, const Stepper &stepper)
         {
+          return Controller(abs_error, rel_error, stepper);
+        }
+      };
 
-            // default template for the controller
-            template <class Stepper>
-            struct get_controller
-            {
-            };
+      namespace result_of
+      {
+        template <class Stepper>
+        struct make_controlled
+        {
+          typedef typename get_controller<Stepper>::type type;
+        };
+      }  // namespace result_of
 
-            // default controller factory
-            template <class Stepper, class Controller>
-            struct controller_factory
-            {
-                Controller operator()(typename Stepper::value_type abs_error,
-                                      typename Stepper::value_type rel_error,
-                                      const Stepper               &stepper)
-                {
-                    return Controller(abs_error, rel_error, stepper);
-                }
-            };
+      template <class Stepper>
+      typename result_of::make_controlled<Stepper>::type make_controlled(
+          typename Stepper::value_type abs_error, typename Stepper::value_type rel_error,
+          const Stepper &stepper = Stepper())
+      {
+        typedef Stepper                                                 stepper_type;
+        typedef typename result_of::make_controlled<stepper_type>::type controller_type;
+        typedef controller_factory<stepper_type, controller_type>       factory_type;
+        factory_type                                                    factory;
+        return factory(abs_error, rel_error, stepper);
+      }
 
-            namespace result_of
-            {
-                template <class Stepper>
-                struct make_controlled
-                {
-                    typedef typename get_controller<Stepper>::type type;
-                };
-            }  // namespace result_of
-
-            template <class Stepper>
-            typename result_of::make_controlled<Stepper>::type make_controlled(
-                typename Stepper::value_type abs_error, typename Stepper::value_type rel_error,
-                const Stepper &stepper = Stepper())
-            {
-                typedef Stepper                                                 stepper_type;
-                typedef typename result_of::make_controlled<stepper_type>::type controller_type;
-                typedef controller_factory<stepper_type, controller_type>       factory_type;
-                factory_type                                                    factory;
-                return factory(abs_error, rel_error, stepper);
-            }
-
-        }  // namespace odeint
-    }      // namespace numeric
+    }  // namespace odeint
+  }    // namespace numeric
 }  // namespace boost
 
 #endif  // BOOST_NUMERIC_ODEINT_STEPPER_GENERATION_MAKE_CONTROLLED_HPP_INCLUDED

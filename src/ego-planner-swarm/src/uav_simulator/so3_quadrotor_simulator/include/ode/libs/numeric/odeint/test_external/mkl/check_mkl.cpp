@@ -30,17 +30,16 @@ const double eps = 1E-14;
 
 BOOST_AUTO_TEST_CASE(test_mkl)
 {
-    // to use mkl routines we have to use the vector_space_algebra and the mkl_operations
-    runge_kutta4<state_type, value_type, state_type, value_type, vector_space_algebra,
-                 mkl_operations>
-               stepper;
-    state_type x;
-    x[0] = 0.0;
+  // to use mkl routines we have to use the vector_space_algebra and the mkl_operations
+  runge_kutta4<state_type, value_type, state_type, value_type, vector_space_algebra, mkl_operations>
+             stepper;
+  state_type x;
+  x[0] = 0.0;
 
-    stepper.do_step(constant_system, x, 0.0, 0.1);
+  stepper.do_step(constant_system, x, 0.0, 0.1);
 
-    using std::abs;
+  using std::abs;
 
-    std::cout << x[0] << " ?= " << 0.1 << std::endl;
-    BOOST_CHECK_SMALL(abs(x[0] - 0.1), eps);
+  std::cout << x[0] << " ?= " << 0.1 << std::endl;
+  BOOST_CHECK_SMALL(abs(x[0] - 0.1), eps);
 }

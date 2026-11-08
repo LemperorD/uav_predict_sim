@@ -60,22 +60,22 @@ typedef mpl::vector<euler<state_type, value_type, deriv_type, time_type, vector_
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(test_do_step, T, stepper_types)
 {
-    typedef T    stepper_type;
-    stepper_type stepper;
-    state_type   x  = 0.0;
-    time_type    t  = 0.0;
-    time_type    dt = 0.1;
-    stepper.do_step(constant_system, x, t, dt);
-    BOOST_CHECK_CLOSE(x, 0.1, 1.0e-10);
+  typedef T    stepper_type;
+  stepper_type stepper;
+  state_type   x  = 0.0;
+  time_type    t  = 0.0;
+  time_type    dt = 0.1;
+  stepper.do_step(constant_system, x, t, dt);
+  BOOST_CHECK_CLOSE(x, 0.1, 1.0e-10);
 
-    // this overload is not allowed if the types of dxdt and dt are the same
-    // deriv_type dxdt = 1.0;
-    // stepper.do_step( constant_system , x , dxdt , t , dt );
+  // this overload is not allowed if the types of dxdt and dt are the same
+  // deriv_type dxdt = 1.0;
+  // stepper.do_step( constant_system , x , dxdt , t , dt );
 
-    state_type x_out;
-    stepper.do_step(constant_system, x, t, x_out, dt);
-    BOOST_CHECK_CLOSE(x, 0.1, 1.0e-10);
-    BOOST_CHECK_CLOSE(x_out, 0.2, 1.0e-10);
+  state_type x_out;
+  stepper.do_step(constant_system, x, t, x_out, dt);
+  BOOST_CHECK_CLOSE(x, 0.1, 1.0e-10);
+  BOOST_CHECK_CLOSE(x_out, 0.2, 1.0e-10);
 }
 
 /* test integrate_adaptive with controlled steppers */
@@ -89,13 +89,13 @@ typedef mpl::vector<
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(test_integrate, T, error_stepper_types)
 {
-    typedef T  stepper_type;
-    state_type x  = 0.0;
-    time_type  t0 = 0.0;
-    time_type  t1 = 1.0;
-    time_type  dt = 0.1;
-    integrate_adaptive(make_controlled<stepper_type>(1e-6, 1e-6), constant_system, x, t0, t1, dt);
-    BOOST_CHECK_CLOSE(x, 1.0, 1.0e-10);
+  typedef T  stepper_type;
+  state_type x  = 0.0;
+  time_type  t0 = 0.0;
+  time_type  t1 = 1.0;
+  time_type  dt = 0.1;
+  integrate_adaptive(make_controlled<stepper_type>(1e-6, 1e-6), constant_system, x, t0, t1, dt);
+  BOOST_CHECK_CLOSE(x, 1.0, 1.0e-10);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

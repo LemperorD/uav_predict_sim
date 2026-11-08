@@ -21,40 +21,40 @@
 
 namespace boost
 {
-    namespace numeric
+  namespace numeric
+  {
+    namespace odeint
     {
-        namespace odeint
+      namespace detail
+      {
+
+        /**
+         * return t1 < t2 if dt > 0 and t1 > t2 if dt < 0
+         */
+        template <typename T1, typename T2, typename T3>
+        bool less_with_sign(T1 t1, T2 t2, T3 dt)
         {
-            namespace detail
-            {
+          if (get_unit_value(dt) > 0)
+            return t1 < t2;
+          else
+            return t1 > t2;
+        }
 
-                /**
-                 * return t1 < t2 if dt > 0 and t1 > t2 if dt < 0
-                 */
-                template <typename T1, typename T2, typename T3>
-                bool less_with_sign(T1 t1, T2 t2, T3 dt)
-                {
-                    if (get_unit_value(dt) > 0)
-                        return t1 < t2;
-                    else
-                        return t1 > t2;
-                }
+        /**
+         * return t1 <= t2 if dt > 0 and t1 => t2 if dt < 0
+         */
+        template <typename T1, typename T2, typename T3>
+        bool less_eq_with_sign(T1 t1, T2 t2, T3 dt)
+        {
+          if (get_unit_value(dt) > 0)
+            return t1 <= t2;
+          else
+            return t1 >= t2;
+        }
 
-                /**
-                 * return t1 <= t2 if dt > 0 and t1 => t2 if dt < 0
-                 */
-                template <typename T1, typename T2, typename T3>
-                bool less_eq_with_sign(T1 t1, T2 t2, T3 dt)
-                {
-                    if (get_unit_value(dt) > 0)
-                        return t1 <= t2;
-                    else
-                        return t1 >= t2;
-                }
-
-            }  // namespace detail
-        }      // namespace odeint
-    }          // namespace numeric
+      }  // namespace detail
+    }    // namespace odeint
+  }      // namespace numeric
 }  // namespace boost
 
 #endif

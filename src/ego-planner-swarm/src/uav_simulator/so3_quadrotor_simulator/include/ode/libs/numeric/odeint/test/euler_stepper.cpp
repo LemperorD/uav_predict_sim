@@ -32,30 +32,30 @@ using namespace boost::numeric::odeint;
 
 class my_vec : public std::vector<double>
 {
-   public:
-    my_vec() : std::vector<double>() {}
+ public:
+  my_vec() : std::vector<double>() {}
 
-    my_vec(const my_vec &x) : std::vector<double>(x) {}
+  my_vec(const my_vec &x) : std::vector<double>(x) {}
 
-    my_vec(size_t dim) : std::vector<double>(dim) {}
+  my_vec(size_t dim) : std::vector<double>(dim) {}
 };
 
 namespace boost
 {
-    namespace numeric
+  namespace numeric
+  {
+    namespace odeint
     {
-        namespace odeint
-        {
 
-            template <>
-            struct is_resizeable<my_vec>
-            {
-                // struct type : public boost::true_type { };
-                typedef boost::true_type type;
-                const static bool        value = type::value;
-            };
-        }  // namespace odeint
-    }      // namespace numeric
+      template <>
+      struct is_resizeable<my_vec>
+      {
+        // struct type : public boost::true_type { };
+        typedef boost::true_type type;
+        const static bool        value = type::value;
+      };
+    }  // namespace odeint
+  }    // namespace numeric
 }  // namespace boost
 
 typedef double value_type;
@@ -65,37 +65,37 @@ typedef my_vec state_type;
 /* use functors, because functions don't work with msvc 10, I guess this is a bug */
 struct sys
 {
-    void operator()(const state_type &x, state_type &dxdt, const value_type t) const
-    {
-        std::cout << "sys start " << dxdt.size() << std::endl;
-        dxdt[0] = x[0] + 2 * x[1];
-        dxdt[1] = x[1];
-        std::cout << "sys done" << std::endl;
-    }
+  void operator()(const state_type &x, state_type &dxdt, const value_type t) const
+  {
+    std::cout << "sys start " << dxdt.size() << std::endl;
+    dxdt[0] = x[0] + 2 * x[1];
+    dxdt[1] = x[1];
+    std::cout << "sys done" << std::endl;
+  }
 };
 
 BOOST_AUTO_TEST_SUITE(explicit_euler_test)
 
 BOOST_AUTO_TEST_CASE(test_euler)
 {
-    range_algebra     algebra;
-    euler<state_type> stepper(algebra);
-    state_type        x(2);
-    x[0] = 0.0;
-    x[1] = 1.0;
+  range_algebra     algebra;
+  euler<state_type> stepper(algebra);
+  state_type        x(2);
+  x[0] = 0.0;
+  x[1] = 1.0;
 
-    std::cout << "initialized" << std::endl;
+  std::cout << "initialized" << std::endl;
 
-    const value_type eps = 1E-12;
-    const value_type dt  = 0.1;
+  const value_type eps = 1E-12;
+  const value_type dt  = 0.1;
 
-    stepper.do_step(sys(), x, 0.0, dt);
+  stepper.do_step(sys(), x, 0.0, dt);
 
-    using std::abs;
+  using std::abs;
 
-    // compare with analytic solution of above system
-    BOOST_CHECK_MESSAGE(abs(x[0] - 2.0 * 1.0 * dt) < eps, x[0] - 2.0 * 1.0 * dt);
-    BOOST_CHECK_MESSAGE(abs(x[1] - (1.0 + dt)) < eps, x[1] - (1.0 + dt));
+  // compare with analytic solution of above system
+  BOOST_CHECK_MESSAGE(abs(x[0] - 2.0 * 1.0 * dt) < eps, x[0] - 2.0 * 1.0 * dt);
+  BOOST_CHECK_MESSAGE(abs(x[1] - (1.0 + dt)) < eps, x[1] - (1.0 + dt));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

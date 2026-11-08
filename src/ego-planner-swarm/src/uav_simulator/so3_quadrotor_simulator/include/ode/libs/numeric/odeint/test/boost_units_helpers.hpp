@@ -33,22 +33,22 @@ typedef boost::units::quantity<boost::units::si::acceleration, value_type> accel
 
 struct oscillator_mom_func_units
 {
-    template <class Coor, class MomDeriv>
-    void operator()(const Coor &q, MomDeriv &dp) const
-    {
-        const boost::units::quantity<boost::units::si::frequency, value_type> omega =
-            1.0 * boost::units::si::hertz;
-        boost::fusion::at_c<0>(dp) = -omega * omega * boost::fusion::at_c<0>(q);
-    }
+  template <class Coor, class MomDeriv>
+  void operator()(const Coor &q, MomDeriv &dp) const
+  {
+    const boost::units::quantity<boost::units::si::frequency, value_type> omega =
+        1.0 * boost::units::si::hertz;
+    boost::fusion::at_c<0>(dp) = -omega * omega * boost::fusion::at_c<0>(q);
+  }
 };
 
 struct oscillator_coor_func_units
 {
-    template <class Mom, class CoorDeriv>
-    void operator()(const Mom &p, CoorDeriv &dq) const
-    {
-        boost::fusion::at_c<0>(dq) = boost::fusion::at_c<0>(p);
-    }
+  template <class Mom, class CoorDeriv>
+  void operator()(const Mom &p, CoorDeriv &dq) const
+  {
+    boost::fusion::at_c<0>(dq) = boost::fusion::at_c<0>(p);
+  }
 };
 
 #endif  // LIBS_NUMERIC_ODEINT_TEST_DUMMY_BOOST_UNITS_HPP_DEFINED

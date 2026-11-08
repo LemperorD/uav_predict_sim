@@ -1,7 +1,6 @@
 # 基础风格
 BasedOnStyle: Google
-IndentWidth: 4              # 缩进宽度
-TabWidth: 4                 # Tab 显示宽度
+IndentWidth: 2              # 缩进宽度
 UseTab: Never               # 不使用 Tab，统一用空格
 
 # 换行与空格

@@ -22,29 +22,29 @@
 
 namespace boost
 {
-    namespace numeric
+  namespace numeric
+  {
+    namespace odeint
     {
-        namespace odeint
+
+      // controller factory for controlled_runge_kutta
+      template <class Stepper>
+      struct controller_factory<Stepper, controlled_runge_kutta<Stepper> >
+      {
+        typedef Stepper                                      stepper_type;
+        typedef controlled_runge_kutta<stepper_type>         controller_type;
+        typedef typename controller_type::error_checker_type error_checker_type;
+        typedef typename stepper_type::value_type            value_type;
+
+        controller_type operator()(value_type abs_error, value_type rel_error,
+                                   const stepper_type &stepper)
         {
+          return controller_type(error_checker_type(abs_error, rel_error), stepper);
+        }
+      };
 
-            // controller factory for controlled_runge_kutta
-            template <class Stepper>
-            struct controller_factory<Stepper, controlled_runge_kutta<Stepper> >
-            {
-                typedef Stepper                                      stepper_type;
-                typedef controlled_runge_kutta<stepper_type>         controller_type;
-                typedef typename controller_type::error_checker_type error_checker_type;
-                typedef typename stepper_type::value_type            value_type;
-
-                controller_type operator()(value_type abs_error, value_type rel_error,
-                                           const stepper_type &stepper)
-                {
-                    return controller_type(error_checker_type(abs_error, rel_error), stepper);
-                }
-            };
-
-        }  // namespace odeint
-    }      // namespace numeric
+    }  // namespace odeint
+  }    // namespace numeric
 }  // namespace boost
 
 #endif  // BOOST_NUMERIC_ODEINT_STEPPER_GENERATION_GENERATION_CONTROLLED_RUNGE_KUTTA_HPP_INCLUDED

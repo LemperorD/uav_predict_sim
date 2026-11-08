@@ -43,43 +43,43 @@ typedef boost::numeric::ublas::matrix<value_type> matrix_type;
 /* use functors, because functions don't work with msvc 10, I guess this is a bug */
 struct sys
 {
-    void operator()(const state_type &x, state_type &dxdt, const value_type t) const
-    {
-        dxdt(0) = x(0) + 2 * x(1);
-        dxdt(1) = x(1);
-    }
+  void operator()(const state_type &x, state_type &dxdt, const value_type t) const
+  {
+    dxdt(0) = x(0) + 2 * x(1);
+    dxdt(1) = x(1);
+  }
 };
 
 struct jacobi
 {
-    void operator()(const state_type &x, matrix_type &jacobi, const value_type t) const
-    {
-        jacobi(0, 0) = 1;
-        jacobi(0, 1) = 2;
-        jacobi(1, 0) = 0;
-        jacobi(1, 1) = 1;
-    }
+  void operator()(const state_type &x, matrix_type &jacobi, const value_type t) const
+  {
+    jacobi(0, 0) = 1;
+    jacobi(0, 1) = 2;
+    jacobi(1, 0) = 0;
+    jacobi(1, 1) = 1;
+  }
 };
 
 BOOST_AUTO_TEST_SUITE(implicit_euler_test)
 
 BOOST_AUTO_TEST_CASE(test_euler)
 {
-    implicit_euler<value_type> stepper;
-    state_type                 x(2);
-    x(0) = 0.0;
-    x(1) = 1.0;
+  implicit_euler<value_type> stepper;
+  state_type                 x(2);
+  x(0) = 0.0;
+  x(1) = 1.0;
 
-    value_type eps = 1E-12;
+  value_type eps = 1E-12;
 
-    /* make_pair doesn't work with function pointers on msvc 10 */
-    stepper.do_step(std::make_pair(sys(), jacobi()), x, 0.0, 0.1);
+  /* make_pair doesn't work with function pointers on msvc 10 */
+  stepper.do_step(std::make_pair(sys(), jacobi()), x, 0.0, 0.1);
 
-    using std::abs;
+  using std::abs;
 
-    // compare with analytic solution of above system
-    BOOST_CHECK_MESSAGE(abs(x(0) - 20.0 / 81.0) < eps, x(0) - 20.0 / 81.0);
-    BOOST_CHECK_MESSAGE(abs(x(1) - 10.0 / 9.0) < eps, x(0) - 10.0 / 9.0);
+  // compare with analytic solution of above system
+  BOOST_CHECK_MESSAGE(abs(x(0) - 20.0 / 81.0) < eps, x(0) - 20.0 / 81.0);
+  BOOST_CHECK_MESSAGE(abs(x(1) - 10.0 / 9.0) < eps, x(0) - 10.0 / 9.0);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
