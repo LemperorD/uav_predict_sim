@@ -24,6 +24,15 @@
     cv_accel_density: 0.30
     ca_jerk_density: 1.0
     stay_probability: 0.98
+    motion_models: [cv, ca]  # selectable: cv | ca | body_velocity; order defines matrix/probability order
+    # Optional flattened row-major NxN matrix; otherwise use symmetric stay_probability.
+    # model_transition: [0.98, 0.02, 0.02, 0.98]
+    # model_initial_probability: [0.5, 0.5]
+    use_attitude: true
+    use_angular_velocity: false  # EGO fake_drone stores acceleration in twist.angular!
+    attitude_noise_std: 0.05  # local rotation, rad
+    angular_velocity_noise_std: 0.10  # body axes, rad/s
+    angular_accel_density: 0.30
     prediction_step: 0.05
     prediction_steps: 20
     max_time_gap: 1.0

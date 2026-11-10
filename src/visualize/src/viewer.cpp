@@ -88,7 +88,14 @@ int main(int argc, char **argv)
     pangolin::DataLog errors, sigma, prob;
     errors.SetLabels({"time (s)", "position error (m)", "horizon error (m)"});
     sigma.SetLabels({"time (s)", "Pxx (m2)", "Pyy (m2)", "Pzz (m2)"});
-    prob.SetLabels({"time (s)", "P(CV)", "P(CA)"});
+    const auto model_names =
+        node->declare_parameter<std::vector<std::string>>("motion_models", {"cv", "ca"});
+    std::vector<std::string> probability_labels = {"time (s)"};
+    for (const auto &name : model_names)
+    {
+      probability_labels.push_back("P(" + name + ")");
+    }
+    prob.SetLabels(probability_labels);
     pangolin::Plotter error_plot(&errors, 0, duration, 0, error_max, 5, error_max / 4),
         cov_plot(&sigma, 0, duration, 0, covariance_max, 5, covariance_max / 4),
         prob_plot(&prob, 0, duration, 0, 1, 5, .2);
@@ -108,10 +115,11 @@ int main(int argc, char **argv)
                          pangolin::DrawingModeLine, pangolin::Colour::Unspecified(),
                          "P" + std::string(2, "xyz"[i - 1]) + " (m2)");
     }
-    prob_plot.AddSeries("$0", "$1", pangolin::DrawingModeLine, pangolin::Colour(.2, .9, .4),
-                        "P(CV)");
-    prob_plot.AddSeries("$0", "$2", pangolin::DrawingModeLine, pangolin::Colour(.9, .3, .8),
-                        "P(CA)");
+    for (size_t i = 0; i < model_names.size(); ++i)
+    {
+      prob_plot.AddSeries("$0", "$" + std::to_string(i + 1), pangolin::DrawingModeLine,
+                          pangolin::Colour::Unspecified(), probability_labels[i + 1]);
+    }
     error_plot.SetBounds(.67, 1, .62, 1);
     cov_plot.SetBounds(.34, .67, .62, 1);
     prob_plot.SetBounds(0, .34, .62, 1);
@@ -126,7 +134,7 @@ int main(int argc, char **argv)
         "metrics", 100,
         [&](const std_msgs::msg::Float64MultiArray &m)
         {
-          if (m.data.size() != 19)
+          if (m.data.size() < 19)
           {
             return;
           }
@@ -144,7 +152,32 @@ int main(int argc, char **argv)
           }
           errors.Log(d[0], d[15], d[16]);
           sigma.Log(d[0], d[10], d[11], d[12]);
-          prob.Log(d[0], d[13], d[14]);
+          std::vector<float> probabilities = {static_cast<float>(d[0])};
+          for (const auto &name : model_names)
+          {
+            size_t index = name == "cv" ? 13 : 14;
+            if (name != "cv" && name != "ca")
+            {
+              index = 19;
+              for (const auto &candidate : model_names)
+              {
+                if (candidate == name)
+                {
+                  break;
+                }
+                if (candidate != "cv" && candidate != "ca")
+                {
+                  ++index;
+                }
+              }
+            }
+            if (index >= d.size())
+            {
+              return;
+            }
+            probabilities.push_back(d[index]);
+          }
+          prob.Log(probabilities);
         });
     auto path = node->create_subscription<nav_msgs::msg::Path>(
         "prediction", 10,

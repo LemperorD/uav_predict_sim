@@ -36,7 +36,7 @@ def summarize(samples, forecasts, destination):
     for row in rows:
         if not all(math.isfinite(v) for k, v in row.items() if k != 'horizon_error'):
             raise RuntimeError('nonfinite filter output')
-        if abs(row['p_cv'] + row['p_ca'] - 1) > 1e-8:
+        if abs(sum(value for key, value in row.items() if key.startswith('p_')) - 1) > 1e-8:
             raise RuntimeError('invalid model probabilities')
     result = {
         'samples': len(rows), 'scored_predictions': len(predictions), 'duration_s': rows[-1]['t'],

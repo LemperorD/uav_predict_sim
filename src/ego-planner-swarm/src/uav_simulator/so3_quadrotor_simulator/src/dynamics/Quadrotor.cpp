@@ -1,7 +1,7 @@
 #include "so3_quadrotor_simulator/Quadrotor.h"
 
 #include <Eigen/Geometry>
-#include <boost/bind.hpp>
+#include <boost/ref.hpp>
 #include <iostream>
 #include <rclcpp/rclcpp.hpp>
 

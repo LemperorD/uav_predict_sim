@@ -1,0 +1,4 @@
+# Legacy Odeint headers rely on include order. Preserve the bundled library.
+BasedOnStyle: InheritParentConfig
+DisableFormat: true
+SortIncludes: false

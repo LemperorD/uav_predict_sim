@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <deque>
 #include <filesystem>
 #include <fstream>
@@ -18,13 +19,47 @@ class Predictor : public rclcpp::Node
   Predictor() : Node("predictor_node")
   {
     predictor::Settings s;
-    s.position_std     = declare_parameter("position_noise_std", 0.15);
-    s.velocity_std     = declare_parameter("velocity_noise_std", 0.1);
-    s.cv_accel_density = declare_parameter("cv_accel_density", 0.3);
-    s.ca_jerk_density  = declare_parameter("ca_jerk_density", 1.0);
-    s.stay_probability = declare_parameter("stay_probability", 0.98);
-    filter_            = std::make_unique<predictor::Imm>(s);
-    settings_          = s;
+    s.position_std          = declare_parameter("position_noise_std", 0.15);
+    s.velocity_std          = declare_parameter("velocity_noise_std", 0.1);
+    s.cv_accel_density      = declare_parameter("cv_accel_density", 0.3);
+    s.ca_jerk_density       = declare_parameter("ca_jerk_density", 1.0);
+    s.stay_probability      = declare_parameter("stay_probability", 0.98);
+    s.attitude_std          = declare_parameter("attitude_noise_std", 0.05);
+    s.angular_velocity_std  = declare_parameter("angular_velocity_noise_std", 0.1);
+    s.angular_accel_density = declare_parameter("angular_accel_density", 0.3);
+    s.models = declare_parameter<std::vector<std::string>>("motion_models", {"cv", "ca"});
+    const auto transition =
+        declare_parameter<std::vector<double>>("model_transition", std::vector<double>{});
+    const auto initial =
+        declare_parameter<std::vector<double>>("model_initial_probability", std::vector<double>{});
+    const int n = s.models.size();
+    if (!transition.empty())
+    {
+      if (transition.size() != static_cast<size_t>(n * n))
+      {
+        throw std::invalid_argument("model_transition must have N*N entries in row order");
+      }
+      s.transition.resize(n, n);
+      for (int i = 0; i < n; ++i)
+      {
+        for (int j = 0; j < n; ++j)
+        {
+          s.transition(i, j) = transition[i * n + j];
+        }
+      }
+    }
+    if (!initial.empty())
+    {
+      s.initial_probability = Eigen::Map<const Eigen::VectorXd>(initial.data(), initial.size());
+    }
+    use_attitude_         = declare_parameter("use_attitude", true);
+    use_angular_velocity_ = declare_parameter("use_angular_velocity", false);
+    if (use_angular_velocity_ && !use_attitude_)
+    {
+      throw std::invalid_argument("use_angular_velocity requires use_attitude");
+    }
+    filter_   = std::make_unique<predictor::Imm>(s);
+    settings_ = s;
 
     noise_ = declare_parameter("inject_noise", true);
     rng_.seed(declare_parameter("noise_seed", 42));
@@ -72,14 +107,24 @@ class Predictor : public rclcpp::Node
     predictions_ << std::setprecision(12);
     samples_ << "t,truth_x,truth_y,truth_z,measurement_x,measurement_y,measurement_"
                 "z,estimate_x,estimate_y,estimate_z,std_x,std_y,std_z,p_cv,p_ca,"
-                "position_error,horizon_error,velocity_error,position_nees\n";
+                "position_error,horizon_error,velocity_error,position_nees";
+    for (const auto &name : settings_.models)
+    {
+      if (name != "cv" && name != "ca")
+      {
+        samples_ << ",p_" << name;
+      }
+    }
+    samples_ << '\n';
     predictions_ << "origin_t,target_t,pred_x,pred_y,pred_z,truth_x,truth_y,"
                     "truth_z,error,std_x,std_y,std_z\n";
 
     estimate_pub_ = create_publisher<nav_msgs::msg::Odometry>("estimate", 10);
     path_pub_     = create_publisher<nav_msgs::msg::Path>("prediction", 10);
-    metrics_pub_  = create_publisher<std_msgs::msg::Float64MultiArray>("metrics", 10);
-    done_         = create_subscription<std_msgs::msg::Bool>("simulation_done",
+    probability_pub_ =
+        create_publisher<std_msgs::msg::Float64MultiArray>("model_probabilities", 10);
+    metrics_pub_ = create_publisher<std_msgs::msg::Float64MultiArray>("metrics", 10);
+    done_        = create_subscription<std_msgs::msg::Bool>("simulation_done",
                                                      rclcpp::QoS(1).transient_local(),
                                                      [this](const std_msgs::msg::Bool &message)
                                                      {
@@ -90,7 +135,7 @@ class Predictor : public rclcpp::Node
                                                          predictions_.flush();
                                                        }
                                                      });
-    sub_          = create_subscription<nav_msgs::msg::Odometry>(
+    sub_         = create_subscription<nav_msgs::msg::Odometry>(
         "odometry", rclcpp::QoS(50),
         [this](nav_msgs::msg::Odometry::ConstSharedPtr m) { receive(*m); });
   }
@@ -150,7 +195,44 @@ class Predictor : public rclcpp::Node
       }
     }
 
-    auto e = filter_->update(z, dt);
+    Eigen::Quaterniond             orientation(m.pose.pose.orientation.w, m.pose.pose.orientation.x,
+                                               m.pose.pose.orientation.y, m.pose.pose.orientation.z);
+    std::optional<Eigen::Vector3d> omega;
+    if (use_angular_velocity_)
+    {
+      omega = Eigen::Vector3d(m.twist.twist.angular.x, m.twist.twist.angular.y,
+                              m.twist.twist.angular.z);
+    }
+    if ((use_attitude_ && (!orientation.coeffs().allFinite() ||
+                           !std::isfinite(orientation.norm()) || orientation.norm() < 1e-12)) ||
+        (omega && !omega->allFinite()))
+    {
+      RCLCPP_WARN(get_logger(), "Skipping invalid attitude/angular velocity");
+      return;
+    }
+    if (use_attitude_)
+    {
+      orientation.normalize();
+      if (noise_)
+      {
+        Eigen::Vector3d rotation_noise;
+        for (int k = 0; k < 3; ++k)
+        {
+          rotation_noise(k) = normal_(rng_) * settings_.attitude_std;
+          if (omega)
+          {
+            (*omega)(k) += normal_(rng_) * settings_.angular_velocity_std;
+          }
+        }
+        const double angle = rotation_noise.norm();
+        if (angle > 0)
+        {
+          orientation =
+              orientation * Eigen::Quaterniond(Eigen::AngleAxisd(angle, rotation_noise / angle));
+        }
+      }
+    }
+    auto e = use_attitude_ ? filter_->update(z, orientation, dt, omega) : filter_->update(z, dt);
 
     double horizon_error = std::numeric_limits<double>::quiet_NaN();
     while (!pending_.empty() && pending_.front().target <= t)
@@ -191,16 +273,31 @@ class Predictor : public rclcpp::Node
     odom.pose.pose.position.x    = e.mean(0);
     odom.pose.pose.position.y    = e.mean(1);
     odom.pose.pose.position.z    = e.mean(2);
-    odom.pose.pose.orientation.w = 1;
+    odom.pose.pose.orientation.w = e.orientation.w();
+    odom.pose.pose.orientation.x = e.orientation.x();
+    odom.pose.pose.orientation.y = e.orientation.y();
+    odom.pose.pose.orientation.z = e.orientation.z();
+    odom.twist.twist.angular.x   = e.mean(12);
+    odom.twist.twist.angular.y   = e.mean(13);
+    odom.twist.twist.angular.z   = e.mean(14);
     odom.twist.twist.linear.x    = e.mean(3);
     odom.twist.twist.linear.y    = e.mean(4);
     odom.twist.twist.linear.z    = e.mean(5);
-    for (int i = 0; i < 3; ++i)
+    // Pose covariance uses fixed/world axes; filter attitude errors use body axes.
+    Eigen::Matrix<double, 6, 15> pose_map = Eigen::Matrix<double, 6, 15>::Zero();
+    pose_map.topLeftCorner<3, 3>().setIdentity();
+    pose_map.block<3, 3>(3, 9)             = e.orientation.toRotationMatrix();
+    Eigen::Matrix<double, 6, 15> twist_map = Eigen::Matrix<double, 6, 15>::Zero();
+    twist_map.block<3, 3>(0, 3).setIdentity();
+    twist_map.block<3, 3>(3, 12).setIdentity();
+    const Eigen::Matrix<double, 6, 6> pose_cov  = pose_map * e.covariance * pose_map.transpose();
+    const Eigen::Matrix<double, 6, 6> twist_cov = twist_map * e.covariance * twist_map.transpose();
+    for (int i = 0; i < 6; ++i)
     {
-      for (int j = 0; j < 3; ++j)
+      for (int j = 0; j < 6; ++j)
       {
-        odom.pose.covariance[6 * i + j]  = e.covariance(i, j);
-        odom.twist.covariance[6 * i + j] = e.covariance(i + 3, j + 3);
+        odom.pose.covariance[6 * i + j]  = pose_cov(i, j);
+        odom.twist.covariance[6 * i + j] = twist_cov(i, j);
       }
     }
     estimate_pub_->publish(odom);
@@ -216,7 +313,10 @@ class Predictor : public rclcpp::Node
       p.pose.position.x    = future[i].mean(0);
       p.pose.position.y    = future[i].mean(1);
       p.pose.position.z    = future[i].mean(2);
-      p.pose.orientation.w = 1;
+      p.pose.orientation.w = future[i].orientation.w();
+      p.pose.orientation.x = future[i].orientation.x();
+      p.pose.orientation.y = future[i].orientation.y();
+      p.pose.orientation.z = future[i].orientation.z();
       path.poses.push_back(p);
     }
     path_pub_->publish(path);
@@ -242,13 +342,40 @@ class Predictor : public rclcpp::Node
     {
       metrics.data.push_back(v);
     }
-    metrics.data.push_back(e.probability(0));
-    metrics.data.push_back(e.probability(1));
+    const auto probability = [&](const std::string &name)
+    {
+      const auto it = std::find(settings_.models.begin(), settings_.models.end(), name);
+      return it == settings_.models.end() ? 0.0 : e.probability(it - settings_.models.begin());
+    };
+    metrics.data.push_back(probability("cv"));
+    metrics.data.push_back(probability("ca"));
     metrics.data.push_back(error.norm());
     metrics.data.push_back(horizon_error);
     metrics.data.push_back((e.mean.segment<3>(3) - truth.tail<3>()).norm());
     metrics.data.push_back(nees);
+    for (const auto &name : settings_.models)
+    {
+      if (name != "cv" && name != "ca")
+      {
+        metrics.data.push_back(probability(name));
+      }
+    }
     metrics_pub_->publish(metrics);
+    std_msgs::msg::Float64MultiArray probabilities;
+    probabilities.layout.dim.resize(1);
+    auto &dimension = probabilities.layout.dim[0];
+    for (const auto &name : settings_.models)
+    {
+      if (!dimension.label.empty())
+      {
+        dimension.label += ",";
+      }
+      dimension.label += name;
+    }
+    dimension.size   = e.probability.size();
+    dimension.stride = dimension.size;
+    probabilities.data.assign(e.probability.data(), e.probability.data() + e.probability.size());
+    probability_pub_->publish(probabilities);
 
     for (size_t i = 0; i < metrics.data.size(); ++i)
     {
@@ -272,6 +399,7 @@ class Predictor : public rclcpp::Node
   predictor::Settings                                  settings_;
   std::unique_ptr<predictor::Imm>                      filter_;
   bool                                                 noise_;
+  bool                                                 use_attitude_, use_angular_velocity_;
   bool                                                 finished_ = false;
   rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr done_;
   std::mt19937                                         rng_;
@@ -283,6 +411,7 @@ class Predictor : public rclcpp::Node
   std::ofstream       samples_, predictions_;
   rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr       sub_;
   rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr          estimate_pub_;
+  rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr probability_pub_;
   rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr              path_pub_;
   rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr metrics_pub_;
 };

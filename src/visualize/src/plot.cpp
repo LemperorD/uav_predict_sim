@@ -22,13 +22,24 @@ int main(int argc, char **argv)
     }
     std::string line;
     std::getline(in, line);
-    std::array<std::vector<double>, 19> columns;
+    std::vector<std::string> names;
+    std::stringstream        header(line);
+    std::string              name;
+    while (std::getline(header, name, ','))
+    {
+      names.push_back(name);
+    }
+    if (names.size() < 19)
+    {
+      throw std::runtime_error("invalid sample header");
+    }
+    std::vector<std::vector<double>> columns(names.size());
     while (std::getline(in, line))
     {
-      std::stringstream      s(line);
-      std::string            cell;
-      std::array<double, 19> row{};
-      for (int i = 0; i < 19; ++i)
+      std::stringstream   s(line);
+      std::string         cell;
+      std::vector<double> row(names.size());
+      for (size_t i = 0; i < names.size(); ++i)
       {
         if (!std::getline(s, cell, ','))
         {
@@ -36,7 +47,7 @@ int main(int argc, char **argv)
         }
         row[i] = std::stod(cell);
       }
-      for (int i = 0; i < 19; ++i)
+      for (size_t i = 0; i < names.size(); ++i)
       {
         columns[i].push_back(row[i]);
       }
@@ -82,8 +93,13 @@ int main(int argc, char **argv)
     plt::grid(true);
     plt::subplot(2, 2, 4);
     plt::title("IMM model probabilities");
-    plt::named_plot("CV", t, columns[13]);
-    plt::named_plot("CA", t, columns[14]);
+    for (size_t i = 0; i < names.size(); ++i)
+    {
+      if (names[i].rfind("p_", 0) == 0)
+      {
+        plt::named_plot(names[i].substr(2), t, columns[i]);
+      }
+    }
     plt::ylim(0, 1);
     plt::xlabel("time (s)");
     plt::legend();

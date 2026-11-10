@@ -17,7 +17,7 @@ namespace QuadrotorSimulator
       Eigen::Matrix3d R;
       Eigen::Vector3d omega;
       Eigen::Array4d  motor_rpm;
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     };
 
     Quadrotor();

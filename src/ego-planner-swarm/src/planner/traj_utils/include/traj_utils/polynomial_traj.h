@@ -3,6 +3,7 @@
 
 #include <Eigen/Eigen>
 #include <vector>
+#include <iostream>
 
 using std::vector;
 

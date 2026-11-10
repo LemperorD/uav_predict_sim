@@ -19,7 +19,8 @@ def main():
     template = yaml.safe_load((ROOT/'src/predictor/config/simulation.yaml').read_text())
     results = {}
     for name in ('straight_noisy', 'acceleration_noisy', 'figure8_clean', 'hover_noisy',
-                 'circle_noisy', 'helix_noisy', 'sinusoid_noisy', 'csv_replay'):
+                 'circle_noisy', 'helix_noisy', 'sinusoid_noisy', 'csv_replay',
+                 'three_models', 'single_body_model'):
         config = yaml.safe_load(yaml.safe_dump(template))
         p = config['/**']['ros__parameters']
         p.update(output_dir=str(base/name), duration=8.0, show_viewer=False, record_video=False)
@@ -34,6 +35,12 @@ def main():
                      trajectory_amplitude=[2.0, 1.0, 0.4],
                      trajectory_frequency=[0.4, 0.6, 0.3],
                      trajectory_phase=[0.2, 0.1, -0.2])
+        if name == 'three_models':
+            p.update(trajectory='circle', motion_models=['body_velocity', 'ca', 'cv'],
+                     model_initial_probability=[0.4, 0.3, 0.3],
+                     model_transition=[0.96, 0.02, 0.02, 0.02, 0.96, 0.02, 0.02, 0.02, 0.96])
+        if name == 'single_body_model':
+            p.update(motion_models=['body_velocity'])
         if name == 'csv_replay':
             # Exercise configured nested output names and input path containing spaces.
             source = base/'kinematic input.csv'
@@ -60,6 +67,12 @@ def main():
             assert metrics['filtered_position_rmse_m']<.12, name
         with (Path(p['output_dir'])/p['samples_file']).open() as f:
             observations = list(csv.DictReader(f))
+        if name in ('three_models', 'single_body_model'):
+            assert 'p_body_velocity' in observations[0], name
+            for row in observations:
+                assert abs(sum(float(v) for k, v in row.items() if k.startswith('p_'))-1) < 1e-8, name
+                if name == 'single_body_model':
+                    assert float(row['p_body_velocity']) == 1, name
         if name == 'hover_noisy':
             for row in observations:
                 assert all(abs(float(row[f'truth_{a}']) - v) < 1e-10
