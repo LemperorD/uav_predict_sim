@@ -1,0 +1,11 @@
+{
+  "observation": 40,
+  "horizon": 20,
+  "dt": 1.0,
+  "hidden": 64,
+  "heads": 4,
+  "layers": 3,
+  "feedforward": 256,
+  "dropout": 0.1,
+  "backbone": "transformer_lstm"
+}

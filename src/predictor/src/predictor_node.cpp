@@ -133,6 +133,7 @@ class PredictionNode : public rclcpp::Node
 
     estimate_pub_ = create_publisher<nav_msgs::msg::Odometry>("estimate", 10);
     path_pub_     = create_publisher<nav_msgs::msg::Path>("prediction", 10);
+    measurement_pub_ = create_publisher<nav_msgs::msg::Odometry>("measurement_position", 50);
     probability_pub_ =
         create_publisher<std_msgs::msg::Float64MultiArray>("model_probabilities", 10);
     metrics_pub_ = create_publisher<std_msgs::msg::Float64MultiArray>("metrics", 10);
@@ -254,6 +255,16 @@ class PredictionNode : public rclcpp::Node
       observation.angular_velocity = omega;
     }
     filter_->update(observation);
+
+    // Position-only observation for learned predictors, identical to the noisy
+    // input used above. Do not expose simulator truth or onboard velocity.
+    nav_msgs::msg::Odometry measurement;
+    measurement.header = m.header;
+    measurement.pose.pose.position.x = observation.position.x();
+    measurement.pose.pose.position.y = observation.position.y();
+    measurement.pose.pose.position.z = observation.position.z();
+    measurement.pose.pose.orientation.w = 1.0;
+    measurement_pub_->publish(measurement);
 
     double horizon_error = std::numeric_limits<double>::quiet_NaN();
     while (!pending_.empty() && pending_.front().target <= t)
@@ -470,6 +481,7 @@ class PredictionNode : public rclcpp::Node
   std::ofstream       samples_, predictions_;
   rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr       sub_;
   rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr          estimate_pub_;
+  rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr          measurement_pub_;
   rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr probability_pub_;
   rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr              path_pub_;
   rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr metrics_pub_;
