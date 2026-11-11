@@ -5,5 +5,6 @@
 - [编译、运行与结果说明](src/predictor/README.md)
 - [数值仿真配置](src/predictor/config/simulation.yaml)
 - [Pangolin 显示配置](src/predictor/config/visualization.yaml)
+- [Transformer-LSTM / LIMM 论文复现、训练和推理](learning/README.md)
 
 在工作区完成编译后执行 `scripts/run_simulation.sh`。每轮运行前，在数值配置中设置新的 `output_dir`。
