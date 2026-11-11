@@ -61,7 +61,7 @@ int main()
 {
   static_assert(std::is_abstract_v<predictor::Predictor>);
   static_assert(std::has_virtual_destructor_v<predictor::Predictor>);
-  static_assert(std::is_abstract_v<predictor::PoseKF>);
+  static_assert(!std::is_abstract_v<predictor::PoseKF>);
   static_assert(std::is_base_of_v<predictor::Predictor, predictor::PoseKF>);
   static_assert(
       std::is_same_v<decltype(std::declval<const predictor::Predictor &>().predict(.1, 2)),

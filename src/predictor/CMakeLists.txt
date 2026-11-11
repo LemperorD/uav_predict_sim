@@ -11,7 +11,7 @@ find_package(quadrotor_msgs REQUIRED)
 add_library(imm src/imm.cpp)
 target_include_directories(imm PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>)
 target_link_libraries(imm PUBLIC Eigen3::Eigen)
-add_library(predictor_algorithms src/imm_predictor.cpp src/predictor_factory.cpp)
+add_library(predictor_algorithms src/imm_predictor.cpp src/Pose-KF.cpp src/predictor_factory.cpp)
 target_include_directories(predictor_algorithms PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -37,6 +37,9 @@ if(BUILD_TESTING)
   add_executable(test_predictor_interface test/test_predictor_interface.cpp)
   target_link_libraries(test_predictor_interface predictor_algorithms)
   add_test(NAME predictor_interface COMMAND test_predictor_interface)
+  add_executable(test_pose_kf test/test_pose_kf.cpp)
+  target_link_libraries(test_pose_kf predictor_algorithms)
+  add_test(NAME pose_kf_numerics COMMAND test_pose_kf)
   add_executable(test_imm test/test_imm.cpp)
   target_link_libraries(test_imm imm)
   add_test(NAME imm_numerics COMMAND test_imm)

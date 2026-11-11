@@ -120,7 +120,43 @@ def main():
     if not args.finalize_only and result['duration_s'] < float(params['duration']) - 1.0:
         raise RuntimeError('Simulation terminated before configured duration')
     env = dict(os.environ, MPLBACKEND='Agg', PYTHONNOUSERSITE='1', MPLCONFIGDIR=str(output_path(output, params.get('matplotlib_cache_dir', '.matplotlib'))))
-    subprocess.run(['ros2','run','prediction_visualize','prediction_plot',str(samples),str(plot_file)], check=True, env=env)
+    if params.get('offline_plot', True):
+        command = ['ros2', 'run', 'prediction_visualize', 'prediction_plot', str(samples), str(plot_file),
+                   '--profile', params.get('prediction_algorithm', 'imm'),
+                   '--label', params.get('plot_label', params.get('prediction_algorithm', 'imm'))]
+        baseline_files = params.get('baseline_samples', [])
+        baseline_labels = params.get('baseline_labels', [])
+        if len(baseline_files) != len(baseline_labels):
+            raise ValueError('baseline_samples and baseline_labels must have equal length')
+        labels = [command[-1], *baseline_labels]
+        if any(not isinstance(label, str) or not label.strip() for label in labels) or len(set(labels)) != len(labels):
+            raise ValueError('plot/baseline labels must be nonempty and unique')
+        comparison = {}
+        for label, sample_file in zip(labels, [samples, *[
+                output_path(config.parent, path).resolve() for path in baseline_files]]):
+            with Path(sample_file).open() as stream:
+                rows = [{key: float(value) for key, value in row.items()} for row in csv.DictReader(stream)]
+            if not rows:
+                raise ValueError(f'empty baseline/current CSV: {sample_file}')
+            settled = [row for row in rows if row['t'] >= min(2.0, rows[-1]['t'] / 4)]
+            comparison[label] = {
+                'samples_file': str(sample_file), 'samples': len(rows),
+                'duration_s': rows[-1]['t'],
+                'position_rmse_m': rmse([row['position_error'] for row in settled]),
+                'velocity_rmse_mps': rmse([row['velocity_error'] for row in settled]),
+                'horizon_rmse_m': rmse([row['horizon_error'] for row in rows]),
+            }
+        for label, path in zip(baseline_labels, baseline_files):
+            command.extend(['--baseline', label, str(output_path(config.parent, path).resolve())])
+        subprocess.run(command, check=True, env=env)
+        if baseline_files:
+            destination = output_path(output, params.get('comparison_metrics_file', 'comparison_metrics.json'))
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            destination.write_text(json.dumps({
+                'note': 'Independent run metrics; time axes are each run elapsed time. '
+                        'Use matching trajectory, duration, noise and forecast horizon for comparison. '
+                        'Horizon RMSE uses finite scored samples in samples.csv.',
+                'runs': comparison}, indent=2, allow_nan=False) + '\n')
     if params.get('record_video', True) and show:
         if not any(frames.glob('frame_*.png')):
             raise RuntimeError('Recording requested but no Pangolin frames were captured')

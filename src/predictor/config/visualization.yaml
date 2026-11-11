@@ -35,4 +35,8 @@ prediction_viewer:
 
     # 右侧曲线初始纵轴上限，横轴跟随仿真 duration。
     error_plot_max: 1.0             # m，必须为正
-    covariance_plot_max: 0.001      # m²，必须为正
+    covariance_plot_max: 0.1      # m²，必须为正
+
+    # auto selects panels from prediction_algorithm; override: imm | pose_kf | kf
+    plot_profile: auto
+    velocity_error_plot_max: 2.0

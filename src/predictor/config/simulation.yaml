@@ -1,7 +1,7 @@
 /**:
   ros__parameters:
     # Relative file paths resolve from this YAML's directory. Use a new output_dir for each run.
-    output_dir: ../../../outputs/demo2
+    output_dir: ../../../outputs/pose_kf_demo
     input_csv: ""  # optional: t,px,py,pz,vx,vy,vz,ax,ay,az; seconds, SI, world frame
     duration: 30.0
     sample_rate: 50.0
@@ -33,7 +33,16 @@
     attitude_noise_std: 0.05  # local rotation, rad
     angular_velocity_noise_std: 0.10  # body axes, rad/s
     angular_accel_density: 0.30
-    prediction_algorithm: imm  # 通过 core/predictor.hpp 统一接口创建预测算法
+    prediction_algorithm: pose_kf  # imm | pose_kf | kf (position-only CV baseline)
+    pose_kf_process_variance: 0.01  # sigma_q, variance per update (paper convention)
+    pose_kf_measurement_variance: 0.1  # sigma_r, not standard deviation
+    pose_kf_gravity: 9.81
+    pose_kf_world_up_sign: 1.0  # ROS ENU +1; paper down-positive -1
+    offline_plot: true
+    plot_label: Pose-KF
+    baseline_samples: []  # paths relative to this YAML, or absolute paths
+    baseline_labels: []  # one unique label for each baseline_samples entry
+    comparison_metrics_file: comparison_metrics.json
     prediction_step: 0.05
     prediction_steps: 20
     max_time_gap: 1.0

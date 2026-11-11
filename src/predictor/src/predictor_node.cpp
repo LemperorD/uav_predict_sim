@@ -60,8 +60,13 @@ class PredictionNode : public rclcpp::Node
       throw std::invalid_argument("use_angular_velocity requires use_attitude");
     }
     const auto algorithm = declare_parameter<std::string>("prediction_algorithm", "imm");
-    filter_              = predictor::makePredictor(algorithm, s, use_attitude_);
-    settings_            = s;
+    predictor::PoseKFSettings pose_settings;
+    pose_settings.process_variance     = declare_parameter("pose_kf_process_variance", 0.01);
+    pose_settings.measurement_variance = declare_parameter("pose_kf_measurement_variance", 0.1);
+    pose_settings.gravity              = declare_parameter("pose_kf_gravity", 9.81);
+    pose_settings.world_up_sign        = declare_parameter("pose_kf_world_up_sign", 1.0);
+    filter_   = predictor::makePredictor(algorithm, s, use_attitude_, pose_settings);
+    settings_ = s;
 
     noise_ = declare_parameter("inject_noise", true);
     rng_.seed(declare_parameter("noise_seed", 42));
@@ -117,7 +122,9 @@ class PredictionNode : public rclcpp::Node
         samples_ << ",p_" << name;
       }
     }
-    samples_ << '\n';
+    samples_ << ",truth_vx,truth_vy,truth_vz,measurement_vx,measurement_vy,measurement_vz,"
+                "estimate_vx,estimate_vy,estimate_vz,measurement_qw,measurement_qx,measurement_qy,"
+                "measurement_qz\n";
     predictions_ << "origin_t,target_t,pred_x,pred_y,pred_z,truth_x,truth_y,"
                     "truth_z,error,std_x,std_y,std_z\n";
 
@@ -426,6 +433,14 @@ class PredictionNode : public rclcpp::Node
       }
       samples_ << metrics.data[i];
     }
+    for (double v : truth.tail<3>()) samples_ << ',' << v;
+    for (double v : z.tail<3>()) samples_ << ',' << v;
+    for (double v : diagnostic.velocity) samples_ << ',' << v;
+    if (observation.orientation)
+      samples_ << ',' << orientation.w() << ',' << orientation.x() << ',' << orientation.y() << ','
+               << orientation.z();
+    else
+      samples_ << ",nan,nan,nan,nan";
     samples_ << '\n';
     if (++received_ % 100 == 0)
     {

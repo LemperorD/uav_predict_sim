@@ -1,6 +1,6 @@
 # 轨迹预测数值仿真
 
-本项目生成已知运动轨迹，通过引用的 `poscmd_2_odom` 运动学仿真器输出里程计，再加入观测噪声并执行 IMM 轨迹预测。Pangolin 实时显示真实轨迹、观测、滤波估计和未来预测，结束后导出误差统计、曲线图和录像。
+本项目生成已知运动轨迹，通过引用的 `poscmd_2_odom` 运动学仿真器输出里程计，再加入观测噪声并执行可配置的 Pose-KF / KF / IMM 轨迹预测。Pangolin 实时显示真实轨迹、观测、滤波估计和未来预测，结束后导出误差统计、曲线图和录像。
 
 ## 编译
 
@@ -26,7 +26,7 @@ colcon build --symlink-install \
 scripts/run_simulation.sh
 ```
 
-脚本自动加载 ROS 和本工作区环境。默认预热约 2 秒，然后运行 30 秒三维八字轨迹。Pangolin 左侧显示真实轨迹、含噪观测、滤波估计和未来预测，右侧显示位置/预测误差、位置协方差对角线和模型概率。鼠标可旋转、平移、缩放三维视角。
+脚本自动加载 ROS 和本工作区环境。默认预热约 2 秒，然后运行 30 秒三维八字轨迹。Pangolin 左侧显示真实轨迹、含噪观测、滤波估计和未来预测，右侧显示位置/预测误差、位置协方差对角线，以及算法对应的速度误差或模型概率。鼠标可旋转、平移、缩放三维视角。
 
 仿真结束后窗口自动关闭，脚本生成统计、曲线图与 MP4。提前关闭窗口会中止本轮仿真并报告失败。图形运行需要有效的 `DISPLAY` 和 OpenGL 环境。
 
@@ -151,7 +151,7 @@ prediction_viewer:
 - `inject_noise`：是否注入观测噪声；`position_noise_std`、`velocity_noise_std` 为位置/速度噪声标准差。关闭噪声时仍保留正的标准差配置，供滤波器使用。
 - `motion_models`：可选择 `[cv, ca]` 或加入 `body_velocity`。分别采用世界系匀速、恒加速度和恒机体系速度假设。
 - `stay_probability`：默认模型转移矩阵的对角概率；也可通过 `model_transition` 与 `model_initial_probability` 指定转移矩阵和先验。
-- `prediction_algorithm`：当前为 `imm`，所有算法通过统一基类创建。
+- `prediction_algorithm`：`pose_kf`（默认）、`kf` 或 `imm`，所有算法通过统一基类创建。
 - `prediction_step × prediction_steps`：预测总时域，默认 1 秒。
 - `use_attitude`：是否使用姿态观测。本项目引用的仿真器将加速度写在 `twist.angular` 中，保持 `use_angular_velocity: false`。
 - `show_viewer`、`record_video`：是否显示窗口、录制视频；`window_width/height` 为初始窗口宽高，必须为正整数，`video_fps` 为 1～120。
@@ -160,7 +160,7 @@ prediction_viewer:
 
 ## 查看结果
 
-默认写入 `outputs/demo/`，各文件名可在数值配置中修改：
+默认写入 `outputs/pose_kf_demo/`，各文件名可在数值配置中修改：
 
 | 输出 | 内容 |
 | --- | --- |
@@ -186,4 +186,50 @@ scripts/run_simulation.sh --config /absolute/path/to/simulation.yaml --finalize-
 
 所有算法通过 [core/predictor.hpp](core/predictor.hpp) 的 `predictor::Predictor` 基类调用，预测结果统一为三维位置序列，内部状态维度由各算法自行决定。ROS `prediction` 话题仅携带这些预测位置，姿态字段为单位四元数占位。当前估计姿态、协方差和概率保留为可选诊断，供仿真面板与评估使用。
 
-新增算法、输入输出约定与 `PoseKF` 占位类的说明见 [统一接口说明](core/README.md)。
+新增算法、输入输出约定与 `PoseKF` 实现的说明见 [统一接口说明](core/README.md)。
+
+
+## 20261111：Pose-KF 与位置观测 KF 基线
+
+选择 `prediction_algorithm: pose_kf`，并保留 `use_attitude: true`。实现依据本地论文第 VI-A 节式 (19)–(24)：六维状态 `[p, v]`，姿态作为过程模型的外部输入，观测矩阵为 `[I, 0]`。不使用观测速度或仿真真值初始化速度；首帧位置取观测，速度为零，协方差为单位矩阵。后续使用本次姿态输入、实际观测时间间隔做前向 Euler 传播，并做位置观测校正。
+
+ROS 仿真为 Z 轴向上、机体 +Z 为推力方向，因此默认使用 `a = g (R e3 - e3)`；`pose_kf_world_up_sign: -1.0` 对应论文的向下正方向 `a = g (e3 - R e3)`，仅应在输入坐标也相应转换后使用。使用归一化四元数计算旋转，避免论文打印的旋转矩阵条目问题。预测复制当前状态，在整个预测区间保持最后姿态不变；不读取未来姿态。Euler 位置传播不额外添加 `0.5*a*dt²`。
+
+论文式 (23) 打印的 `Gamma` 为 6×1，而 `Q` 为 6×6，乘积维度不一致；式 (24) 增益也未印出逆矩阵。本实现明确采用 `Gamma = diag(1 + dt*B)`、`B = [0, sign*R*e3]` 和 `Q = sigma_q*I6`，用线性方程求解创新协方差的逆作用，并使用 Joseph 协方差校正维持数值稳定性。该约定是对不完整公式的工程解释，不宣称严格复现论文指标。
+
+| 参数 | 默认值 | 含义 |
+| --- | --- | --- |
+| `pose_kf_process_variance` | 0.01 | 论文 `sigma_q`，每次更新的过程方差系数 |
+| `pose_kf_measurement_variance` | 0.1 | 论文 `sigma_r`，位置观测方差，m² |
+| `pose_kf_gravity` | 9.81 | 重力大小，m/s² |
+| `pose_kf_world_up_sign` | 1.0 | +1 为本仿真 ENU，-1 为论文向下正 |
+
+前两项是方差系数，不是噪声标准差，也不自动等同于注入观测噪声。论文运行于 10 Hz，本仿真里程计为 100 Hz；过程方差按更新注入，改变采样率需重新评估参数。等重力推力假设在大倾角或垂直机动时会产生模型误差。`kf` 采用相同位置观测和协方差设置，关闭姿态加速度输入；IMM 还使用速度观测，因此与 IMM 的对比包含输入信息差异。
+
+Pose-KF 诊断提供位置/速度、对应三维协方差与预测终点协方差；姿态字段透传最后观测。没有姿态误差估计、角速度或模型概率，这些字段保持 NaN/空值。`samples.csv` 追加真值/观测/估计速度和观测四元数，保留前 19 列及原有模型概率索引，便于离线分析。
+
+## 按算法扩展 Pangolin 曲线
+
+`src/visualize/include/predictor_visualization.hpp` 中的 `PredictorVisualization` 为曲线定义基类，提供公共误差与协方差面板。每个子类返回 `DiagnosticPanel`，声明标签、指标索引、平方变换及纵轴上限；查看器统一创建 DataLog/Plotter，三维场景继续共用。新增算法时实现子类并加入查看器的选择分支。
+
+`visualization.yaml` 中 `plot_profile: auto` 根据算法选择：IMM 第三栏为模型概率，Pose-KF/KF 第三栏为速度误差。可指定 `imm`、`pose_kf`、`kf` 覆盖；`velocity_error_plot_max` 控制速度误差上限。位置协方差较大时，将 `covariance_plot_max` 调到如 `0.1`。
+
+## 离线绘图与已有基线比较
+
+仿真照常记录 CSV。以下配置控制运行结束后的 matplotlib-cpp 绘图，`--finalize-only --headless` 可对已有数据重新绘图，无须重跑仿真：
+
+```yaml
+    offline_plot: true
+    plot_label: Pose-KF
+    baseline_samples:
+      - ../../../outputs/kf_trial/samples.csv
+      - ../../../outputs/imm_trial/samples.csv
+    baseline_labels: [KF, IMM]
+    comparison_metrics_file: comparison_metrics.json
+```
+
+`baseline_samples` 路径相对于数值 YAML 文件，也支持绝对路径和含空格路径；标签与路径一一对应且不能重复。离线图叠加各方法的 XY 轨迹、位置/预测误差、速度误差；协方差面板展示当前算法。绘图按 CSV 列名读取，兼容旧数据和列重排。`offline_plot: false` 跳过绘图与基线比较，保留原始 CSV 和当前运行的 `metrics.json`。
+
+比较结果写入 `comparison_metrics.json`，报告每个数据集的样本数、时长、位置/速度 RMSE 与已评分时域误差。位置/速度指标排除预热，预测指标只取 CSV 中有限值。各运行以自己的 elapsed time 作横轴，指标分别汇总，不做逐样本配对；应使用相同轨迹、时长、噪声参数与预测时域。固定种子仍不能消除 ROS 调度时刻差异。主运行 `metrics.json` 的预测 RMSE 继续以 `predictions.csv` 为准，比较表则使用 `samples.csv` 的 `horizon_error`，两者可能因采样/重采样略有差异。
+
+例如先用 `prediction_algorithm: kf`、新的 `output_dir` 运行基线，再切换为 `pose_kf`、另一个 `output_dir` 并填写基线 CSV 路径。不要把输出目录改成已存在数据的目录来启动新仿真。

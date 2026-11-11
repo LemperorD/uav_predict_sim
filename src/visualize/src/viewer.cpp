@@ -6,6 +6,7 @@
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 #include "drone_model.hpp"
+#include "predictor_visualization.hpp"
 #include "viewer_settings.hpp"
 
 #include <array>
@@ -82,7 +83,8 @@ int main(int argc, char **argv)
       }
       frame_times << "frame,elapsed_s,width,height\n" << std::setprecision(12);
     }
-    pangolin::CreateWindowAndBind("UAV trajectory prediction | IMM-KF", width, height);
+    const auto algorithm = node->declare_parameter<std::string>("prediction_algorithm", "imm");
+    pangolin::CreateWindowAndBind("UAV trajectory prediction | " + algorithm, width, height);
     glEnable(GL_DEPTH_TEST);
     std::unique_ptr<DroneModel> drone;
     if (style.show_drone)
@@ -119,52 +121,47 @@ int main(int argc, char **argv)
     auto &view = pangolin::CreateDisplay()
                      .SetBounds(0, 1, 0, .62)
                      .SetHandler(new pangolin::Handler3D(camera));
-    pangolin::DataLog errors, sigma, prob;
-    errors.SetLabels({"time (s)", "position error (m)", "horizon error (m)"});
-    sigma.SetLabels({"time (s)", "Pxx (m2)", "Pyy (m2)", "Pzz (m2)"});
     const auto model_names =
         node->declare_parameter<std::vector<std::string>>("motion_models", {"cv", "ca"});
-    std::vector<std::string> probability_labels = {"time (s)"};
-    for (const auto &name : model_names)
+    const auto profile  = node->declare_parameter<std::string>("plot_profile", "auto");
+    const auto selected = profile == "auto" ? algorithm : profile;
+    std::unique_ptr<PredictorVisualization> visualization;
+    if (selected == "imm")
+      visualization = std::make_unique<ImmVisualization>(model_names);
+    else if (selected == "pose_kf" || selected == "kf")
+      visualization = std::make_unique<PoseKFVisualization>();
+    else
+      throw std::invalid_argument("Unknown plot_profile: " + selected);
+    const double velocity_max = node->declare_parameter("velocity_error_plot_max", 2.0);
+    if (!std::isfinite(velocity_max) || velocity_max <= 0)
+      throw std::invalid_argument("velocity_error_plot_max must be positive and finite");
+    const auto panels = visualization->panels(error_max, covariance_max, velocity_max);
+    std::vector<std::unique_ptr<pangolin::DataLog>> logs;
+    std::vector<std::unique_ptr<pangolin::Plotter>> plots;
+    for (size_t i = 0; i < panels.size(); ++i)
     {
-      probability_labels.push_back("P(" + name + ")");
-    }
-    prob.SetLabels(probability_labels);
-    pangolin::Plotter error_plot(&errors, 0, duration, 0, error_max, 5, error_max / 4),
-        cov_plot(&sigma, 0, duration, 0, covariance_max, 5, covariance_max / 4),
-        prob_plot(&prob, 0, duration, 0, 1, 5, .2);
-    std::array<pangolin::Plotter *, 3> plots = {&error_plot, &cov_plot, &prob_plot};
-    for (auto *p : plots)
-    {
-      p->ClearSeries();
-      p->SetBackgroundColour(style.plot_background);
-      p->SetAxisColour(style.plot_axis);
-      p->SetTickColour(style.plot_ticks);
-    }
-    error_plot.AddSeries("$0", "$1", pangolin::DrawingModeLine, style.position_error,
-                         "position error (m)");
-    error_plot.AddSeries("$0", "$2", pangolin::DrawingModeLine, style.horizon_error,
-                         "horizon error (m)");
-    for (int i = 1; i <= 3; ++i)
-    {
-      cov_plot.AddSeries("$0", "$" + std::to_string(i) + "*$" + std::to_string(i),
-                         pangolin::DrawingModeLine, style.covariance[i - 1],
-                         "P" + std::string(2, "xyz"[i - 1]) + " (m2)");
-    }
-    for (size_t i = 0; i < model_names.size(); ++i)
-    {
-      prob_plot.AddSeries("$0", "$" + std::to_string(i + 1), pangolin::DrawingModeLine,
-                          style.models[model_names[i] == "cv"   ? 0
-                                       : model_names[i] == "ca" ? 1
-                                                                : 2],
-                          probability_labels[i + 1]);
-    }
-    error_plot.SetBounds(.67, 1, .62, 1);
-    cov_plot.SetBounds(.34, .67, .62, 1);
-    prob_plot.SetBounds(0, .34, .62, 1);
-    for (auto *p : plots)
-    {
-      pangolin::DisplayBase().AddDisplay(*p);
+      const auto &panel = panels[i];
+      logs.push_back(std::make_unique<pangolin::DataLog>());
+      std::vector<std::string> labels = {"time (s)"};
+      for (const auto &curve : panel.curves) labels.push_back(curve.label);
+      logs.back()->SetLabels(labels);
+      plots.push_back(std::make_unique<pangolin::Plotter>(logs.back().get(), 0, duration, 0,
+                                                          panel.maximum, 5, panel.maximum / 4));
+      auto &plot = *plots.back();
+      plot.ClearSeries();
+      plot.SetBackgroundColour(style.plot_background);
+      plot.SetAxisColour(style.plot_axis);
+      plot.SetTickColour(style.plot_ticks);
+      for (size_t j = 0; j < panel.curves.size(); ++j)
+      {
+        const auto color = i == 0   ? (j == 0 ? style.position_error : style.horizon_error)
+                           : i == 1 ? style.covariance[j % 3]
+                                    : style.models[j % 3];
+        plot.AddSeries("$0", "$" + std::to_string(j + 1), pangolin::DrawingModeLine, color,
+                       panel.curves[j].label);
+      }
+      plot.SetBounds(1.0 - double(i + 1) / panels.size(), 1.0 - double(i) / panels.size(), .62, 1);
+      pangolin::DisplayBase().AddDisplay(plot);
     }
     std::deque<Point> truth, measure, estimate, future;
     Point             stddev       = {0, 0, 0};
@@ -189,34 +186,18 @@ int main(int argc, char **argv)
             measure.pop_front();
             estimate.pop_front();
           }
-          errors.Log(d[0], d[15], d[16]);
-          sigma.Log(d[0], d[10], d[11], d[12]);
-          std::vector<float> probabilities = {static_cast<float>(d[0])};
-          for (const auto &name : model_names)
+          for (size_t i = 0; i < panels.size(); ++i)
           {
-            size_t index = name == "cv" ? 13 : 14;
-            if (name != "cv" && name != "ca")
+            std::vector<float> values = {static_cast<float>(d[0])};
+            for (const auto &curve : panels[i].curves)
             {
-              index = 19;
-              for (const auto &candidate : model_names)
-              {
-                if (candidate == name)
-                {
-                  break;
-                }
-                if (candidate != "cv" && candidate != "ca")
-                {
-                  ++index;
-                }
-              }
+              const double value = curve.metric_index < d.size()
+                                                         ? d[curve.metric_index]
+                                                         : std::numeric_limits<double>::quiet_NaN();
+              values.push_back(static_cast<float>(curve.square ? value * value : value));
             }
-            if (index >= d.size())
-            {
-              return;
-            }
-            probabilities.push_back(d[index]);
+            logs[i]->Log(values);
           }
-          prob.Log(probabilities);
         });
     auto path = node->create_subscription<nav_msgs::msg::Path>(
         "prediction", 10,

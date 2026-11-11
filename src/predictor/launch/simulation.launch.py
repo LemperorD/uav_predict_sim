@@ -1,4 +1,4 @@
-"""EGO kinematic simulator -> noisy observation -> IMM -> Pangolin."""
+"""EGO kinematic simulator -> noisy observation -> predictor -> Pangolin."""
 from pathlib import Path
 import csv
 import math
@@ -66,7 +66,11 @@ def setup(context):
     if not snapshot.is_absolute():
         snapshot = output / snapshot
     snapshot.parent.mkdir(parents=True, exist_ok=True)
-    viewer_params = {**params, **style}
+    # Runner-only lists may be empty, which ROS launch cannot infer as a typed array.
+    runner_keys = {'offline_plot', 'plot_label', 'baseline_samples', 'baseline_labels',
+                   'comparison_metrics_file'}
+    ros_params = {key: value for key, value in params.items() if key not in runner_keys}
+    viewer_params = {**ros_params, **style}
     snapshot.write_text(yaml.safe_dump({
         '/**': {'ros__parameters': params},
         'prediction_viewer': {'ros__parameters': viewer_params},
@@ -77,9 +81,9 @@ def setup(context):
                      name='ego_kinematic_simulator', output='screen',
                      parameters=[dict(zip(('init_x', 'init_y', 'init_z'), start))], remappings=topics)
     predictor = Node(package='predictor', executable='predictor_node',
-                     output='screen', parameters=[params], remappings=topics)
+                     output='screen', parameters=[ros_params], remappings=topics)
     source = Node(package='predictor', executable='kinematic_source',
-                  output='screen', parameters=[params], remappings=topics)
+                  output='screen', parameters=[ros_params], remappings=topics)
     nodes = [predictor]
     processors = [simulator, predictor]
     if params.get('show_viewer', True):

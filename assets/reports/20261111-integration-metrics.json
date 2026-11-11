@@ -1,0 +1,50 @@
+{
+  "pose_kf": {
+    "samples": 800,
+    "scored_predictions": 699,
+    "duration_s": 7.98998379707,
+    "measurement_position_rmse_m": 0.2596324879187366,
+    "filtered_position_rmse_m": 0.10648939080112044,
+    "velocity_rmse_mps": 0.1570287597928819,
+    "horizon_position_rmse_m": 0.7700660702930753,
+    "mean_position_nees": 0.40889501194890643,
+    "position_2sigma_axis_coverage": {
+      "x": 1.0,
+      "y": 1.0,
+      "z": 1.0
+    },
+    "unscored_tail_note": "Predictions whose target is beyond the last truth sample are excluded."
+  },
+  "kf": {
+    "samples": 799,
+    "scored_predictions": 698,
+    "duration_s": 7.97988700867,
+    "measurement_position_rmse_m": 0.2598180068322305,
+    "filtered_position_rmse_m": 0.1096144517106284,
+    "velocity_rmse_mps": 0.9951227990961209,
+    "horizon_position_rmse_m": 1.3836970035689329,
+    "mean_position_nees": 0.4332841940313701,
+    "position_2sigma_axis_coverage": {
+      "x": 1.0,
+      "y": 1.0,
+      "z": 1.0
+    },
+    "unscored_tail_note": "Predictions whose target is beyond the last truth sample are excluded."
+  },
+  "imm": {
+    "samples": 799,
+    "scored_predictions": 699,
+    "duration_s": 7.97984647751,
+    "measurement_position_rmse_m": 0.25981800683223194,
+    "filtered_position_rmse_m": 0.029802438726620705,
+    "velocity_rmse_mps": 0.059913581237290965,
+    "horizon_position_rmse_m": 0.32406201565858034,
+    "mean_position_nees": 5.759077207416861,
+    "position_2sigma_axis_coverage": {
+      "x": 1.0,
+      "y": 0.6444073455759599,
+      "z": 0.988313856427379
+    },
+    "unscored_tail_note": "Predictions whose target is beyond the last truth sample are excluded."
+  }
+}
