@@ -18,6 +18,8 @@
   <depend>visualization_msgs</depend>
   <depend>Boost</depend>
 
+  <exec_depend>prediction_visualize</exec_depend>
+
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
 

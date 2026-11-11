@@ -1,0 +1,49 @@
+# Pangolin 轨迹预测面板。修改后在下一次启动时生效；录像同步采用这些样式。
+# RGB 按 [红, 绿, 蓝] 排列，每项为 0.0～1.0 的浮点数。
+# 窗口尺寸、video_fps、record_video 和输出路径仍在 simulation.yaml 中配置。
+prediction_viewer:
+  ros__parameters:
+    # 窗口与曲线区背景。浅色背景可使用 [1.0, 1.0, 1.0]，同时调暗文字/坐标颜色。
+    background_color: [0.04, 0.055, 0.08]
+    plot_background_color: [0.06, 0.08, 0.12]
+    text_color: [0.9, 0.94, 1.0]
+    plot_axis_color: [0.5, 0.5, 0.5]
+    plot_tick_color: [0.3, 0.3, 0.3]
+
+    # 左侧三维轨迹、观测点与位置不确定度。
+    truth_color: [0.2, 0.9, 0.4]
+    observation_color: [0.55, 0.55, 0.6]
+    estimate_color: [0.2, 0.65, 1.0]
+    forecast_color: [1.0, 0.6, 0.1]
+    uncertainty_color: [0.3, 0.7, 1.0]
+    trajectory_line_width: 2.0       # 像素
+    observation_point_size: 2.0     # 像素
+    estimate_point_size: 9.0        # 像素
+    max_track_points: 20000         # 保留最近的真实/观测/估计点，不截断 CSV
+    show_uncertainty: true          # 估计位置的三轴 2σ 线段
+    show_legend: true               # 标题、图例和当前时间
+
+    # 世界坐标系地面网格，单位 m；extent 为从原点向两侧延伸的距离。
+    show_grid: true
+    grid_color: [0.2, 0.25, 0.3]
+    grid_extent: 10.0
+    grid_spacing: 1.0               # extent / spacing 不超过 1000
+
+    # 初始相机，Z 轴向上；可在窗口中继续用鼠标调整。
+    camera_eye: [8.0, -10.0, 8.0]
+    camera_target: [0.0, 0.0, 2.0]
+    camera_focal_length: 850.0      # 像素，越大视角越窄
+    camera_near_clip: 0.1          # m
+    camera_far_clip: 1000.0        # m，必须大于 near_clip
+
+    # 右侧曲线颜色与初始纵轴上限，横轴跟随仿真 duration。
+    position_error_color: [0.2, 0.7, 1.0]
+    horizon_error_color: [1.0, 0.6, 0.1]
+    error_plot_max: 1.0             # m，必须为正
+    covariance_plot_max: 0.001      # m²，必须为正
+    covariance_x_color: [0.9, 0.3, 0.9]
+    covariance_y_color: [0.7, 0.9, 0.2]
+    covariance_z_color: [0.2, 0.65, 1.0]
+    model_cv_color: [0.9, 0.3, 0.9]
+    model_ca_color: [0.7, 0.9, 0.2]
+    model_body_velocity_color: [0.2, 0.65, 1.0]

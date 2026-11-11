@@ -61,7 +61,5 @@ install(
   DIRECTORY launch/
   DESTINATION share/${PROJECT_NAME}/launch
 )
-# 安装config（存放rviz的config文件）
-install(DIRECTORY config DESTINATION share/${PROJECT_NAME})
 
 ament_package()

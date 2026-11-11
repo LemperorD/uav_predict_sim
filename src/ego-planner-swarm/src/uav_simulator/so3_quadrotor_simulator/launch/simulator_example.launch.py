@@ -77,24 +77,9 @@ def generate_launch_description():
             output='screen'
         )
     
-    visualization_node = launch_ros.actions.Node(
-            package='odom_visualization', executable='odom_visualization',
-            name='odom_visualization', output='screen',
-            parameters=[{'color/a': 0.5},
-                        {'color/r': 1.0},
-                        {'color/g': 0.0},
-                        {'color/b': 0.0},
-                        {'covariance_scale': 100.0},
-                        {'robot_scale': 1.0},
-                        {'tf45': True}],
-            
-            remappings=[('odom', '/sim/odom')])
-
-
-    rviz_config_path = os.path.join(get_package_share_directory('so3_quadrotor_simulator'), 'config', 'rviz.rviz')
-    rviz_node = launch_ros.actions.Node(
-            package='rviz2', executable='rviz2', output='screen',
-            arguments=['--display-config', rviz_config_path])
+    viewer_node = launch_ros.actions.Node(
+        package='prediction_visualize', executable='scene_viewer', output='screen',
+        parameters=[{'odometry_topics': ['/sim/odom'], 'cloud_topics': ['']}])
 
     ld = LaunchDescription()
     ld.add_action(init_x_cmd)
@@ -102,7 +87,6 @@ def generate_launch_description():
     ld.add_action(init_z_cmd)
     ld.add_action(so3_quadrotor_simulator)
     ld.add_action(so3_control_container)
-    ld.add_action(visualization_node)
-    ld.add_action(rviz_node)
+    ld.add_action(viewer_node)
 
     return ld

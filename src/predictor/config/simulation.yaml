@@ -52,9 +52,8 @@
     video_file: simulation.mp4
     plot_file: summary.png
     metrics_file: metrics.json
+    # 背景、颜色、相机、网格和曲线样式见同目录 visualization.yaml。
     window_width: 1280
     window_height: 800
     video_fps: 15
-    error_plot_max: 1.0
-    covariance_plot_max: 0.001
     ffmpeg_path: /usr/bin/ffmpeg

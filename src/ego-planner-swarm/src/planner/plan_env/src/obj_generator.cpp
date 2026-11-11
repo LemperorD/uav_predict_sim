@@ -232,7 +232,7 @@ void visualizeObj(int id)
   Eigen::Quaterniond qua;
   qua = rot;
 
-  /* ---------- rviz ---------- */
+  /* ---------- visualization markers ---------- */
   visualization_msgs::msg::Marker mk;
   mk.header.frame_id = "world";
   mk.header.stamp    = rclcpp::Clock().now();

@@ -60,6 +60,9 @@ def summarize(samples, forecasts, destination):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--config', type=Path, default=ROOT/'src/predictor/config/simulation.yaml')
+    parser.add_argument('--visualization-config', type=Path,
+                        default=ROOT/'src/predictor/config/visualization.yaml',
+                        help='Pangolin appearance YAML (loaded at startup)')
     parser.add_argument('--headless', action='store_true', help='disable Pangolin/video; keep numerical run and plots')
     parser.add_argument('--finalize-only', action='store_true', help='regenerate plots/metrics/video from existing data')
     args = parser.parse_args()
@@ -81,7 +84,8 @@ def main():
         # Refuse overwrites so failed/new runs cannot masquerade as an earlier success.
         if samples.exists() or forecasts.exists() or any(frames.glob('frame_*.png')):
             raise RuntimeError(f'Output already contains a run: {output}. Choose a new output_dir.')
-        command = ['ros2','launch','predictor','simulation.launch.py',f'config:={config}']
+        command = ['ros2','launch','predictor','simulation.launch.py',f'config:={config}',
+                   f'visualization_config:={args.visualization_config.expanduser().resolve()}']
         if args.headless:
             command.append('viewer:=false')
         launch_log.parent.mkdir(parents=True, exist_ok=True)

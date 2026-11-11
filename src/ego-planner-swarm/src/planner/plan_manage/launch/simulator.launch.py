@@ -185,36 +185,6 @@ def generate_launch_description():
         condition = UnlessCondition(use_dynamic)
     )
 
-    odom_visualization_node = Node(
-        package='odom_visualization',
-        executable='odom_visualization',
-        name=['drone_', drone_id, '_odom_visualization'],
-        output='screen',
-        remappings=[
-            ('odom', ['drone_', drone_id, '_visual_slam/odom']),
-            ('robot', ['drone_', drone_id, '_vis/robot']),
-            ('path', ['drone_', drone_id, '_vis/path']),
-            ('time_gap', ['drone_', drone_id, '_vis/time_gap']),
-            # ('pose', ['drone_', drone_id, '_vis/pose']),
-            # ('velocity', ['drone_', drone_id, '_vis/velocity']),
-            # ('covariance', ['drone_', drone_id, '_vis/covariance']),
-            # ('covariance_velocity', ['drone_', drone_id, '_vis/covariance_velocity']),
-            # ('trajectory', ['drone_', drone_id, '_vis/trajectory']),
-            # ('sensor', ['drone_', drone_id, '_vis/sensor']),
-            # ('height', ['drone_', drone_id, '_vis/height']),
-        ],
-        parameters=[
-            {'color/a': 1.0},
-            {'color/r': 0.0},
-            {'color/g': 0.0},
-            {'color/b': 0.0},
-            {'covariance_scale': 100.0},
-            {'robot_scale': 1.0},
-            {'tf45': False},
-            {'drone_id': drone_id}
-        ]
-    )
-    
     camera_file = os.path.join( 
         get_package_share_directory('local_sensing'), 
         'config', 
@@ -270,7 +240,6 @@ def generate_launch_description():
     ld.add_action(so3_control_container)
     ld.add_action(poscmd_2_odom_node)
     
-    ld.add_action(odom_visualization_node)
     ld.add_action(pcl_render_node)
 
     return ld

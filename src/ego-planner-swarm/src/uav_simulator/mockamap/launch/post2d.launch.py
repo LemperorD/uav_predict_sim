@@ -1,8 +1,6 @@
-import os
 
 from launch import LaunchDescription
 import launch_ros.actions
-from ament_index_python.packages import get_package_share_directory
 
 def generate_launch_description():
     mockamap_node = launch_ros.actions.Node(
@@ -22,13 +20,10 @@ def generate_launch_description():
                         {'width_max': 1.5},
                         {'obstacle_number': 50}])
     
-    rviz_config_path = os.path.join(get_package_share_directory('mockamap'), 'config', 'rviz.rviz')
-    rviz_node = launch_ros.actions.Node(
-            package='rviz2', executable='rviz2', output='screen',
-            arguments=['--display-config', rviz_config_path])
-
     ld = LaunchDescription()
     ld.add_action(mockamap_node)
-    ld.add_action(rviz_node)
+    ld.add_action(launch_ros.actions.Node(
+        package='prediction_visualize', executable='scene_viewer', output='screen',
+        parameters=[{'cloud_topics': ['/mock_map'], 'odometry_topics': ['']}]))
 
     return ld

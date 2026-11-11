@@ -3,6 +3,8 @@
 #include <pangolin/pangolin.h>
 #include <pangolin/plot/plotter.h>
 
+#include "viewer_settings.hpp"
+
 #include <array>
 #include <deque>
 #include <filesystem>
@@ -16,9 +18,9 @@
 
 using Point = std::array<double, 3>;
 
-void line(const std::deque<Point> &points, float r, float g, float b)
+void line(const std::deque<Point> &points, const pangolin::Colour &color)
 {
-  glColor3f(r, g, b);
+  glColor3f(color.r, color.g, color.b);
   glBegin(GL_LINE_STRIP);
   for (auto &p : points)
   {
@@ -32,15 +34,15 @@ int main(int argc, char **argv)
   rclcpp::init(argc, argv);
   try
   {
-    auto      node              = std::make_shared<rclcpp::Node>("prediction_viewer");
-    const int width             = node->declare_parameter("window_width", 1280),
-              height            = node->declare_parameter("window_height", 800);
-    const int    fps            = node->declare_parameter("video_fps", 15);
-    const bool   record         = node->declare_parameter("record_video", true);
-    const double duration       = node->declare_parameter("duration", 30.0);
-    const double error_max      = node->declare_parameter("error_plot_max", 1.0);
-    const double covariance_max = node->declare_parameter("covariance_plot_max", 0.001);
-    const auto   output =
+    auto      node                = std::make_shared<rclcpp::Node>("prediction_viewer");
+    const int width               = node->declare_parameter("window_width", 1280),
+              height              = node->declare_parameter("window_height", 800);
+    const int            fps      = node->declare_parameter("video_fps", 15);
+    const bool           record   = node->declare_parameter("record_video", true);
+    const double         duration = node->declare_parameter("duration", 30.0);
+    const ViewerSettings style(*node);
+    const double         error_max = style.error_max, covariance_max = style.covariance_max;
+    const auto           output =
         std::filesystem::path(node->declare_parameter<std::string>("output_dir", "outputs/demo"));
     auto frames =
         std::filesystem::path(node->declare_parameter<std::string>("frame_dir", "frames"));
@@ -73,15 +75,13 @@ int main(int argc, char **argv)
       }
       frame_times << "frame,elapsed_s\n" << std::setprecision(12);
     }
-    pangolin::CreateWindowAndBind(
-        "UAV IMM-KF | truth green - observation gray "
-        "- estimate blue - forecast orange",
-        width, height);
+    pangolin::CreateWindowAndBind("UAV trajectory prediction | IMM-KF", width, height);
     glEnable(GL_DEPTH_TEST);
     pangolin::OpenGlRenderState camera(
-        pangolin::ProjectionMatrix(width * .62, height, 850, 850, width * .31, height * .5, .1,
-                                   1000),
-        pangolin::ModelViewLookAt(8, -10, 8, 0, 0, 2, pangolin::AxisZ));
+        pangolin::ProjectionMatrix(width * .62, height, style.focal_length, style.focal_length,
+                                   width * .31, height * .5, style.near_clip, style.far_clip),
+        pangolin::ModelViewLookAt(style.eye[0], style.eye[1], style.eye[2], style.target[0],
+                                  style.target[1], style.target[2], pangolin::AxisZ));
     auto &view = pangolin::CreateDisplay()
                      .SetBounds(0, 1, 0, .62)
                      .SetHandler(new pangolin::Handler3D(camera));
@@ -103,22 +103,27 @@ int main(int argc, char **argv)
     for (auto *p : plots)
     {
       p->ClearSeries();
-      p->SetBackgroundColour(pangolin::Colour(.06, .08, .12));
+      p->SetBackgroundColour(style.plot_background);
+      p->SetAxisColour(style.plot_axis);
+      p->SetTickColour(style.plot_ticks);
     }
-    error_plot.AddSeries("$0", "$1", pangolin::DrawingModeLine, pangolin::Colour(.2, .7, 1),
+    error_plot.AddSeries("$0", "$1", pangolin::DrawingModeLine, style.position_error,
                          "position error (m)");
-    error_plot.AddSeries("$0", "$2", pangolin::DrawingModeLine, pangolin::Colour(1, .6, .1),
+    error_plot.AddSeries("$0", "$2", pangolin::DrawingModeLine, style.horizon_error,
                          "horizon error (m)");
     for (int i = 1; i <= 3; ++i)
     {
       cov_plot.AddSeries("$0", "$" + std::to_string(i) + "*$" + std::to_string(i),
-                         pangolin::DrawingModeLine, pangolin::Colour::Unspecified(),
+                         pangolin::DrawingModeLine, style.covariance[i - 1],
                          "P" + std::string(2, "xyz"[i - 1]) + " (m2)");
     }
     for (size_t i = 0; i < model_names.size(); ++i)
     {
       prob_plot.AddSeries("$0", "$" + std::to_string(i + 1), pangolin::DrawingModeLine,
-                          pangolin::Colour::Unspecified(), probability_labels[i + 1]);
+                          style.models[model_names[i] == "cv"   ? 0
+                                       : model_names[i] == "ca" ? 1
+                                                                : 2],
+                          probability_labels[i + 1]);
     }
     error_plot.SetBounds(.67, 1, .62, 1);
     cov_plot.SetBounds(.34, .67, .62, 1);
@@ -144,7 +149,7 @@ int main(int argc, char **argv)
           measure.push_back({d[4], d[5], d[6]});
           estimate.push_back({d[7], d[8], d[9]});
           stddev = {d[10], d[11], d[12]};
-          if (truth.size() > 20000)
+          if (truth.size() > static_cast<size_t>(style.max_track_points))
           {
             truth.pop_front();
             measure.pop_front();
@@ -195,27 +200,32 @@ int main(int argc, char **argv)
     while (rclcpp::ok() && !pangolin::ShouldQuit())
     {
       rclcpp::spin_some(node);
-      glClearColor(.04, .055, .08, 1);
+      glClearColor(style.background.r, style.background.g, style.background.b, 1);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       view.Activate(camera);
       glEnable(GL_DEPTH_TEST);
       glLineWidth(1);
-      glColor3f(.2, .25, .3);
-      glBegin(GL_LINES);
-      for (int i = -10; i <= 10; ++i)
+      if (style.show_grid)
       {
-        glVertex3f(i, -10, 0);
-        glVertex3f(i, 10, 0);
-        glVertex3f(-10, i, 0);
-        glVertex3f(10, i, 0);
+        glColor3f(style.grid.r, style.grid.g, style.grid.b);
+        glBegin(GL_LINES);
+        const int steps = static_cast<int>(style.grid_extent / style.grid_spacing);
+        for (int i = -steps; i <= steps; ++i)
+        {
+          const double position = i * style.grid_spacing;
+          glVertex3d(position, -style.grid_extent, 0);
+          glVertex3d(position, style.grid_extent, 0);
+          glVertex3d(-style.grid_extent, position, 0);
+          glVertex3d(style.grid_extent, position, 0);
+        }
+        glEnd();
       }
-      glEnd();
-      glLineWidth(2);
-      line(truth, .2, .9, .4);
-      line(estimate, .2, .65, 1);
-      line(future, 1, .6, .1);
-      glColor3f(.55, .55, .6);
-      glPointSize(2);
+      glLineWidth(style.line_width);
+      line(truth, style.truth);
+      line(estimate, style.estimate);
+      line(future, style.forecast);
+      glColor3f(style.observation.r, style.observation.g, style.observation.b);
+      glPointSize(style.observation_size);
       glBegin(GL_POINTS);
       for (auto &p : measure)
       {
@@ -227,18 +237,22 @@ int main(int argc, char **argv)
         // Position marginal 2-sigma radii (axis-aligned; cross-correlation is
         // logged in odometry).
         auto p = estimate.back();
-        glColor3f(.3, .7, 1);
-        glBegin(GL_LINES);
-        for (int k = 0; k < 3; ++k)
+        if (style.show_uncertainty)
         {
-          auto a = p, b = p;
-          a[k] -= 2 * stddev[k];
-          b[k] += 2 * stddev[k];
-          glVertex3dv(a.data());
-          glVertex3dv(b.data());
+          glColor3f(style.uncertainty.r, style.uncertainty.g, style.uncertainty.b);
+          glBegin(GL_LINES);
+          for (int k = 0; k < 3; ++k)
+          {
+            auto a = p, b = p;
+            a[k] -= 2 * stddev[k];
+            b[k] += 2 * stddev[k];
+            glVertex3dv(a.data());
+            glVertex3dv(b.data());
+          }
+          glEnd();
         }
-        glEnd();
-        glPointSize(9);
+        glColor3f(style.estimate.r, style.estimate.g, style.estimate.b);
+        glPointSize(style.estimate_size);
         glBegin(GL_POINTS);
         glVertex3dv(p.data());
         glEnd();
@@ -257,20 +271,25 @@ int main(int argc, char **argv)
       glMatrixMode(GL_MODELVIEW);
       glPushMatrix();
       glLoadIdentity();
-      glColor3f(.9, .94, 1);
-      pangolin::default_font().Text("IMM-KF | EGO kinematic simulation").Draw(20, height - 32);
-      glColor3f(.2, .9, .4);
-      pangolin::default_font().Text("Truth").Draw(20, height - 62);
-      glColor3f(.6, .6, .65);
-      pangolin::default_font().Text("Observation").Draw(100, height - 62);
-      glColor3f(.2, .65, 1);
-      pangolin::default_font().Text("Estimate + 2 sigma").Draw(240, height - 62);
-      glColor3f(1, .6, .1);
-      pangolin::default_font().Text("Forecast").Draw(460, height - 62);
-      glColor3f(.8, .85, .9);
-      pangolin::default_font()
-          .Text("t = %.2f s | World frame / meters", current_time)
-          .Draw(20, height - 92);
+      if (style.show_legend)
+      {
+        glColor3f(style.text.r, style.text.g, style.text.b);
+        pangolin::default_font().Text("IMM-KF | Trajectory prediction").Draw(20, height - 32);
+        glColor3f(style.truth.r, style.truth.g, style.truth.b);
+        pangolin::default_font().Text("Truth").Draw(20, height - 62);
+        glColor3f(style.observation.r, style.observation.g, style.observation.b);
+        pangolin::default_font().Text("Observation").Draw(100, height - 62);
+        glColor3f(style.estimate.r, style.estimate.g, style.estimate.b);
+        pangolin::default_font()
+            .Text(style.show_uncertainty ? "Estimate + 2 sigma" : "Estimate")
+            .Draw(240, height - 62);
+        glColor3f(style.forecast.r, style.forecast.g, style.forecast.b);
+        pangolin::default_font().Text("Forecast").Draw(460, height - 62);
+        glColor3f(style.text.r, style.text.g, style.text.b);
+        pangolin::default_font()
+            .Text("t = %.2f s | World frame / meters", current_time)
+            .Draw(20, height - 92);
+      }
       glPopMatrix();
       glMatrixMode(GL_PROJECTION);
       glPopMatrix();

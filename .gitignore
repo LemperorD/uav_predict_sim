@@ -6,5 +6,7 @@ install/
 
 log/
 
-outputs/
 __pycache__/
+
+outputs/*
+!outputs/.gitkeep

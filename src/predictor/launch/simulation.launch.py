@@ -1,4 +1,4 @@
-"""EGO kinematic simulator -> noisy observation -> IMM -> Pangolin (no RViz)."""
+"""EGO kinematic simulator -> noisy observation -> IMM -> Pangolin."""
 from pathlib import Path
 import csv
 import math
@@ -37,6 +37,11 @@ def initial_position(params):
 def setup(context):
     config = Path(LaunchConfiguration('config').perform(context)).expanduser().resolve()
     params = yaml.safe_load(config.read_text())['/**']['ros__parameters']
+    visualization_config = Path(
+        LaunchConfiguration('visualization_config').perform(context)).expanduser().resolve()
+    style = yaml.safe_load(visualization_config.read_text())['prediction_viewer']['ros__parameters']
+    if not isinstance(style, dict):
+        raise ValueError('visualization config must contain prediction_viewer.ros__parameters')
     for key in ('output_dir', 'input_csv', 'ffmpeg_path'):
         if params.get(key):
             p = Path(params[key]).expanduser()
@@ -56,7 +61,11 @@ def setup(context):
     if not snapshot.is_absolute():
         snapshot = output / snapshot
     snapshot.parent.mkdir(parents=True, exist_ok=True)
-    snapshot.write_text(yaml.safe_dump({'/**': {'ros__parameters': params}}))
+    viewer_params = {**params, **style}
+    snapshot.write_text(yaml.safe_dump({
+        '/**': {'ros__parameters': params},
+        'prediction_viewer': {'ros__parameters': viewer_params},
+    }))
     topics = [('odometry', params['odometry_topic']), ('command', params['command_topic'])]
     start = initial_position(params)
     simulator = Node(package='poscmd_2_odom', executable='poscmd_2_odom',
@@ -70,7 +79,7 @@ def setup(context):
     processors = [simulator, predictor]
     if params.get('show_viewer', True):
         viewer = Node(package='prediction_visualize', executable='prediction_viewer',
-                      output='screen', parameters=[params])
+                      output='screen', parameters=[viewer_params])
         nodes.append(viewer)
         processors.append(viewer)
     # Subscribers and GL initialization start before commands are sent.
@@ -90,6 +99,8 @@ def generate_launch_description():
     default = str(Path(get_package_share_directory('predictor')) / 'config' / 'simulation.yaml')
     return LaunchDescription([
         DeclareLaunchArgument('config', default_value=default),
+        DeclareLaunchArgument('visualization_config', default_value=str(
+            Path(get_package_share_directory('predictor')) / 'config' / 'visualization.yaml')),
         DeclareLaunchArgument('viewer', default_value='config', choices=['config', 'true', 'false']),
         OpaqueFunction(function=setup),
     ])
