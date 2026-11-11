@@ -3,6 +3,9 @@
 #include <pangolin/pangolin.h>
 #include <pangolin/plot/plotter.h>
 
+#include <ament_index_cpp/get_package_share_directory.hpp>
+#include <nav_msgs/msg/odometry.hpp>
+#include "drone_model.hpp"
 #include "viewer_settings.hpp"
 
 #include <array>
@@ -77,6 +80,33 @@ int main(int argc, char **argv)
     }
     pangolin::CreateWindowAndBind("UAV trajectory prediction | IMM-KF", width, height);
     glEnable(GL_DEPTH_TEST);
+    std::unique_ptr<DroneModel> drone;
+    if (style.show_drone)
+    {
+      auto mesh_file = node->declare_parameter<std::string>("drone_mesh_file", "");
+      if (mesh_file.empty())
+      {
+        mesh_file = ament_index_cpp::get_package_share_directory("prediction_visualize") +
+                    "/meshes/hummingbird.ply";
+      }
+      drone = std::make_unique<DroneModel>(mesh_file);
+    }
+    DronePose                                                drone_pose;
+    rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr drone_odometry;
+    if (style.show_drone)
+    {
+      const auto pose_topic = style.drone_pose_source == "truth" ? "odometry" : "estimate";
+      drone_odometry        = node->create_subscription<nav_msgs::msg::Odometry>(
+          pose_topic, rclcpp::SensorDataQoS(),
+          [&](const nav_msgs::msg::Odometry &message)
+          {
+            if (!drone_pose.update(message.pose.pose))
+            {
+              RCLCPP_WARN_THROTTLE(node->get_logger(), *node->get_clock(), 5000,
+                                          "Ignoring invalid drone position/quaternion");
+            }
+          });
+    }
     pangolin::OpenGlRenderState camera(
         pangolin::ProjectionMatrix(width * .62, height, style.focal_length, style.focal_length,
                                    width * .31, height * .5, style.near_clip, style.far_clip),
@@ -194,12 +224,16 @@ int main(int argc, char **argv)
             future.push_back({p.pose.position.x, p.pose.position.y, p.pose.position.z});
           }
         });
+    // Drain queued samples each frame; spinning only once per subscription makes
+    // the 100 Hz trajectory lag behind the latest pose at the video frame rate.
+    rclcpp::executors::SingleThreadedExecutor executor;
+    executor.add_node(node);
     auto       next            = std::chrono::steady_clock::now();
     int        frame           = 0;
     const auto recording_start = std::chrono::steady_clock::now();
     while (rclcpp::ok() && !pangolin::ShouldQuit())
     {
-      rclcpp::spin_some(node);
+      executor.spin_all(std::chrono::milliseconds(5));
       glClearColor(style.background.r, style.background.g, style.background.b, 1);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       view.Activate(camera);
@@ -257,6 +291,11 @@ int main(int argc, char **argv)
         glVertex3dv(p.data());
         glEnd();
       }
+      if (drone)
+      {
+        drone->draw(drone_pose, style.drone_scale, style.drone_body, style.drone_front,
+                    style.show_drone_axes, style.drone_axis_length);
+      }
       // Render plots before capture, so the recording includes the entire
       // dashboard.
       pangolin::DisplayBase().Render();
@@ -289,6 +328,13 @@ int main(int argc, char **argv)
         pangolin::default_font()
             .Text("t = %.2f s | World frame / meters", current_time)
             .Draw(20, height - 92);
+        if (style.show_drone)
+        {
+          pangolin::default_font()
+              .Text("Drone: %s | body axes: X red, Y green, Z blue",
+                    style.drone_pose_source.c_str())
+              .Draw(20, height - 120);
+        }
       }
       glPopMatrix();
       glMatrixMode(GL_PROJECTION);

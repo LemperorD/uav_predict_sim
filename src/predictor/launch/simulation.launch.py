@@ -40,6 +40,10 @@ def setup(context):
     visualization_config = Path(
         LaunchConfiguration('visualization_config').perform(context)).expanduser().resolve()
     style = yaml.safe_load(visualization_config.read_text())['prediction_viewer']['ros__parameters']
+    if isinstance(style, dict) and style.get('drone_mesh_file'):
+        mesh_file = Path(style['drone_mesh_file']).expanduser()
+        style['drone_mesh_file'] = str((visualization_config.parent / mesh_file).resolve()
+                                      if not mesh_file.is_absolute() else mesh_file)
     if not isinstance(style, dict):
         raise ValueError('visualization config must contain prediction_viewer.ros__parameters')
     for key in ('output_dir', 'input_csv', 'ffmpeg_path'):
@@ -79,7 +83,8 @@ def setup(context):
     processors = [simulator, predictor]
     if params.get('show_viewer', True):
         viewer = Node(package='prediction_visualize', executable='prediction_viewer',
-                      output='screen', parameters=[viewer_params])
+                      output='screen', parameters=[viewer_params],
+                      remappings=[('odometry', params['odometry_topic'])])
         nodes.append(viewer)
         processors.append(viewer)
     # Subscribers and GL initialization start before commands are sent.

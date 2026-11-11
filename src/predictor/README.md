@@ -91,6 +91,26 @@ RGB 必须是三个 `0.0～1.0` 的浮点数。未填写的字段使用内置默
 | `error_plot_max`、`covariance_plot_max` | 初始误差/协方差纵轴上限，m / m² |
 | `max_track_points` | 窗口保留的最近轨迹点数，不截断 CSV |
 
+## 查看四旋翼姿态
+
+启动数值仿真后，Pangolin 左侧默认显示随位置和姿态运动的四旋翼。模型资源位于 `src/visualize/meshes/`：原始资源为 `hummingbird.mesh`，运行时读取转换后的 `hummingbird.ply`。详见 [模型来源与转换说明](../visualize/meshes/README.md)。
+
+`visualization.yaml` 中可调整：
+
+```yaml
+    show_drone: true
+    drone_pose_source: truth
+    drone_scale: 2.0
+    show_drone_axes: true
+    drone_axis_length: 0.45
+```
+
+默认 `truth` 使用仿真里程计的位置和四元数；`estimate` 使用滤波输出，观察估计姿态时请保持数值配置中的 `use_attitude: true`。不使用轨迹切线或速度方向代替姿态。仿真器根据加速度和偏航构造运动学姿态，这里显示该姿态，未引入额外动力学。
+
+机头橙色箭头沿机体系 +X，三根坐标轴 X 红、Y 绿、Z 蓝，随机体一起旋转。`drone_scale` 仅改变显示倍率，不影响位置、轨迹或滤波计算。可通过 `drone_body_color`、`drone_front_color` 改色，通过 `show_drone: false` 隐藏模型。若要替换模型，`drone_mesh_file` 可指定包含三角面的 PLY；相对路径以显示配置所在目录为基准，顶点应使用 m 并与机体系对齐。空字符串使用内置模型。
+
+修改 `odometry_topic` 时，启动流程会将四旋翼的真值订阅同步重映射。模型也包含在面板录像中。
+
 ## 选择轨迹
 
 修改 `simulation.yaml` 中的 `trajectory` 与对应的 `trajectory_` 参数。位置、速度、加速度均使用世界坐标系，单位为 m、s、rad；向量按 x/y/z 排列。

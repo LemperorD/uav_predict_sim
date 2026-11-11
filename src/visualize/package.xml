@@ -4,7 +4,8 @@
   <description>Pangolin trajectory dashboard and matplotlib-cpp result export</description>
   <maintainer email="ld@example.com">ld</maintainer><license>MIT</license>
   <buildtool_depend>ament_cmake</buildtool_depend>
-  <depend>rclcpp</depend><depend>nav_msgs</depend><depend>std_msgs</depend><depend>sensor_msgs</depend>
+  <depend>ament_index_cpp</depend><depend>eigen</depend>
+  <depend>rclcpp</depend><depend>nav_msgs</depend><depend>geometry_msgs</depend><depend>std_msgs</depend><depend>sensor_msgs</depend>
   <exec_depend>launch_ros</exec_depend>
   <build_depend>python3-dev</build_depend><exec_depend>python3-matplotlib</exec_depend>
   <export><build_type>ament_cmake</build_type></export>

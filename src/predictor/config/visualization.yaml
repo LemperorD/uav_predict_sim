@@ -23,6 +23,16 @@ prediction_viewer:
     show_uncertainty: true          # 估计位置的三轴 2σ 线段
     show_legend: true               # 标题、图例和当前时间
 
+    # 运动中的四旋翼：使用里程计四元数（机体系到世界系）驱动姿态。
+    show_drone: true
+    drone_pose_source: truth        # truth: 仿真真值；estimate: 滤波估计（需启用姿态观测）
+    drone_mesh_file: ""             # 空字符串使用内置 hummingbird.ply；自定义 PLY 相对本 YAML
+    drone_scale: 2.0                # 仅显示倍率，原模型翼展约 0.53 m，不影响数值仿真
+    drone_body_color: [0.75, 0.8, 0.85]
+    drone_front_color: [1.0, 0.3, 0.05]  # 机头箭头沿机体系 +X
+    show_drone_axes: true           # 机体系 X 红、Y 绿、Z 蓝
+    drone_axis_length: 0.45         # 原模型坐标下的 m，随 drone_scale 一起缩放
+
     # 世界坐标系地面网格，单位 m；extent 为从原点向两侧延伸的距离。
     show_grid: true
     grid_color: [0.2, 0.25, 0.3]

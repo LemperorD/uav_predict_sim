@@ -69,6 +69,17 @@ struct ViewerSettings
                        color("covariance_z_color", {.2, .65, 1.})};
     models          = {color("model_cv_color", {.9, .3, .9}), color("model_ca_color", {.7, .9, .2}),
                        color("model_body_velocity_color", {.2, .65, 1.})};
+    drone_body      = color("drone_body_color", {.75, .8, .85});
+    drone_front     = color("drone_front_color", {1., .3, .05});
+    drone_scale     = positive("drone_scale", 2.);
+    drone_axis_length = positive("drone_axis_length", .45);
+    show_drone        = node.declare_parameter("show_drone", true);
+    show_drone_axes   = node.declare_parameter("show_drone_axes", true);
+    drone_pose_source = node.declare_parameter<std::string>("drone_pose_source", "truth");
+    if (drone_pose_source != "truth" && drone_pose_source != "estimate")
+    {
+      throw std::invalid_argument("drone_pose_source must be truth or estimate");
+    }
     eye             = vector("camera_eye", {8., -10., 8.});
     target          = vector("camera_target", {0., 0., 2.});
     const double dx = eye[0] - target[0], dy = eye[1] - target[1];
@@ -107,6 +118,10 @@ struct ViewerSettings
   pangolin::Colour background, plot_background, plot_axis, plot_ticks, text, grid;
   pangolin::Colour truth, observation, estimate, forecast, uncertainty, position_error,
       horizon_error;
+  pangolin::Colour                drone_body, drone_front;
+  double                          drone_scale, drone_axis_length;
+  bool                            show_drone, show_drone_axes;
+  std::string                     drone_pose_source;
   std::array<pangolin::Colour, 3> covariance, models;
   std::vector<double>             eye, target;
   double                          focal_length, near_clip, far_clip, grid_extent, grid_spacing;
