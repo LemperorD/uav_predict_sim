@@ -34,12 +34,14 @@ namespace predictor
 
   struct Settings
   {
-    double                   position_std = 0.15, velocity_std = 0.1;
-    double                   attitude_std = 0.05, angular_velocity_std = 0.1;
-    double                   cv_accel_density = 0.3, ca_jerk_density = 1.0;
-    double                   angular_accel_density = 0.3;
-    double                   stay_probability      = 0.98;
-    std::vector<std::string> models                = {"cv", "ca"};
+    double position_std = 0.15, velocity_std = 0.1;
+    double attitude_std = 0.05, angular_velocity_std = 0.1;
+    double cv_accel_density = 0.3, ca_jerk_density = 1.0;
+    double angular_accel_density = 0.3;
+    double pose_accel_density    = 0.3;  // unmodeled acceleration for pose hypothesis
+    double pose_gravity = 9.81, pose_world_up_sign = 1.0;
+    double stay_probability         = 0.98;
+    std::vector<std::string> models = {"cv", "ca"};
     // Row source -> column destination. Empty uses symmetric stay_probability.
     Eigen::MatrixXd transition;
     Eigen::VectorXd initial_probability;

@@ -65,6 +65,9 @@ class PredictionNode : public rclcpp::Node
     pose_settings.measurement_variance = declare_parameter("pose_kf_measurement_variance", 0.1);
     pose_settings.gravity              = declare_parameter("pose_kf_gravity", 9.81);
     pose_settings.world_up_sign        = declare_parameter("pose_kf_world_up_sign", 1.0);
+    s.pose_accel_density               = declare_parameter("imm_pose_accel_density", 0.3);
+    s.pose_gravity                     = pose_settings.gravity;
+    s.pose_world_up_sign               = pose_settings.world_up_sign;
     filter_   = predictor::makePredictor(algorithm, s, use_attitude_, pose_settings);
     settings_ = s;
 

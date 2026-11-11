@@ -1,4 +1,5 @@
 #include "predictor/imm_predictor.hpp"
+#include <algorithm>
 
 namespace predictor
 {
@@ -17,6 +18,9 @@ namespace predictor
   void ImmPredictor::update(const Observation &observation)
   {
     observation.validate();
+    if (!use_attitude_ && std::find(settings_.models.begin(), settings_.models.end(), "pose_kf") !=
+                              settings_.models.end())
+      throw std::invalid_argument("IMM pose_kf hypothesis requires use_attitude: true");
     if (!observation.velocity || !observation.velocity->allFinite())
     {
       throw std::invalid_argument("IMM requires finite world velocity observations");

@@ -1,0 +1,82 @@
+# IMM with the Pose-KF motion hypothesis; other settings match simulation.yaml.
+/**:
+  ros__parameters:
+    output_dir: ../../../outputs/imm_pose_demo
+    input_csv: ''
+    duration: 30.0
+    sample_rate: 50.0
+    trajectory: figure8
+    trajectory_origin:
+    - 0.0
+    - 0.0
+    - 2.0
+    trajectory_acceleration:
+    - 0.2
+    - 0.0
+    - 0.0
+    trajectory_amplitude:
+    - 4.0
+    - 3.0
+    - 0.6
+    trajectory_frequency:
+    - 0.35
+    - 0.7
+    - 0.5
+    trajectory_phase:
+    - 0.0
+    - 0.0
+    - 0.0
+    trajectory_radius: 4.0
+    trajectory_angular_speed: 0.35
+    trajectory_circle_phase: 0.0
+    trajectory_vertical_speed: 0.2
+    inject_noise: true
+    noise_seed: 42
+    position_noise_std: 0.15
+    velocity_noise_std: 0.1
+    cv_accel_density: 0.3
+    ca_jerk_density: 1.0
+    imm_pose_accel_density: 0.3
+    stay_probability: 0.98
+    motion_models:
+    - cv
+    - ca
+    - pose_kf
+    use_attitude: true
+    use_angular_velocity: false
+    attitude_noise_std: 0.05
+    angular_velocity_noise_std: 0.1
+    angular_accel_density: 0.3
+    prediction_algorithm: imm
+    pose_kf_process_variance: 0.01
+    pose_kf_measurement_variance: 0.1
+    pose_kf_gravity: 9.81
+    pose_kf_world_up_sign: 1.0
+    offline_plot: true
+    plot_label: IMM-CV-CA-Pose
+    baseline_samples: []
+    baseline_labels: []
+    comparison_metrics_file: comparison_metrics.json
+    prediction_step: 0.05
+    prediction_steps: 20
+    max_time_gap: 1.0
+    odometry_topic: /prediction_demo/odometry
+    command_topic: /prediction_demo/command
+    show_viewer: true
+    record_video: true
+    samples_file: samples.csv
+    predictions_file: predictions.csv
+    snapshot_file: resolved.yaml
+    launch_log_file: launch.log
+    ros_log_dir: ros_logs
+    matplotlib_cache_dir: .matplotlib
+    frame_dir: frames
+    frame_timestamps_file: frame_times.csv
+    video_manifest_file: video_frames.ffconcat
+    video_file: simulation.mp4
+    plot_file: summary.png
+    metrics_file: metrics.json
+    window_width: 1280
+    window_height: 800
+    video_fps: 15
+    ffmpeg_path: /usr/bin/ffmpeg

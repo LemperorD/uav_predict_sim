@@ -23,8 +23,9 @@
     velocity_noise_std: 0.10
     cv_accel_density: 0.30
     ca_jerk_density: 1.0
+    imm_pose_accel_density: 0.30  # unmodeled acceleration density for IMM pose_kf hypothesis
     stay_probability: 0.98
-    motion_models: [cv, ca]  # selectable: cv | ca | body_velocity; order defines matrix/probability order
+    motion_models: [cv, ca]  # selectable: cv | ca | body_velocity | pose_kf; order defines matrix/probability order
     # Optional flattened row-major NxN matrix; otherwise use symmetric stay_probability.
     # model_transition: [0.98, 0.02, 0.02, 0.98]
     # model_initial_probability: [0.5, 0.5]

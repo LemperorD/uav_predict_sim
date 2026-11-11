@@ -1,0 +1,4306 @@
+{
+  "per_seed": [
+    {
+      "scenario": "hover",
+      "seed": 11,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.03334020560535725,
+      "velocity_rmse": 0.07015798858159486,
+      "trajectory_rmse": 0.3283851958502944,
+      "fde_05_rmse": 0.08153362472235434,
+      "fde_1_rmse": 0.20810371222221588,
+      "fde_2_rmse": 0.6453476638642944,
+      "p_pose_kf": 0.0,
+      "update_us": 31.487368421052636,
+      "forecast_us": 375.7176578947368
+    },
+    {
+      "scenario": "hover",
+      "seed": 11,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.03334188877958243,
+      "velocity_rmse": 0.0701328003630883,
+      "trajectory_rmse": 0.3466117324385501,
+      "fde_05_rmse": 0.08147995382980139,
+      "fde_1_rmse": 0.2095048152599391,
+      "fde_2_rmse": 0.7053545100602848,
+      "p_pose_kf": 0.051306004683266994,
+      "update_us": 41.773513157894726,
+      "forecast_us": 533.3292631578947
+    },
+    {
+      "scenario": "hover",
+      "seed": 11,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.03310129607216455,
+      "velocity_rmse": 0.10023683550432308,
+      "trajectory_rmse": 0.4727255465429175,
+      "fde_05_rmse": 0.06854216786884448,
+      "fde_1_rmse": 0.18205392887488708,
+      "fde_2_rmse": 1.1169906743854034,
+      "p_pose_kf": 0.48378555700713405,
+      "update_us": 25.18765789473684,
+      "forecast_us": 302.2113684210526
+    },
+    {
+      "scenario": "hover",
+      "seed": 11,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.03306945732917558,
+      "velocity_rmse": 0.10015502453551771,
+      "trajectory_rmse": 0.9455584405440395,
+      "fde_05_rmse": 0.07767288389024851,
+      "fde_1_rmse": 0.3212502423665829,
+      "fde_2_rmse": 2.2640134426595067,
+      "p_pose_kf": 1.0,
+      "update_us": 11.065473684210527,
+      "forecast_us": 122.02036842105264
+    },
+    {
+      "scenario": "hover",
+      "seed": 22,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.031115415562985502,
+      "velocity_rmse": 0.07015904574060987,
+      "trajectory_rmse": 0.3345175234178353,
+      "fde_05_rmse": 0.07963385034470284,
+      "fde_1_rmse": 0.2104528603643907,
+      "fde_2_rmse": 0.6592533687641545,
+      "p_pose_kf": 0.0,
+      "update_us": 25.155026315789474,
+      "forecast_us": 303.36222368421056
+    },
+    {
+      "scenario": "hover",
+      "seed": 22,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.031117446847714603,
+      "velocity_rmse": 0.07011252793260671,
+      "trajectory_rmse": 0.34797181925587956,
+      "fde_05_rmse": 0.07970091411256262,
+      "fde_1_rmse": 0.21184059092532048,
+      "fde_2_rmse": 0.7033534760104201,
+      "p_pose_kf": 0.04221787123116166,
+      "update_us": 41.70092105263157,
+      "forecast_us": 534.253302631579
+    },
+    {
+      "scenario": "hover",
+      "seed": 22,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.031154655904774554,
+      "velocity_rmse": 0.09619062749588471,
+      "trajectory_rmse": 0.4593346091390198,
+      "fde_05_rmse": 0.06487913207132823,
+      "fde_1_rmse": 0.18035370628336886,
+      "fde_2_rmse": 1.0796522659826755,
+      "p_pose_kf": 0.4904261358433148,
+      "update_us": 25.339723684210526,
+      "forecast_us": 305.4140657894737
+    },
+    {
+      "scenario": "hover",
+      "seed": 22,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.03111387935616193,
+      "velocity_rmse": 0.0962302269274283,
+      "trajectory_rmse": 0.9041044984312245,
+      "fde_05_rmse": 0.07517523526359483,
+      "fde_1_rmse": 0.3134814018715369,
+      "fde_2_rmse": 2.1572140897125722,
+      "p_pose_kf": 1.0,
+      "update_us": 11.131657894736842,
+      "forecast_us": 123.04946052631581
+    },
+    {
+      "scenario": "hover",
+      "seed": 33,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.033301930710805255,
+      "velocity_rmse": 0.07801499404184371,
+      "trajectory_rmse": 0.37645499909873886,
+      "fde_05_rmse": 0.08798285532905882,
+      "fde_1_rmse": 0.23585639270970757,
+      "fde_2_rmse": 0.7431088482810332,
+      "p_pose_kf": 0.0,
+      "update_us": 26.894644736842103,
+      "forecast_us": 325.4849868421053
+    },
+    {
+      "scenario": "hover",
+      "seed": 33,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.03330214151879712,
+      "velocity_rmse": 0.07799532718369195,
+      "trajectory_rmse": 0.3834372260182915,
+      "fde_05_rmse": 0.08774663352357957,
+      "fde_1_rmse": 0.23517422997783913,
+      "fde_2_rmse": 0.770803263695393,
+      "p_pose_kf": 0.04419536948432788,
+      "update_us": 42.46243421052632,
+      "forecast_us": 541.9374342105264
+    },
+    {
+      "scenario": "hover",
+      "seed": 33,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.03323893552019404,
+      "velocity_rmse": 0.11127190331321458,
+      "trajectory_rmse": 0.4612222051454492,
+      "fde_05_rmse": 0.07153166827156829,
+      "fde_1_rmse": 0.18674928392993925,
+      "fde_2_rmse": 1.0803325148419254,
+      "p_pose_kf": 0.487871384845806,
+      "update_us": 25.35189473684211,
+      "forecast_us": 303.337697368421
+    },
+    {
+      "scenario": "hover",
+      "seed": 33,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.033228262122226376,
+      "velocity_rmse": 0.11122498131433255,
+      "trajectory_rmse": 0.9010448723031096,
+      "fde_05_rmse": 0.07991860032106693,
+      "fde_1_rmse": 0.3132241668465736,
+      "fde_2_rmse": 2.151575484094739,
+      "p_pose_kf": 1.0,
+      "update_us": 11.299131578947367,
+      "forecast_us": 125.04230263157892
+    },
+    {
+      "scenario": "hover",
+      "seed": 44,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.03021959687282737,
+      "velocity_rmse": 0.07233156346601397,
+      "trajectory_rmse": 0.34290670625987435,
+      "fde_05_rmse": 0.08106012889448637,
+      "fde_1_rmse": 0.21546924332759188,
+      "fde_2_rmse": 0.6762042816863979,
+      "p_pose_kf": 0.0,
+      "update_us": 25.419881578947372,
+      "forecast_us": 304.50768421052635
+    },
+    {
+      "scenario": "hover",
+      "seed": 44,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.030218789007358856,
+      "velocity_rmse": 0.07249924629015826,
+      "trajectory_rmse": 0.3664815336179614,
+      "fde_05_rmse": 0.08089212676144292,
+      "fde_1_rmse": 0.21742200698735276,
+      "fde_2_rmse": 0.7515675197238575,
+      "p_pose_kf": 0.05655268519518137,
+      "update_us": 41.89656578947368,
+      "forecast_us": 532.2814078947368
+    },
+    {
+      "scenario": "hover",
+      "seed": 44,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.03018019582646616,
+      "velocity_rmse": 0.10528130212199088,
+      "trajectory_rmse": 0.4817187701453316,
+      "fde_05_rmse": 0.06890924751310382,
+      "fde_1_rmse": 0.1919006246740206,
+      "fde_2_rmse": 1.1289730402178952,
+      "p_pose_kf": 0.48535273056420075,
+      "update_us": 25.336381578947368,
+      "forecast_us": 304.2890789473684
+    },
+    {
+      "scenario": "hover",
+      "seed": 44,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.030110697528882808,
+      "velocity_rmse": 0.10533959033331716,
+      "trajectory_rmse": 0.9475552953671075,
+      "fde_05_rmse": 0.07931231067183285,
+      "fde_1_rmse": 0.33116642826144893,
+      "fde_2_rmse": 2.257501454929491,
+      "p_pose_kf": 1.0,
+      "update_us": 11.209789473684213,
+      "forecast_us": 123.63532894736845
+    },
+    {
+      "scenario": "hover",
+      "seed": 55,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.030273654534040278,
+      "velocity_rmse": 0.07401604993623283,
+      "trajectory_rmse": 0.3570948545215504,
+      "fde_05_rmse": 0.08144863375252928,
+      "fde_1_rmse": 0.22243055263539047,
+      "fde_2_rmse": 0.7064596551722564,
+      "p_pose_kf": 0.0,
+      "update_us": 26.346263157894736,
+      "forecast_us": 311.1593026315789
+    },
+    {
+      "scenario": "hover",
+      "seed": 55,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.0302718111906835,
+      "velocity_rmse": 0.07404826383549012,
+      "trajectory_rmse": 0.3829228783583934,
+      "fde_05_rmse": 0.08180107423056056,
+      "fde_1_rmse": 0.2266736515593495,
+      "fde_2_rmse": 0.7837316270208509,
+      "p_pose_kf": 0.05994634797296723,
+      "update_us": 42.68413157894737,
+      "forecast_us": 541.3816447368421
+    },
+    {
+      "scenario": "hover",
+      "seed": 55,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.030419865496124326,
+      "velocity_rmse": 0.10334383062107931,
+      "trajectory_rmse": 0.48295641765487596,
+      "fde_05_rmse": 0.06687700107527704,
+      "fde_1_rmse": 0.19146053894882697,
+      "fde_2_rmse": 1.1327046818910722,
+      "p_pose_kf": 0.49020670369969876,
+      "update_us": 28.73760526315789,
+      "forecast_us": 335.6238289473684
+    },
+    {
+      "scenario": "hover",
+      "seed": 55,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.03040816851820789,
+      "velocity_rmse": 0.10350296584029907,
+      "trajectory_rmse": 0.9467367006247487,
+      "fde_05_rmse": 0.07825484223184993,
+      "fde_1_rmse": 0.3306412425022137,
+      "fde_2_rmse": 2.2563193338050893,
+      "p_pose_kf": 1.0,
+      "update_us": 12.631421052631577,
+      "forecast_us": 139.35940789473682
+    },
+    {
+      "scenario": "straight",
+      "seed": 11,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.03334020557091255,
+      "velocity_rmse": 0.07015798857594513,
+      "trajectory_rmse": 0.3283851958324307,
+      "fde_05_rmse": 0.08153362468494595,
+      "fde_1_rmse": 0.20810371219176635,
+      "fde_2_rmse": 0.6453476638530821,
+      "p_pose_kf": 0.0,
+      "update_us": 30.461052631578948,
+      "forecast_us": 374.04230263157893
+    },
+    {
+      "scenario": "straight",
+      "seed": 11,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.03334188874938714,
+      "velocity_rmse": 0.07013280036547712,
+      "trajectory_rmse": 0.3466117324116699,
+      "fde_05_rmse": 0.08147995379251093,
+      "fde_1_rmse": 0.20950481522683037,
+      "fde_2_rmse": 0.7053545100250598,
+      "p_pose_kf": 0.051306004683246996,
+      "update_us": 43.227078947368426,
+      "forecast_us": 562.558092105263
+    },
+    {
+      "scenario": "straight",
+      "seed": 11,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.03310129602060125,
+      "velocity_rmse": 0.10023683550463504,
+      "trajectory_rmse": 0.47272554652280996,
+      "fde_05_rmse": 0.06854216780167698,
+      "fde_1_rmse": 0.18205392882703278,
+      "fde_2_rmse": 1.1169906743688276,
+      "p_pose_kf": 0.48378555699966236,
+      "update_us": 25.069513157894743,
+      "forecast_us": 306.9420526315789
+    },
+    {
+      "scenario": "straight",
+      "seed": 11,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.03306945727279725,
+      "velocity_rmse": 0.10015502453485207,
+      "trajectory_rmse": 0.9455584405250701,
+      "fde_05_rmse": 0.07767288381651744,
+      "fde_1_rmse": 0.32125024232632343,
+      "fde_2_rmse": 2.2640134426374603,
+      "p_pose_kf": 1.0,
+      "update_us": 11.298973684210528,
+      "forecast_us": 125.98013157894736
+    },
+    {
+      "scenario": "straight",
+      "seed": 22,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.031115415553584633,
+      "velocity_rmse": 0.07015904574580843,
+      "trajectory_rmse": 0.3345175234977012,
+      "fde_05_rmse": 0.07963385037337833,
+      "fde_1_rmse": 0.21045286042585312,
+      "fde_2_rmse": 0.6592533689093256,
+      "p_pose_kf": 0.0,
+      "update_us": 25.357315789473684,
+      "forecast_us": 302.50055263157896
+    },
+    {
+      "scenario": "straight",
+      "seed": 22,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.031117446886921227,
+      "velocity_rmse": 0.0701125279271082,
+      "trajectory_rmse": 0.3479718192767359,
+      "fde_05_rmse": 0.0797009141466749,
+      "fde_1_rmse": 0.21184059095170216,
+      "fde_2_rmse": 0.7033534760382659,
+      "p_pose_kf": 0.04221787123559497,
+      "update_us": 41.98013157894737,
+      "forecast_us": 532.2997894736842
+    },
+    {
+      "scenario": "straight",
+      "seed": 22,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.03115465594122742,
+      "velocity_rmse": 0.09619062749453863,
+      "trajectory_rmse": 0.45933460916148877,
+      "fde_05_rmse": 0.06487913211283479,
+      "fde_1_rmse": 0.18035370631934872,
+      "fde_2_rmse": 1.0796522660109764,
+      "p_pose_kf": 0.4904261357957476,
+      "update_us": 25.40268421052632,
+      "forecast_us": 303.70588157894736
+    },
+    {
+      "scenario": "straight",
+      "seed": 22,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.031113879387139415,
+      "velocity_rmse": 0.09623022692631303,
+      "trajectory_rmse": 0.9041044984491449,
+      "fde_05_rmse": 0.07517523530574306,
+      "fde_1_rmse": 0.3134814019037399,
+      "fde_2_rmse": 2.157214089734173,
+      "p_pose_kf": 1.0,
+      "update_us": 11.242381578947368,
+      "forecast_us": 123.73950000000002
+    },
+    {
+      "scenario": "straight",
+      "seed": 33,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.03330193065099656,
+      "velocity_rmse": 0.07801499404054935,
+      "trajectory_rmse": 0.376454999141565,
+      "fde_05_rmse": 0.08798285532032267,
+      "fde_1_rmse": 0.23585639273123193,
+      "fde_2_rmse": 0.7431088483739857,
+      "p_pose_kf": 0.0,
+      "update_us": 25.07113157894737,
+      "forecast_us": 301.6812631578947
+    },
+    {
+      "scenario": "straight",
+      "seed": 33,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.03330214148999289,
+      "velocity_rmse": 0.07799532717737391,
+      "trajectory_rmse": 0.3834372260476683,
+      "fde_05_rmse": 0.0877466335387771,
+      "fde_1_rmse": 0.23517423000261284,
+      "fde_2_rmse": 0.770803263748873,
+      "p_pose_kf": 0.04419536949749379,
+      "update_us": 41.926842105263155,
+      "forecast_us": 534.8591710526316
+    },
+    {
+      "scenario": "straight",
+      "seed": 33,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.03323893546295565,
+      "velocity_rmse": 0.11127190331242018,
+      "trajectory_rmse": 0.4612222051392567,
+      "fde_05_rmse": 0.07153166826059258,
+      "fde_1_rmse": 0.18674928393705975,
+      "fde_2_rmse": 1.0803325148197462,
+      "p_pose_kf": 0.4878713848342799,
+      "update_us": 25.48125,
+      "forecast_us": 305.22165789473684
+    },
+    {
+      "scenario": "straight",
+      "seed": 33,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.03322826206618849,
+      "velocity_rmse": 0.11122498131299252,
+      "trajectory_rmse": 0.9010448723219702,
+      "fde_05_rmse": 0.07991860032274332,
+      "fde_1_rmse": 0.3132241668670275,
+      "fde_2_rmse": 2.1515754841295087,
+      "p_pose_kf": 1.0,
+      "update_us": 12.004092105263156,
+      "forecast_us": 132.16993421052632
+    },
+    {
+      "scenario": "straight",
+      "seed": 44,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.03021959693824791,
+      "velocity_rmse": 0.0723315634621429,
+      "trajectory_rmse": 0.34290670626063124,
+      "fde_05_rmse": 0.08106012890431502,
+      "fde_1_rmse": 0.21546924332614478,
+      "fde_2_rmse": 0.6762042816883476,
+      "p_pose_kf": 0.0,
+      "update_us": 25.809513157894735,
+      "forecast_us": 305.1515789473685
+    },
+    {
+      "scenario": "straight",
+      "seed": 44,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.030218789035658698,
+      "velocity_rmse": 0.07249924628407736,
+      "trajectory_rmse": 0.36648153354173224,
+      "fde_05_rmse": 0.08089212673080046,
+      "fde_1_rmse": 0.217422006928052,
+      "fde_2_rmse": 0.7515675195853023,
+      "p_pose_kf": 0.0565526852068667,
+      "update_us": 42.08402631578947,
+      "forecast_us": 530.9724736842106
+    },
+    {
+      "scenario": "straight",
+      "seed": 44,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.030180195845870124,
+      "velocity_rmse": 0.10528130212142423,
+      "trajectory_rmse": 0.48171877013924197,
+      "fde_05_rmse": 0.06890924746899726,
+      "fde_1_rmse": 0.1919006246160594,
+      "fde_2_rmse": 1.1289730402520999,
+      "p_pose_kf": 0.4853527305970807,
+      "update_us": 25.456631578947366,
+      "forecast_us": 306.5863815789474
+    },
+    {
+      "scenario": "straight",
+      "seed": 44,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.03011069755098387,
+      "velocity_rmse": 0.10533959033297104,
+      "trajectory_rmse": 0.9475552953208745,
+      "fde_05_rmse": 0.07931231061101457,
+      "fde_1_rmse": 0.3311664281868688,
+      "fde_2_rmse": 2.2575014548663996,
+      "p_pose_kf": 1.0,
+      "update_us": 11.209052631578947,
+      "forecast_us": 122.8588947368421
+    },
+    {
+      "scenario": "straight",
+      "seed": 55,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.030273654609037873,
+      "velocity_rmse": 0.07401604993822769,
+      "trajectory_rmse": 0.35709485448667067,
+      "fde_05_rmse": 0.0814486337530158,
+      "fde_1_rmse": 0.22243055260710431,
+      "fde_2_rmse": 0.7064596551083233,
+      "p_pose_kf": 0.0,
+      "update_us": 25.247565789473686,
+      "forecast_us": 300.82219736842103
+    },
+    {
+      "scenario": "straight",
+      "seed": 55,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.0302718112292749,
+      "velocity_rmse": 0.07404826382756823,
+      "trajectory_rmse": 0.38292287833614114,
+      "fde_05_rmse": 0.08180107423218926,
+      "fde_1_rmse": 0.22667365154098934,
+      "fde_2_rmse": 0.7837316269838042,
+      "p_pose_kf": 0.059946347969146184,
+      "update_us": 41.71497368421053,
+      "forecast_us": 532.8312894736843
+    },
+    {
+      "scenario": "straight",
+      "seed": 55,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.0304198655461737,
+      "velocity_rmse": 0.10334383062117136,
+      "trajectory_rmse": 0.48295641779970294,
+      "fde_05_rmse": 0.0668770011028864,
+      "fde_1_rmse": 0.19146053902007057,
+      "fde_2_rmse": 1.1327046822075646,
+      "p_pose_kf": 0.49020670388724225,
+      "update_us": 25.239039473684212,
+      "forecast_us": 302.53825000000006
+    },
+    {
+      "scenario": "straight",
+      "seed": 55,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.030408168581707837,
+      "velocity_rmse": 0.1035029658405843,
+      "trajectory_rmse": 0.9467367006373101,
+      "fde_05_rmse": 0.07825484226683263,
+      "fde_1_rmse": 0.33064124252348526,
+      "fde_2_rmse": 2.256319333824401,
+      "p_pose_kf": 1.0,
+      "update_us": 11.814513157894737,
+      "forecast_us": 129.36223684210526
+    },
+    {
+      "scenario": "circle",
+      "seed": 11,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.033340744326978373,
+      "velocity_rmse": 0.07029225016074267,
+      "trajectory_rmse": 0.3592383563173883,
+      "fde_05_rmse": 0.08270936005252463,
+      "fde_1_rmse": 0.2176311375930839,
+      "fde_2_rmse": 0.7238083717117132,
+      "p_pose_kf": 0.0,
+      "update_us": 26.674236842105266,
+      "forecast_us": 313.5060394736842
+    },
+    {
+      "scenario": "circle",
+      "seed": 11,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.033339635286515526,
+      "velocity_rmse": 0.07014612966509497,
+      "trajectory_rmse": 0.36390986236585066,
+      "fde_05_rmse": 0.08195210297427656,
+      "fde_1_rmse": 0.2142185437337135,
+      "fde_2_rmse": 0.749902522837315,
+      "p_pose_kf": 0.05167238623103452,
+      "update_us": 41.72232894736842,
+      "forecast_us": 530.5303552631578
+    },
+    {
+      "scenario": "circle",
+      "seed": 11,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.0329218367294356,
+      "velocity_rmse": 0.10025983671900723,
+      "trajectory_rmse": 0.5514513296995495,
+      "fde_05_rmse": 0.0780393069718887,
+      "fde_1_rmse": 0.23126808068835125,
+      "fde_2_rmse": 1.273961798259248,
+      "p_pose_kf": 0.5318575749397734,
+      "update_us": 25.250078947368422,
+      "forecast_us": 305.0126184210526
+    },
+    {
+      "scenario": "circle",
+      "seed": 11,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.0329675919957371,
+      "velocity_rmse": 0.10014081210230565,
+      "trajectory_rmse": 0.9464787699452963,
+      "fde_05_rmse": 0.07883876035515104,
+      "fde_1_rmse": 0.32211063470603474,
+      "fde_2_rmse": 2.2661482539015543,
+      "p_pose_kf": 1.0,
+      "update_us": 11.214263157894736,
+      "forecast_us": 123.15759210526315
+    },
+    {
+      "scenario": "circle",
+      "seed": 22,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.031119352825294842,
+      "velocity_rmse": 0.07030163902547183,
+      "trajectory_rmse": 0.3694412492437682,
+      "fde_05_rmse": 0.08183624621701598,
+      "fde_1_rmse": 0.22207310966868973,
+      "fde_2_rmse": 0.7467265420124256,
+      "p_pose_kf": 0.0,
+      "update_us": 25.396684210526313,
+      "forecast_us": 300.43222368421056
+    },
+    {
+      "scenario": "circle",
+      "seed": 22,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.031128135076077635,
+      "velocity_rmse": 0.07017469961286886,
+      "trajectory_rmse": 0.36806103095346676,
+      "fde_05_rmse": 0.0809536595607689,
+      "fde_1_rmse": 0.2184801829683981,
+      "fde_2_rmse": 0.7528850068708316,
+      "p_pose_kf": 0.04236812510279055,
+      "update_us": 41.65847368421053,
+      "forecast_us": 529.9131710526316
+    },
+    {
+      "scenario": "circle",
+      "seed": 22,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.03231343862670599,
+      "velocity_rmse": 0.09653096179692153,
+      "trajectory_rmse": 0.5546875947267389,
+      "fde_05_rmse": 0.08320458630109276,
+      "fde_1_rmse": 0.24330783397549935,
+      "fde_2_rmse": 1.2673110508437493,
+      "p_pose_kf": 0.5340422633950744,
+      "update_us": 25.607855263157894,
+      "forecast_us": 303.8129078947368
+    },
+    {
+      "scenario": "circle",
+      "seed": 22,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.033373145092865666,
+      "velocity_rmse": 0.09622086397407136,
+      "trajectory_rmse": 0.9048222267875082,
+      "fde_05_rmse": 0.07999751163126068,
+      "fde_1_rmse": 0.31647480250192,
+      "fde_2_rmse": 2.1567000922325894,
+      "p_pose_kf": 1.0,
+      "update_us": 11.044263157894736,
+      "forecast_us": 121.72217105263158
+    },
+    {
+      "scenario": "circle",
+      "seed": 33,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.03330156337673462,
+      "velocity_rmse": 0.07803118268161288,
+      "trajectory_rmse": 0.4029622410306637,
+      "fde_05_rmse": 0.08768918857122952,
+      "fde_1_rmse": 0.24184530661450948,
+      "fde_2_rmse": 0.8139568103046948,
+      "p_pose_kf": 0.0,
+      "update_us": 25.046776315789476,
+      "forecast_us": 301.08161842105267
+    },
+    {
+      "scenario": "circle",
+      "seed": 33,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.03329003530746387,
+      "velocity_rmse": 0.07800401474192373,
+      "trajectory_rmse": 0.4049794969980221,
+      "fde_05_rmse": 0.0875757698947361,
+      "fde_1_rmse": 0.239639685977297,
+      "fde_2_rmse": 0.8291385806163033,
+      "p_pose_kf": 0.044191393980251695,
+      "update_us": 42.10930263157894,
+      "forecast_us": 552.9082236842105
+    },
+    {
+      "scenario": "circle",
+      "seed": 33,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.03239353915788993,
+      "velocity_rmse": 0.11126997216580793,
+      "trajectory_rmse": 0.5467859272988167,
+      "fde_05_rmse": 0.076496330558333,
+      "fde_1_rmse": 0.23163797239951425,
+      "fde_2_rmse": 1.25886128450994,
+      "p_pose_kf": 0.5369505290746365,
+      "update_us": 25.290473684210525,
+      "forecast_us": 304.2849342105263
+    },
+    {
+      "scenario": "circle",
+      "seed": 33,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.03200678291864731,
+      "velocity_rmse": 0.11123340865946167,
+      "trajectory_rmse": 0.9044330445445129,
+      "fde_05_rmse": 0.07909595176539781,
+      "fde_1_rmse": 0.31476263763155155,
+      "fde_2_rmse": 2.158796643683071,
+      "p_pose_kf": 1.0,
+      "update_us": 11.448065789473684,
+      "forecast_us": 124.84930263157895
+    },
+    {
+      "scenario": "circle",
+      "seed": 44,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.030218381328282407,
+      "velocity_rmse": 0.07220213715444083,
+      "trajectory_rmse": 0.38282381657169096,
+      "fde_05_rmse": 0.08247405950677318,
+      "fde_1_rmse": 0.22761241791558154,
+      "fde_2_rmse": 0.7770541346474479,
+      "p_pose_kf": 0.0,
+      "update_us": 25.193473684210527,
+      "forecast_us": 301.81080263157895
+    },
+    {
+      "scenario": "circle",
+      "seed": 44,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.0302161873860257,
+      "velocity_rmse": 0.07250227041459571,
+      "trajectory_rmse": 0.39320288727507746,
+      "fde_05_rmse": 0.08198256606223389,
+      "fde_1_rmse": 0.22601419345960125,
+      "fde_2_rmse": 0.8167073833739281,
+      "p_pose_kf": 0.057498241308467125,
+      "update_us": 41.8778552631579,
+      "forecast_us": 533.2545131578947
+    },
+    {
+      "scenario": "circle",
+      "seed": 44,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.029964018066464593,
+      "velocity_rmse": 0.1052434185603504,
+      "trajectory_rmse": 0.5648056814251733,
+      "fde_05_rmse": 0.0786969895609768,
+      "fde_1_rmse": 0.24100646963946248,
+      "fde_2_rmse": 1.2972157551422234,
+      "p_pose_kf": 0.5340964271429464,
+      "update_us": 25.183907894736844,
+      "forecast_us": 301.57959210526315
+    },
+    {
+      "scenario": "circle",
+      "seed": 44,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.030058979913037895,
+      "velocity_rmse": 0.1053453039320747,
+      "trajectory_rmse": 0.9477324564113035,
+      "fde_05_rmse": 0.08008966295485823,
+      "fde_1_rmse": 0.3318059591156802,
+      "fde_2_rmse": 2.2575229813294415,
+      "p_pose_kf": 1.0,
+      "update_us": 11.247131578947368,
+      "forecast_us": 123.6213552631579
+    },
+    {
+      "scenario": "circle",
+      "seed": 55,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.030265513727177232,
+      "velocity_rmse": 0.07421723894730946,
+      "trajectory_rmse": 0.400300323611683,
+      "fde_05_rmse": 0.0837127761467797,
+      "fde_1_rmse": 0.23748643431855668,
+      "fde_2_rmse": 0.8120726920626,
+      "p_pose_kf": 0.0,
+      "update_us": 25.344710526315783,
+      "forecast_us": 303.0563289473684
+    },
+    {
+      "scenario": "circle",
+      "seed": 55,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.030251646018913014,
+      "velocity_rmse": 0.07419767900104207,
+      "trajectory_rmse": 0.40907781345074684,
+      "fde_05_rmse": 0.08315458839222302,
+      "fde_1_rmse": 0.2352734700087945,
+      "fde_2_rmse": 0.8481606339854341,
+      "p_pose_kf": 0.060710221781671875,
+      "update_us": 41.88269736842105,
+      "forecast_us": 539.728605263158
+    },
+    {
+      "scenario": "circle",
+      "seed": 55,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.030084890596983896,
+      "velocity_rmse": 0.10344136195064253,
+      "trajectory_rmse": 0.5750820077088606,
+      "fde_05_rmse": 0.07665509087130744,
+      "fde_1_rmse": 0.24285827487048248,
+      "fde_2_rmse": 1.3232895504161963,
+      "p_pose_kf": 0.5403453703289491,
+      "update_us": 25.470118421052632,
+      "forecast_us": 307.1105789473684
+    },
+    {
+      "scenario": "circle",
+      "seed": 55,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.030099361508989914,
+      "velocity_rmse": 0.10351701731878396,
+      "trajectory_rmse": 0.9498926434542375,
+      "fde_05_rmse": 0.07899827309280029,
+      "fde_1_rmse": 0.3327120320312455,
+      "fde_2_rmse": 2.26269614627826,
+      "p_pose_kf": 1.0,
+      "update_us": 11.364671052631579,
+      "forecast_us": 123.33427631578944
+    },
+    {
+      "scenario": "helix",
+      "seed": 11,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.033340744276426415,
+      "velocity_rmse": 0.07029225016411729,
+      "trajectory_rmse": 0.35923835634721896,
+      "fde_05_rmse": 0.08270936003649068,
+      "fde_1_rmse": 0.2176311376056292,
+      "fde_2_rmse": 0.7238083717783221,
+      "p_pose_kf": 0.0,
+      "update_us": 25.517486842105267,
+      "forecast_us": 301.2314342105263
+    },
+    {
+      "scenario": "helix",
+      "seed": 11,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.0333396352330876,
+      "velocity_rmse": 0.07014612966017253,
+      "trajectory_rmse": 0.363909862318701,
+      "fde_05_rmse": 0.08195210294166817,
+      "fde_1_rmse": 0.21421854369702337,
+      "fde_2_rmse": 0.7499025227546386,
+      "p_pose_kf": 0.05167238622039355,
+      "update_us": 42.03021052631579,
+      "forecast_us": 534.3994342105264
+    },
+    {
+      "scenario": "helix",
+      "seed": 11,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.03292183669122274,
+      "velocity_rmse": 0.1002598367186938,
+      "trajectory_rmse": 0.5514513296660689,
+      "fde_05_rmse": 0.07803930695449239,
+      "fde_1_rmse": 0.23126808067277,
+      "fde_2_rmse": 1.2739617981850289,
+      "p_pose_kf": 0.5318575749125977,
+      "update_us": 25.080960526315796,
+      "forecast_us": 302.2608552631579
+    },
+    {
+      "scenario": "helix",
+      "seed": 11,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.03296759196729949,
+      "velocity_rmse": 0.10014081210259461,
+      "trajectory_rmse": 0.946478769954852,
+      "fde_05_rmse": 0.07883876033612938,
+      "fde_1_rmse": 0.3221106346988401,
+      "fde_2_rmse": 2.2661482539334106,
+      "p_pose_kf": 1.0,
+      "update_us": 11.053078947368421,
+      "forecast_us": 121.97546052631577
+    },
+    {
+      "scenario": "helix",
+      "seed": 22,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.03111935283173734,
+      "velocity_rmse": 0.07030163902687156,
+      "trajectory_rmse": 0.3694412492738906,
+      "fde_05_rmse": 0.08183624623232572,
+      "fde_1_rmse": 0.22207310969191274,
+      "fde_2_rmse": 0.7467265420671221,
+      "p_pose_kf": 0.0,
+      "update_us": 25.295684210526318,
+      "forecast_us": 316.46305263157893
+    },
+    {
+      "scenario": "helix",
+      "seed": 22,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.03112813509939773,
+      "velocity_rmse": 0.0701746996104817,
+      "trajectory_rmse": 0.3680610309312979,
+      "fde_05_rmse": 0.0809536595842278,
+      "fde_1_rmse": 0.21848018297335536,
+      "fde_2_rmse": 0.7528850068030772,
+      "p_pose_kf": 0.042368125104146885,
+      "update_us": 42.89428947368421,
+      "forecast_us": 550.6739473684211
+    },
+    {
+      "scenario": "helix",
+      "seed": 22,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.03231343861367733,
+      "velocity_rmse": 0.09653096179714186,
+      "trajectory_rmse": 0.5546875946902446,
+      "fde_05_rmse": 0.08320458629998352,
+      "fde_1_rmse": 0.2433078339631029,
+      "fde_2_rmse": 1.26731105075973,
+      "p_pose_kf": 0.5340422634142317,
+      "update_us": 24.999381578947368,
+      "forecast_us": 307.15477631578943
+    },
+    {
+      "scenario": "helix",
+      "seed": 22,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.03337314507520243,
+      "velocity_rmse": 0.09622086397395413,
+      "trajectory_rmse": 0.9048222267881182,
+      "fde_05_rmse": 0.079997511624159,
+      "fde_1_rmse": 0.31647480249766585,
+      "fde_2_rmse": 2.1567000922381943,
+      "p_pose_kf": 1.0,
+      "update_us": 11.192263157894736,
+      "forecast_us": 126.23028947368421
+    },
+    {
+      "scenario": "helix",
+      "seed": 33,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.0333015633566104,
+      "velocity_rmse": 0.07803118268439506,
+      "trajectory_rmse": 0.4029622410314239,
+      "fde_05_rmse": 0.08768918856128959,
+      "fde_1_rmse": 0.24184530661177653,
+      "fde_2_rmse": 0.8139568103102232,
+      "p_pose_kf": 0.0,
+      "update_us": 25.43027631578947,
+      "forecast_us": 309.36380263157895
+    },
+    {
+      "scenario": "helix",
+      "seed": 33,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.03329003535803577,
+      "velocity_rmse": 0.0780040147459721,
+      "trajectory_rmse": 0.40497949701914143,
+      "fde_05_rmse": 0.0875757699276995,
+      "fde_1_rmse": 0.2396396860002999,
+      "fde_2_rmse": 0.8291385806471083,
+      "p_pose_kf": 0.04419139398642459,
+      "update_us": 42.81264473684211,
+      "forecast_us": 547.1347368421053
+    },
+    {
+      "scenario": "helix",
+      "seed": 33,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.0323935391628226,
+      "velocity_rmse": 0.11126997216547131,
+      "trajectory_rmse": 0.5467859273314726,
+      "fde_05_rmse": 0.076496330565474,
+      "fde_1_rmse": 0.2316379724107631,
+      "fde_2_rmse": 1.258861284588071,
+      "p_pose_kf": 0.5369505290800362,
+      "update_us": 25.426052631578948,
+      "forecast_us": 303.83436842105266
+    },
+    {
+      "scenario": "helix",
+      "seed": 33,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.032006782925438036,
+      "velocity_rmse": 0.11123340865926737,
+      "trajectory_rmse": 0.9044330445448933,
+      "fde_05_rmse": 0.07909595177326172,
+      "fde_1_rmse": 0.3147626376320675,
+      "fde_2_rmse": 2.158796643685217,
+      "p_pose_kf": 1.0,
+      "update_us": 11.076749999999999,
+      "forecast_us": 122.49740789473687
+    },
+    {
+      "scenario": "helix",
+      "seed": 44,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.030218381349933925,
+      "velocity_rmse": 0.07220213715240871,
+      "trajectory_rmse": 0.38282381662636417,
+      "fde_05_rmse": 0.08247405953372611,
+      "fde_1_rmse": 0.22761241795688786,
+      "fde_2_rmse": 0.7770541347470142,
+      "p_pose_kf": 0.0,
+      "update_us": 25.13140789473684,
+      "forecast_us": 301.2185394736842
+    },
+    {
+      "scenario": "helix",
+      "seed": 44,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.030216187411807944,
+      "velocity_rmse": 0.07250227041829488,
+      "trajectory_rmse": 0.393202887267395,
+      "fde_05_rmse": 0.08198256606937604,
+      "fde_1_rmse": 0.22601419346268847,
+      "fde_2_rmse": 0.8167073833452384,
+      "p_pose_kf": 0.05749824129398102,
+      "update_us": 42.11681578947369,
+      "forecast_us": 531.6445263157894
+    },
+    {
+      "scenario": "helix",
+      "seed": 44,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.029964018071121524,
+      "velocity_rmse": 0.10524341856012256,
+      "trajectory_rmse": 0.5648056814206858,
+      "fde_05_rmse": 0.07869698956295612,
+      "fde_1_rmse": 0.2410064696367099,
+      "fde_2_rmse": 1.2972157551331707,
+      "p_pose_kf": 0.5340964271442237,
+      "update_us": 25.308276315789474,
+      "forecast_us": 301.050855263158
+    },
+    {
+      "scenario": "helix",
+      "seed": 44,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.030058979915498187,
+      "velocity_rmse": 0.10534530393208424,
+      "trajectory_rmse": 0.9477324563864407,
+      "fde_05_rmse": 0.08008966296336605,
+      "fde_1_rmse": 0.3318059591123349,
+      "fde_2_rmse": 2.2575229812667557,
+      "p_pose_kf": 1.0,
+      "update_us": 11.15982894736842,
+      "forecast_us": 123.14910526315789
+    },
+    {
+      "scenario": "helix",
+      "seed": 55,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.030265513741464287,
+      "velocity_rmse": 0.07421723894433671,
+      "trajectory_rmse": 0.40030032356824985,
+      "fde_05_rmse": 0.08371277614561767,
+      "fde_1_rmse": 0.23748643429396052,
+      "fde_2_rmse": 0.812072691973764,
+      "p_pose_kf": 0.0,
+      "update_us": 25.73134210526316,
+      "forecast_us": 315.5530263157894
+    },
+    {
+      "scenario": "helix",
+      "seed": 55,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.030251646031612744,
+      "velocity_rmse": 0.07419767900232391,
+      "trajectory_rmse": 0.4090778134378598,
+      "fde_05_rmse": 0.08315458838721915,
+      "fde_1_rmse": 0.2352734699971783,
+      "fde_2_rmse": 0.8481606339637185,
+      "p_pose_kf": 0.06071022179290641,
+      "update_us": 41.46477631578948,
+      "forecast_us": 532.3216973684212
+    },
+    {
+      "scenario": "helix",
+      "seed": 55,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.030084890616365982,
+      "velocity_rmse": 0.10344136195030067,
+      "trajectory_rmse": 0.5750820077238606,
+      "fde_05_rmse": 0.07665509087625491,
+      "fde_1_rmse": 0.24285827487528777,
+      "fde_2_rmse": 1.3232895504516669,
+      "p_pose_kf": 0.5403453703114317,
+      "update_us": 25.046947368421055,
+      "forecast_us": 300.13431578947365
+    },
+    {
+      "scenario": "helix",
+      "seed": 55,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.030099361535300333,
+      "velocity_rmse": 0.10351701731822703,
+      "trajectory_rmse": 0.9498926434322706,
+      "fde_05_rmse": 0.07899827309349008,
+      "fde_1_rmse": 0.33271203201870947,
+      "fde_2_rmse": 2.2626961462304562,
+      "p_pose_kf": 1.0,
+      "update_us": 11.205157894736844,
+      "forecast_us": 123.91960526315789
+    },
+    {
+      "scenario": "figure8",
+      "seed": 11,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.033325875213903414,
+      "velocity_rmse": 0.07143199864904848,
+      "trajectory_rmse": 0.6103019063367069,
+      "fde_05_rmse": 0.09467714455734644,
+      "fde_1_rmse": 0.3003859240756344,
+      "fde_2_rmse": 1.33427882190314,
+      "p_pose_kf": 0.0,
+      "update_us": 25.051460526315786,
+      "forecast_us": 302.6616184210526
+    },
+    {
+      "scenario": "figure8",
+      "seed": 11,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.03329031705291054,
+      "velocity_rmse": 0.07110674167606026,
+      "trajectory_rmse": 0.5726467825445773,
+      "fde_05_rmse": 0.09250091496317601,
+      "fde_1_rmse": 0.28443089858148696,
+      "fde_2_rmse": 1.2506342714745384,
+      "p_pose_kf": 0.05272393788257561,
+      "update_us": 41.702592105263165,
+      "forecast_us": 531.6048157894737
+    },
+    {
+      "scenario": "figure8",
+      "seed": 11,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.030236365876643117,
+      "velocity_rmse": 0.10144170525453304,
+      "trajectory_rmse": 0.6845472860560273,
+      "fde_05_rmse": 0.09928475757309392,
+      "fde_1_rmse": 0.31460588623640917,
+      "fde_2_rmse": 1.539101814406716,
+      "p_pose_kf": 0.656682681679141,
+      "update_us": 25.187223684210522,
+      "forecast_us": 308.67901315789476
+    },
+    {
+      "scenario": "figure8",
+      "seed": 11,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.030277203771133018,
+      "velocity_rmse": 0.10039739548726914,
+      "trajectory_rmse": 0.9585785915261967,
+      "fde_05_rmse": 0.08550578781209912,
+      "fde_1_rmse": 0.3325036567757378,
+      "fde_2_rmse": 2.2934544560833063,
+      "p_pose_kf": 1.0,
+      "update_us": 11.042407894736844,
+      "forecast_us": 121.64407894736841
+    },
+    {
+      "scenario": "figure8",
+      "seed": 22,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.03110253466336591,
+      "velocity_rmse": 0.07050312983574487,
+      "trajectory_rmse": 0.5787795087414441,
+      "fde_05_rmse": 0.08694405497994713,
+      "fde_1_rmse": 0.2785410416822599,
+      "fde_2_rmse": 1.275897541270699,
+      "p_pose_kf": 0.0,
+      "update_us": 25.439210526315787,
+      "forecast_us": 302.2306052631579
+    },
+    {
+      "scenario": "figure8",
+      "seed": 22,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.03109696453353604,
+      "velocity_rmse": 0.07023262014709396,
+      "trajectory_rmse": 0.5562921288043229,
+      "fde_05_rmse": 0.08585450838255382,
+      "fde_1_rmse": 0.26954133080798776,
+      "fde_2_rmse": 1.22584482500682,
+      "p_pose_kf": 0.044758513515519745,
+      "update_us": 41.56855263157894,
+      "forecast_us": 529.9631184210526
+    },
+    {
+      "scenario": "figure8",
+      "seed": 22,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.029788941029587894,
+      "velocity_rmse": 0.09654832381871019,
+      "trajectory_rmse": 0.6788615388852473,
+      "fde_05_rmse": 0.09302313681855784,
+      "fde_1_rmse": 0.30644420169207065,
+      "fde_2_rmse": 1.5297128290897253,
+      "p_pose_kf": 0.6688903453145073,
+      "update_us": 25.073960526315787,
+      "forecast_us": 300.5944342105263
+    },
+    {
+      "scenario": "figure8",
+      "seed": 22,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.02985151363545754,
+      "velocity_rmse": 0.09613135137997232,
+      "trajectory_rmse": 0.9139104535755139,
+      "fde_05_rmse": 0.0806249702505308,
+      "fde_1_rmse": 0.32198000853723596,
+      "fde_2_rmse": 2.177561787828776,
+      "p_pose_kf": 1.0,
+      "update_us": 11.271828947368421,
+      "forecast_us": 124.37121052631578
+    },
+    {
+      "scenario": "figure8",
+      "seed": 33,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.03329567050636645,
+      "velocity_rmse": 0.07941748765524978,
+      "trajectory_rmse": 0.620300919503445,
+      "fde_05_rmse": 0.09721691747283986,
+      "fde_1_rmse": 0.3090257549111698,
+      "fde_2_rmse": 1.3513033603851365,
+      "p_pose_kf": 0.0,
+      "update_us": 26.15276315789474,
+      "forecast_us": 306.7273421052631
+    },
+    {
+      "scenario": "figure8",
+      "seed": 33,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.03328812900056663,
+      "velocity_rmse": 0.07907209176854885,
+      "trajectory_rmse": 0.5779261395920844,
+      "fde_05_rmse": 0.09481380707755632,
+      "fde_1_rmse": 0.29282774407223366,
+      "fde_2_rmse": 1.2539783087491296,
+      "p_pose_kf": 0.04664773032013802,
+      "update_us": 41.83981578947368,
+      "forecast_us": 532.2441578947368
+    },
+    {
+      "scenario": "figure8",
+      "seed": 33,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.03269510251344668,
+      "velocity_rmse": 0.1121233746757899,
+      "trajectory_rmse": 0.6533533025654311,
+      "fde_05_rmse": 0.10065645777955685,
+      "fde_1_rmse": 0.3038484127105131,
+      "fde_2_rmse": 1.468918276836079,
+      "p_pose_kf": 0.663259005558486,
+      "update_us": 25.643828947368423,
+      "forecast_us": 303.70110526315796
+    },
+    {
+      "scenario": "figure8",
+      "seed": 33,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.033031585387712635,
+      "velocity_rmse": 0.11133855895185067,
+      "trajectory_rmse": 0.9170118335109093,
+      "fde_05_rmse": 0.08662016677069234,
+      "fde_1_rmse": 0.3180888124349471,
+      "fde_2_rmse": 2.1980040717218077,
+      "p_pose_kf": 1.0,
+      "update_us": 11.208486842105264,
+      "forecast_us": 124.04746052631579
+    },
+    {
+      "scenario": "figure8",
+      "seed": 44,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.03022154786903652,
+      "velocity_rmse": 0.0729567296879584,
+      "trajectory_rmse": 0.5970702237719332,
+      "fde_05_rmse": 0.08948560495220252,
+      "fde_1_rmse": 0.29171390860218066,
+      "fde_2_rmse": 1.3083676455164612,
+      "p_pose_kf": 0.0,
+      "update_us": 25.33538157894737,
+      "forecast_us": 310.40557894736844
+    },
+    {
+      "scenario": "figure8",
+      "seed": 44,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.03022550681223141,
+      "velocity_rmse": 0.07307838311014954,
+      "trajectory_rmse": 0.5764015382031572,
+      "fde_05_rmse": 0.08700690261247167,
+      "fde_1_rmse": 0.2795778652099154,
+      "fde_2_rmse": 1.2680696889927663,
+      "p_pose_kf": 0.060357267613397235,
+      "update_us": 41.74089473684211,
+      "forecast_us": 536.7100657894737
+    },
+    {
+      "scenario": "figure8",
+      "seed": 44,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.031742536378598446,
+      "velocity_rmse": 0.10588420488842289,
+      "trajectory_rmse": 0.7241816596609331,
+      "fde_05_rmse": 0.09902555708397408,
+      "fde_1_rmse": 0.3277384544303469,
+      "fde_2_rmse": 1.6292740493493123,
+      "p_pose_kf": 0.6669720358545824,
+      "update_us": 25.134315789473685,
+      "forecast_us": 302.7070789473684
+    },
+    {
+      "scenario": "figure8",
+      "seed": 44,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.032443192933968266,
+      "velocity_rmse": 0.10530281793818512,
+      "trajectory_rmse": 0.9569005254538852,
+      "fde_05_rmse": 0.0854347336303075,
+      "fde_1_rmse": 0.34034937767752793,
+      "fde_2_rmse": 2.2756359596879245,
+      "p_pose_kf": 1.0,
+      "update_us": 11.01946052631579,
+      "forecast_us": 122.03740789473686
+    },
+    {
+      "scenario": "figure8",
+      "seed": 55,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.0302637088617626,
+      "velocity_rmse": 0.07384487692182226,
+      "trajectory_rmse": 0.6053382872892661,
+      "fde_05_rmse": 0.08791617963492805,
+      "fde_1_rmse": 0.2936412818898997,
+      "fde_2_rmse": 1.3280842052918633,
+      "p_pose_kf": 0.0,
+      "update_us": 25.64352631578947,
+      "forecast_us": 309.8773289473684
+    },
+    {
+      "scenario": "figure8",
+      "seed": 55,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.030232849879775026,
+      "velocity_rmse": 0.07378995523380048,
+      "trajectory_rmse": 0.5664728732743664,
+      "fde_05_rmse": 0.08546824904540914,
+      "fde_1_rmse": 0.27592670387012075,
+      "fde_2_rmse": 1.245447725732491,
+      "p_pose_kf": 0.06527879342105418,
+      "update_us": 41.78457894736842,
+      "forecast_us": 534.2281578947367
+    },
+    {
+      "scenario": "figure8",
+      "seed": 55,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.030336748976066443,
+      "velocity_rmse": 0.10357416914484568,
+      "trajectory_rmse": 0.6529250254840376,
+      "fde_05_rmse": 0.09004490217587835,
+      "fde_1_rmse": 0.29086037076152726,
+      "fde_2_rmse": 1.4826312404739874,
+      "p_pose_kf": 0.671711555200002,
+      "update_us": 25.300565789473684,
+      "forecast_us": 303.150802631579
+    },
+    {
+      "scenario": "figure8",
+      "seed": 55,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.030595696800167594,
+      "velocity_rmse": 0.10349825242536552,
+      "trajectory_rmse": 0.9671707729735436,
+      "fde_05_rmse": 0.08204477514062229,
+      "fde_1_rmse": 0.3352879341977817,
+      "fde_2_rmse": 2.313117441039479,
+      "p_pose_kf": 1.0,
+      "update_us": 11.153144736842103,
+      "forecast_us": 123.41328947368419
+    },
+    {
+      "scenario": "aggressive",
+      "seed": 11,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.03330568156179576,
+      "velocity_rmse": 0.09097423018214632,
+      "trajectory_rmse": 2.791055001371359,
+      "fde_05_rmse": 0.24145705231627473,
+      "fde_1_rmse": 1.177229919109579,
+      "fde_2_rmse": 6.262479924966761,
+      "p_pose_kf": 0.0,
+      "update_us": 26.176986842105265,
+      "forecast_us": 313.80655263157894
+    },
+    {
+      "scenario": "aggressive",
+      "seed": 11,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.03328868875409827,
+      "velocity_rmse": 0.09076570834973435,
+      "trajectory_rmse": 2.3984574378370103,
+      "fde_05_rmse": 0.20523386925868692,
+      "fde_1_rmse": 0.9761152353166097,
+      "fde_2_rmse": 5.472412798799179,
+      "p_pose_kf": 0.1631568566939101,
+      "update_us": 41.51801315789473,
+      "forecast_us": 531.9548684210527
+    },
+    {
+      "scenario": "aggressive",
+      "seed": 11,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.041758964414878606,
+      "velocity_rmse": 0.1012966018252596,
+      "trajectory_rmse": 1.5619027277732633,
+      "fde_05_rmse": 0.1940536691590143,
+      "fde_1_rmse": 0.6469306032049316,
+      "fde_2_rmse": 3.6990968942146987,
+      "p_pose_kf": 0.9026024669961894,
+      "update_us": 25.06965789473684,
+      "forecast_us": 301.7056052631579
+    },
+    {
+      "scenario": "aggressive",
+      "seed": 11,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.04189764791197871,
+      "velocity_rmse": 0.10045864331741762,
+      "trajectory_rmse": 1.9412102266210458,
+      "fde_05_rmse": 0.16784125587738122,
+      "fde_1_rmse": 0.6060078624002916,
+      "fde_2_rmse": 4.852590116160368,
+      "p_pose_kf": 1.0,
+      "update_us": 11.025421052631579,
+      "forecast_us": 122.23909210526318
+    },
+    {
+      "scenario": "aggressive",
+      "seed": 22,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.03109883763265447,
+      "velocity_rmse": 0.08623220379106093,
+      "trajectory_rmse": 2.6760553385868406,
+      "fde_05_rmse": 0.23323814893752207,
+      "fde_1_rmse": 1.1214665723978308,
+      "fde_2_rmse": 6.018126567448127,
+      "p_pose_kf": 0.0,
+      "update_us": 29.197513157894736,
+      "forecast_us": 348.9290921052632
+    },
+    {
+      "scenario": "aggressive",
+      "seed": 22,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.03245418223389012,
+      "velocity_rmse": 0.08420763424146774,
+      "trajectory_rmse": 2.3422307874837887,
+      "fde_05_rmse": 0.2016648720971985,
+      "fde_1_rmse": 0.9475262062009148,
+      "fde_2_rmse": 5.355492632965566,
+      "p_pose_kf": 0.16566703066942748,
+      "update_us": 43.56717105263158,
+      "forecast_us": 561.0658157894737
+    },
+    {
+      "scenario": "aggressive",
+      "seed": 22,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.04151919200485203,
+      "velocity_rmse": 0.09830374586837504,
+      "trajectory_rmse": 1.6060733933481282,
+      "fde_05_rmse": 0.20165265190947196,
+      "fde_1_rmse": 0.659265211576066,
+      "fde_2_rmse": 3.8092062050656477,
+      "p_pose_kf": 0.9074283563134925,
+      "update_us": 25.404368421052634,
+      "forecast_us": 304.8756315789474
+    },
+    {
+      "scenario": "aggressive",
+      "seed": 22,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.0417127629055712,
+      "velocity_rmse": 0.09768129288633522,
+      "trajectory_rmse": 1.96825683378754,
+      "fde_05_rmse": 0.17629193587069583,
+      "fde_1_rmse": 0.623200724578211,
+      "fde_2_rmse": 4.906209648290597,
+      "p_pose_kf": 1.0,
+      "update_us": 11.377776315789472,
+      "forecast_us": 125.06610526315791
+    },
+    {
+      "scenario": "aggressive",
+      "seed": 33,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.033324960929862826,
+      "velocity_rmse": 0.09632313766059228,
+      "trajectory_rmse": 2.750864972351006,
+      "fde_05_rmse": 0.23922165555686095,
+      "fde_1_rmse": 1.155661731725198,
+      "fde_2_rmse": 6.181039798659953,
+      "p_pose_kf": 0.0,
+      "update_us": 25.437907894736842,
+      "forecast_us": 322.7588947368421
+    },
+    {
+      "scenario": "aggressive",
+      "seed": 33,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.03423077303160969,
+      "velocity_rmse": 0.09728903220060262,
+      "trajectory_rmse": 2.4438174051086827,
+      "fde_05_rmse": 0.21395267691294154,
+      "fde_1_rmse": 0.999672800259213,
+      "fde_2_rmse": 5.568703963211687,
+      "p_pose_kf": 0.17351883089340206,
+      "update_us": 41.62148684210526,
+      "forecast_us": 542.8904473684212
+    },
+    {
+      "scenario": "aggressive",
+      "seed": 33,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.04337299108648545,
+      "velocity_rmse": 0.1126781437489316,
+      "trajectory_rmse": 1.5410673710405047,
+      "fde_05_rmse": 0.19888733361400002,
+      "fde_1_rmse": 0.6480396931677698,
+      "fde_2_rmse": 3.640045426180065,
+      "p_pose_kf": 0.9118082075244344,
+      "update_us": 25.06931578947369,
+      "forecast_us": 306.9645789473684
+    },
+    {
+      "scenario": "aggressive",
+      "seed": 33,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.0435235117122059,
+      "velocity_rmse": 0.11197128204640602,
+      "trajectory_rmse": 1.8720461894560732,
+      "fde_05_rmse": 0.1726784433058047,
+      "fde_1_rmse": 0.5990554627631834,
+      "fde_2_rmse": 4.671460368451264,
+      "p_pose_kf": 1.0,
+      "update_us": 11.157710526315789,
+      "forecast_us": 123.61505263157896
+    },
+    {
+      "scenario": "aggressive",
+      "seed": 44,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.03020547578221397,
+      "velocity_rmse": 0.09183644265570988,
+      "trajectory_rmse": 2.7126753962409866,
+      "fde_05_rmse": 0.23921291545803053,
+      "fde_1_rmse": 1.1438646174476341,
+      "fde_2_rmse": 6.091127854877037,
+      "p_pose_kf": 0.0,
+      "update_us": 25.13992105263158,
+      "forecast_us": 304.0758815789473
+    },
+    {
+      "scenario": "aggressive",
+      "seed": 44,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.031574504380218305,
+      "velocity_rmse": 0.0931920740945385,
+      "trajectory_rmse": 2.4354900139580136,
+      "fde_05_rmse": 0.21336574588782467,
+      "fde_1_rmse": 0.9947156389862292,
+      "fde_2_rmse": 5.555055522711526,
+      "p_pose_kf": 0.18697743701583683,
+      "update_us": 42.97615789473684,
+      "forecast_us": 547.0030789473685
+    },
+    {
+      "scenario": "aggressive",
+      "seed": 44,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.04064957416831355,
+      "velocity_rmse": 0.10737018842857037,
+      "trajectory_rmse": 1.612529190416208,
+      "fde_05_rmse": 0.19557380924072895,
+      "fde_1_rmse": 0.6532032259502537,
+      "fde_2_rmse": 3.836705362333652,
+      "p_pose_kf": 0.9015819365298695,
+      "update_us": 25.390118421052634,
+      "forecast_us": 303.0858815789474
+    },
+    {
+      "scenario": "aggressive",
+      "seed": 44,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.040848804525441894,
+      "velocity_rmse": 0.10622237973774808,
+      "trajectory_rmse": 2.0054041373004483,
+      "fde_05_rmse": 0.1675296162720609,
+      "fde_1_rmse": 0.6200850316526542,
+      "fde_2_rmse": 5.00994000330631,
+      "p_pose_kf": 1.0,
+      "update_us": 11.135263157894737,
+      "forecast_us": 123.05656578947365
+    },
+    {
+      "scenario": "aggressive",
+      "seed": 55,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.03023337040305117,
+      "velocity_rmse": 0.08823953970821939,
+      "trajectory_rmse": 2.645337186599027,
+      "fde_05_rmse": 0.22114294408252466,
+      "fde_1_rmse": 1.0949505626979192,
+      "fde_2_rmse": 5.965519241360949,
+      "p_pose_kf": 0.0,
+      "update_us": 25.072118421052636,
+      "forecast_us": 303.63227631578945
+    },
+    {
+      "scenario": "aggressive",
+      "seed": 55,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.029783616989254465,
+      "velocity_rmse": 0.08922763143073197,
+      "trajectory_rmse": 2.291027180017968,
+      "fde_05_rmse": 0.19550676822213492,
+      "fde_1_rmse": 0.9288059651809737,
+      "fde_2_rmse": 5.235973400611614,
+      "p_pose_kf": 0.19723655182441224,
+      "update_us": 41.925407894736836,
+      "forecast_us": 534.2518421052631
+    },
+    {
+      "scenario": "aggressive",
+      "seed": 55,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.03623288316026062,
+      "velocity_rmse": 0.10431028469994344,
+      "trajectory_rmse": 1.545751694361834,
+      "fde_05_rmse": 0.1875579368218418,
+      "fde_1_rmse": 0.6360204156467334,
+      "fde_2_rmse": 3.669379671907735,
+      "p_pose_kf": 0.9123607326031762,
+      "update_us": 25.117973684210526,
+      "forecast_us": 302.2915131578947
+    },
+    {
+      "scenario": "aggressive",
+      "seed": 55,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.036333691573567625,
+      "velocity_rmse": 0.10407273458610349,
+      "trajectory_rmse": 1.9178889550246765,
+      "fde_05_rmse": 0.16336643793942202,
+      "fde_1_rmse": 0.605274283832109,
+      "fde_2_rmse": 4.787733986908999,
+      "p_pose_kf": 1.0,
+      "update_us": 11.256013157894737,
+      "forecast_us": 124.65730263157894
+    },
+    {
+      "scenario": "vertical",
+      "seed": 11,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.03333152232466556,
+      "velocity_rmse": 0.07179616012849466,
+      "trajectory_rmse": 0.9209866670732358,
+      "fde_05_rmse": 0.10664134513631716,
+      "fde_1_rmse": 0.40713958080488355,
+      "fde_2_rmse": 2.0595610378245417,
+      "p_pose_kf": 0.0,
+      "update_us": 25.298355263157895,
+      "forecast_us": 302.8115526315789
+    },
+    {
+      "scenario": "vertical",
+      "seed": 11,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.033334230281753315,
+      "velocity_rmse": 0.07162354195252486,
+      "trajectory_rmse": 0.928587822842881,
+      "fde_05_rmse": 0.10636150013173384,
+      "fde_1_rmse": 0.40773702888379443,
+      "fde_2_rmse": 2.0816332102903363,
+      "p_pose_kf": 0.04889613429001274,
+      "update_us": 42.273236842105256,
+      "forecast_us": 532.5619605263159
+    },
+    {
+      "scenario": "vertical",
+      "seed": 11,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.03309157567711271,
+      "velocity_rmse": 0.10092476653122855,
+      "trajectory_rmse": 1.3584714046066209,
+      "fde_05_rmse": 0.1949389984316313,
+      "fde_1_rmse": 0.733808339495934,
+      "fde_2_rmse": 2.829125750939451,
+      "p_pose_kf": 0.4839280871650954,
+      "update_us": 25.320578947368418,
+      "forecast_us": 303.00876315789475
+    },
+    {
+      "scenario": "vertical",
+      "seed": 11,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.03305981608621799,
+      "velocity_rmse": 0.10084358442006144,
+      "trajectory_rmse": 1.5896553100952984,
+      "fde_05_rmse": 0.19840662502278383,
+      "fde_1_rmse": 0.7810130216443693,
+      "fde_2_rmse": 3.4553824306392356,
+      "p_pose_kf": 1.0,
+      "update_us": 11.217552631578947,
+      "forecast_us": 123.6755
+    },
+    {
+      "scenario": "vertical",
+      "seed": 22,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.031126107162040704,
+      "velocity_rmse": 0.07233138317836982,
+      "trajectory_rmse": 0.9125009514285947,
+      "fde_05_rmse": 0.1031140211264036,
+      "fde_1_rmse": 0.4027066303023236,
+      "fde_2_rmse": 2.040931145748465,
+      "p_pose_kf": 0.0,
+      "update_us": 25.60443421052631,
+      "forecast_us": 302.5193157894737
+    },
+    {
+      "scenario": "vertical",
+      "seed": 22,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.031126594805752462,
+      "velocity_rmse": 0.07209356210395285,
+      "trajectory_rmse": 0.9206108545265332,
+      "fde_05_rmse": 0.10291278059434178,
+      "fde_1_rmse": 0.403587545502657,
+      "fde_2_rmse": 2.064377757120968,
+      "p_pose_kf": 0.037913438675625834,
+      "update_us": 42.19419736842106,
+      "forecast_us": 537.3637236842105
+    },
+    {
+      "scenario": "vertical",
+      "seed": 22,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.031190722686443337,
+      "velocity_rmse": 0.09963271526056444,
+      "trajectory_rmse": 1.3655555761506175,
+      "fde_05_rmse": 0.1994012067284209,
+      "fde_1_rmse": 0.7427375700795036,
+      "fde_2_rmse": 2.8375602237171353,
+      "p_pose_kf": 0.49036086459290884,
+      "update_us": 25.294486842105265,
+      "forecast_us": 304.76061842105264
+    },
+    {
+      "scenario": "vertical",
+      "seed": 22,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.031149993333683346,
+      "velocity_rmse": 0.09967158617396361,
+      "trajectory_rmse": 1.5788180532433247,
+      "fde_05_rmse": 0.2030672684338809,
+      "fde_1_rmse": 0.7870211787895006,
+      "fde_2_rmse": 3.415522995648394,
+      "p_pose_kf": 1.0,
+      "update_us": 11.276921052631579,
+      "forecast_us": 123.40898684210526
+    },
+    {
+      "scenario": "vertical",
+      "seed": 33,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.033330707838297384,
+      "velocity_rmse": 0.07975370802191709,
+      "trajectory_rmse": 0.9196154666921487,
+      "fde_05_rmse": 0.10903511236390617,
+      "fde_1_rmse": 0.4119480865127377,
+      "fde_2_rmse": 2.050823508646643,
+      "p_pose_kf": 0.0,
+      "update_us": 25.163434210526315,
+      "forecast_us": 304.4892763157895
+    },
+    {
+      "scenario": "vertical",
+      "seed": 33,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.03333101484160093,
+      "velocity_rmse": 0.07958729881201468,
+      "trajectory_rmse": 0.9256160189763939,
+      "fde_05_rmse": 0.10865879013263632,
+      "fde_1_rmse": 0.4119580439142104,
+      "fde_2_rmse": 2.0694547678253015,
+      "p_pose_kf": 0.040599381039348126,
+      "update_us": 41.91081578947369,
+      "forecast_us": 533.5008815789474
+    },
+    {
+      "scenario": "vertical",
+      "seed": 33,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.03333199602640836,
+      "velocity_rmse": 0.11499471702274716,
+      "trajectory_rmse": 1.3722543352295422,
+      "fde_05_rmse": 0.20927764674906085,
+      "fde_1_rmse": 0.7531545980447446,
+      "fde_2_rmse": 2.8440054803040393,
+      "p_pose_kf": 0.487895516298708,
+      "update_us": 25.565828947368423,
+      "forecast_us": 306.3285263157894
+    },
+    {
+      "scenario": "vertical",
+      "seed": 33,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.03332090987825019,
+      "velocity_rmse": 0.11494980132925087,
+      "trajectory_rmse": 1.5813892646487189,
+      "fde_05_rmse": 0.21238655775073567,
+      "fde_1_rmse": 0.7952463740254667,
+      "fde_2_rmse": 3.4142635045412577,
+      "p_pose_kf": 1.0,
+      "update_us": 11.204855263157896,
+      "forecast_us": 124.82076315789475
+    },
+    {
+      "scenario": "vertical",
+      "seed": 44,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.030175510027296595,
+      "velocity_rmse": 0.07333073438299109,
+      "trajectory_rmse": 0.9144492991720415,
+      "fde_05_rmse": 0.1102186599991348,
+      "fde_1_rmse": 0.4122059737667544,
+      "fde_2_rmse": 2.03630916045188,
+      "p_pose_kf": 0.0,
+      "update_us": 25.26631578947368,
+      "forecast_us": 314.07286842105265
+    },
+    {
+      "scenario": "vertical",
+      "seed": 44,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.030178109102108854,
+      "velocity_rmse": 0.07347548625475062,
+      "trajectory_rmse": 0.9284781440613116,
+      "fde_05_rmse": 0.1102711900204321,
+      "fde_1_rmse": 0.4150639982384001,
+      "fde_2_rmse": 2.0737530609245596,
+      "p_pose_kf": 0.05651051336216589,
+      "update_us": 42.31567105263157,
+      "forecast_us": 535.9779342105263
+    },
+    {
+      "scenario": "vertical",
+      "seed": 44,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.030058490206352362,
+      "velocity_rmse": 0.10794919551967334,
+      "trajectory_rmse": 1.3680254657856135,
+      "fde_05_rmse": 0.19940087378803645,
+      "fde_1_rmse": 0.743969142957088,
+      "fde_2_rmse": 2.842545417338855,
+      "p_pose_kf": 0.4854439540349416,
+      "update_us": 25.334065789473684,
+      "forecast_us": 303.7616578947369
+    },
+    {
+      "scenario": "vertical",
+      "seed": 44,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.0299884510371941,
+      "velocity_rmse": 0.10800697303846311,
+      "trajectory_rmse": 1.5964876353499264,
+      "fde_05_rmse": 0.20331836831304162,
+      "fde_1_rmse": 0.7923603796601489,
+      "fde_2_rmse": 3.4588325451506843,
+      "p_pose_kf": 1.0,
+      "update_us": 11.26571052631579,
+      "forecast_us": 123.15096052631577
+    },
+    {
+      "scenario": "vertical",
+      "seed": 55,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.030265922919874167,
+      "velocity_rmse": 0.07630507240943422,
+      "trajectory_rmse": 0.9068543042485399,
+      "fde_05_rmse": 0.1062023151247346,
+      "fde_1_rmse": 0.40939668660763634,
+      "fde_2_rmse": 2.0170436769877518,
+      "p_pose_kf": 0.0,
+      "update_us": 25.1455,
+      "forecast_us": 299.873302631579
+    },
+    {
+      "scenario": "vertical",
+      "seed": 55,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.030260982971978347,
+      "velocity_rmse": 0.07626229067627052,
+      "trajectory_rmse": 0.9217297969298766,
+      "fde_05_rmse": 0.10653123016623883,
+      "fde_1_rmse": 0.41265065583616606,
+      "fde_2_rmse": 2.0568824809393518,
+      "p_pose_kf": 0.06145218269707572,
+      "update_us": 41.62128947368422,
+      "forecast_us": 530.847
+    },
+    {
+      "scenario": "vertical",
+      "seed": 55,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.0304056228654929,
+      "velocity_rmse": 0.10778450013596295,
+      "trajectory_rmse": 1.3728941118310394,
+      "fde_05_rmse": 0.19732296831248164,
+      "fde_1_rmse": 0.7451219500859179,
+      "fde_2_rmse": 2.855199203917347,
+      "p_pose_kf": 0.4901650924882278,
+      "update_us": 25.34352631578947,
+      "forecast_us": 303.52826315789474
+    },
+    {
+      "scenario": "vertical",
+      "seed": 55,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.030393663774878885,
+      "velocity_rmse": 0.10793712619500012,
+      "trajectory_rmse": 1.6008269512190378,
+      "fde_05_rmse": 0.20150629992689192,
+      "fde_1_rmse": 0.793177896071025,
+      "fde_2_rmse": 3.4709998518498315,
+      "p_pose_kf": 1.0,
+      "update_us": 11.169828947368421,
+      "forecast_us": 122.71744736842105
+    },
+    {
+      "scenario": "bad_attitude",
+      "seed": 11,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.03332587522827548,
+      "velocity_rmse": 0.07143199865821115,
+      "trajectory_rmse": 0.6103019063819857,
+      "fde_05_rmse": 0.09467714457315535,
+      "fde_1_rmse": 0.3003859241076094,
+      "fde_2_rmse": 1.3342788219902204,
+      "p_pose_kf": 0.0,
+      "update_us": 26.360723684210527,
+      "forecast_us": 305.4393026315789
+    },
+    {
+      "scenario": "bad_attitude",
+      "seed": 11,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.033294132221093044,
+      "velocity_rmse": 0.07118571727163742,
+      "trajectory_rmse": 0.5894047882797702,
+      "fde_05_rmse": 0.09327844479143374,
+      "fde_1_rmse": 0.2887592372752009,
+      "fde_2_rmse": 1.295753772076052,
+      "p_pose_kf": 0.04838289501558409,
+      "update_us": 45.2731052631579,
+      "forecast_us": 537.162657894737
+    },
+    {
+      "scenario": "bad_attitude",
+      "seed": 11,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.030000006117667802,
+      "velocity_rmse": 0.10252867905520864,
+      "trajectory_rmse": 0.9098758651952288,
+      "fde_05_rmse": 0.1145964575685067,
+      "fde_1_rmse": 0.4082499633511325,
+      "fde_2_rmse": 2.0488106706163856,
+      "p_pose_kf": 0.582710002721767,
+      "update_us": 25.214250000000003,
+      "forecast_us": 304.8988684210526
+    },
+    {
+      "scenario": "bad_attitude",
+      "seed": 11,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.030151900566691394,
+      "velocity_rmse": 0.10154851730354889,
+      "trajectory_rmse": 1.4636878899194876,
+      "fde_05_rmse": 0.1192778956738087,
+      "fde_1_rmse": 0.5514946629558813,
+      "fde_2_rmse": 3.4249846027047726,
+      "p_pose_kf": 1.0,
+      "update_us": 11.242605263157895,
+      "forecast_us": 123.83155263157896
+    },
+    {
+      "scenario": "bad_attitude",
+      "seed": 22,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.031102534642523064,
+      "velocity_rmse": 0.07050312983678106,
+      "trajectory_rmse": 0.5787795088031907,
+      "fde_05_rmse": 0.0869440549773723,
+      "fde_1_rmse": 0.2785410417135825,
+      "fde_2_rmse": 1.275897541400783,
+      "p_pose_kf": 0.0,
+      "update_us": 25.980644736842105,
+      "forecast_us": 304.1671184210526
+    },
+    {
+      "scenario": "bad_attitude",
+      "seed": 22,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.03110291612926962,
+      "velocity_rmse": 0.07037747231416085,
+      "trajectory_rmse": 0.5800224294479434,
+      "fde_05_rmse": 0.08643976604658438,
+      "fde_1_rmse": 0.2747904303233648,
+      "fde_2_rmse": 1.2900494118021666,
+      "p_pose_kf": 0.04188970529466909,
+      "update_us": 42.77507894736842,
+      "forecast_us": 543.5834078947369
+    },
+    {
+      "scenario": "bad_attitude",
+      "seed": 22,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.02971725382997033,
+      "velocity_rmse": 0.09742613674413066,
+      "trajectory_rmse": 0.9525708671719616,
+      "fde_05_rmse": 0.10895736603710714,
+      "fde_1_rmse": 0.41295780674241656,
+      "fde_2_rmse": 2.1595371530913,
+      "p_pose_kf": 0.6053925048685654,
+      "update_us": 25.71,
+      "forecast_us": 304.0683552631579
+    },
+    {
+      "scenario": "bad_attitude",
+      "seed": 22,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.02975571521327628,
+      "velocity_rmse": 0.0976792991956783,
+      "trajectory_rmse": 1.4852482754677765,
+      "fde_05_rmse": 0.11711875316770368,
+      "fde_1_rmse": 0.5603831156474847,
+      "fde_2_rmse": 3.4709699873372934,
+      "p_pose_kf": 1.0,
+      "update_us": 11.182842105263159,
+      "forecast_us": 124.62640789473684
+    },
+    {
+      "scenario": "bad_attitude",
+      "seed": 33,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.03329567052068231,
+      "velocity_rmse": 0.07941748764984503,
+      "trajectory_rmse": 0.6203009194979254,
+      "fde_05_rmse": 0.09721691747050405,
+      "fde_1_rmse": 0.30902575490073747,
+      "fde_2_rmse": 1.351303360382235,
+      "p_pose_kf": 0.0,
+      "update_us": 25.30703947368421,
+      "forecast_us": 302.8288815789473
+    },
+    {
+      "scenario": "bad_attitude",
+      "seed": 33,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.03329410508086574,
+      "velocity_rmse": 0.0790421564655331,
+      "trajectory_rmse": 0.5831594565537505,
+      "fde_05_rmse": 0.09478659875042729,
+      "fde_1_rmse": 0.2931211037993328,
+      "fde_2_rmse": 1.2712836596155606,
+      "p_pose_kf": 0.04414484267927375,
+      "update_us": 42.1355,
+      "forecast_us": 537.2683289473683
+    },
+    {
+      "scenario": "bad_attitude",
+      "seed": 33,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.03254973727219499,
+      "velocity_rmse": 0.11280972396703864,
+      "trajectory_rmse": 0.891901757499482,
+      "fde_05_rmse": 0.11289193383312285,
+      "fde_1_rmse": 0.3962651045491968,
+      "fde_2_rmse": 2.014661094980434,
+      "p_pose_kf": 0.5998488350456201,
+      "update_us": 25.23453947368421,
+      "forecast_us": 301.59936842105265
+    },
+    {
+      "scenario": "bad_attitude",
+      "seed": 33,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.03295531432132833,
+      "velocity_rmse": 0.11229238520994701,
+      "trajectory_rmse": 1.3872829662140846,
+      "fde_05_rmse": 0.11397032573532909,
+      "fde_1_rmse": 0.5171282017906916,
+      "fde_2_rmse": 3.255862358031425,
+      "p_pose_kf": 1.0,
+      "update_us": 11.202723684210529,
+      "forecast_us": 123.0266052631579
+    },
+    {
+      "scenario": "bad_attitude",
+      "seed": 44,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.03022154785554077,
+      "velocity_rmse": 0.07295672968387928,
+      "trajectory_rmse": 0.597070223731783,
+      "fde_05_rmse": 0.08948560494031128,
+      "fde_1_rmse": 0.291713908577599,
+      "fde_2_rmse": 1.3083676454369817,
+      "p_pose_kf": 0.0,
+      "update_us": 25.404934210526317,
+      "forecast_us": 301.62036842105266
+    },
+    {
+      "scenario": "bad_attitude",
+      "seed": 44,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.030217670999417735,
+      "velocity_rmse": 0.07319891315430137,
+      "trajectory_rmse": 0.6027041243965562,
+      "fde_05_rmse": 0.08797955087296068,
+      "fde_1_rmse": 0.2861305096191684,
+      "fde_2_rmse": 1.3381448174242092,
+      "p_pose_kf": 0.055261949235080814,
+      "update_us": 43.525631578947376,
+      "forecast_us": 555.2088815789474
+    },
+    {
+      "scenario": "bad_attitude",
+      "seed": 44,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.031240930463952366,
+      "velocity_rmse": 0.10678278684187037,
+      "trajectory_rmse": 1.0328340553636288,
+      "fde_05_rmse": 0.11718479490562451,
+      "fde_1_rmse": 0.44890639448764363,
+      "fde_2_rmse": 2.3379509596348105,
+      "p_pose_kf": 0.5920831955261248,
+      "update_us": 25.33998684210526,
+      "forecast_us": 302.62797368421053
+    },
+    {
+      "scenario": "bad_attitude",
+      "seed": 44,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.03200004426934665,
+      "velocity_rmse": 0.10657902888729119,
+      "trajectory_rmse": 1.6204669497047306,
+      "fde_05_rmse": 0.1261949167314752,
+      "fde_1_rmse": 0.6130146580229723,
+      "fde_2_rmse": 3.7822369028107405,
+      "p_pose_kf": 1.0,
+      "update_us": 11.32178947368421,
+      "forecast_us": 124.65372368421053
+    },
+    {
+      "scenario": "bad_attitude",
+      "seed": 55,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.03026370886495679,
+      "velocity_rmse": 0.07384487692033025,
+      "trajectory_rmse": 0.6053382872894887,
+      "fde_05_rmse": 0.08791617962818449,
+      "fde_1_rmse": 0.2936412818820009,
+      "fde_2_rmse": 1.3280842053003552,
+      "p_pose_kf": 0.0,
+      "update_us": 25.367092105263158,
+      "forecast_us": 304.64071052631573
+    },
+    {
+      "scenario": "bad_attitude",
+      "seed": 55,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.030238882463764806,
+      "velocity_rmse": 0.07394079109512389,
+      "trajectory_rmse": 0.5917451718715822,
+      "fde_05_rmse": 0.08629511118159693,
+      "fde_1_rmse": 0.2819041704778989,
+      "fde_2_rmse": 1.3130881621088006,
+      "p_pose_kf": 0.060089606002654096,
+      "update_us": 42.604894736842105,
+      "forecast_us": 549.1034078947367
+    },
+    {
+      "scenario": "bad_attitude",
+      "seed": 55,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.03023883682682502,
+      "velocity_rmse": 0.10464300711319419,
+      "trajectory_rmse": 0.9004439532257689,
+      "fde_05_rmse": 0.10569011673699696,
+      "fde_1_rmse": 0.3936214818650246,
+      "fde_2_rmse": 2.04061389866882,
+      "p_pose_kf": 0.6039319479985357,
+      "update_us": 25.584394736842103,
+      "forecast_us": 306.60855263157896
+    },
+    {
+      "scenario": "bad_attitude",
+      "seed": 55,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.03081273397032777,
+      "velocity_rmse": 0.1053858037611724,
+      "trajectory_rmse": 1.4908926675488148,
+      "fde_05_rmse": 0.11863403387191379,
+      "fde_1_rmse": 0.5651207144502054,
+      "fde_2_rmse": 3.482762340457392,
+      "p_pose_kf": 1.0,
+      "update_us": 11.79363157894737,
+      "forecast_us": 130.52034210526315
+    },
+    {
+      "scenario": "bad_velocity",
+      "seed": 11,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.06568808994223826,
+      "velocity_rmse": 0.23120002597545572,
+      "trajectory_rmse": 0.8837068220560358,
+      "fde_05_rmse": 0.21784946120885126,
+      "fde_1_rmse": 0.5346815505552587,
+      "fde_2_rmse": 1.7949071696214434,
+      "p_pose_kf": 0.0,
+      "update_us": 26.367342105263152,
+      "forecast_us": 318.36199999999997
+    },
+    {
+      "scenario": "bad_velocity",
+      "seed": 11,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.0656256705388258,
+      "velocity_rmse": 0.22933577558232168,
+      "trajectory_rmse": 0.735746495509752,
+      "fde_05_rmse": 0.1981405941625148,
+      "fde_1_rmse": 0.44409489468271907,
+      "fde_2_rmse": 1.5177181455399604,
+      "p_pose_kf": 0.3781696162749447,
+      "update_us": 42.27971052631579,
+      "forecast_us": 542.2581842105263
+    },
+    {
+      "scenario": "bad_velocity",
+      "seed": 11,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.06518499397101034,
+      "velocity_rmse": 0.23689256262557581,
+      "trajectory_rmse": 0.7830481293973534,
+      "fde_05_rmse": 0.1906748059172711,
+      "fde_1_rmse": 0.4376876367917803,
+      "fde_2_rmse": 1.6698925384704932,
+      "p_pose_kf": 0.6326991258716517,
+      "update_us": 26.14502631578947,
+      "forecast_us": 313.07631578947365
+    },
+    {
+      "scenario": "bad_velocity",
+      "seed": 11,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.06524948342311752,
+      "velocity_rmse": 0.23267271356796573,
+      "trajectory_rmse": 1.0376625806047406,
+      "fde_05_rmse": 0.17999280873597004,
+      "fde_1_rmse": 0.44433412696382946,
+      "fde_2_rmse": 2.407510847822318,
+      "p_pose_kf": 1.0,
+      "update_us": 11.41121052631579,
+      "forecast_us": 125.7674210526316
+    },
+    {
+      "scenario": "bad_velocity",
+      "seed": 22,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.06569742279911941,
+      "velocity_rmse": 0.22741121372254244,
+      "trajectory_rmse": 0.8729846914322795,
+      "fde_05_rmse": 0.21044517423165926,
+      "fde_1_rmse": 0.524829248778409,
+      "fde_2_rmse": 1.7762702786988753,
+      "p_pose_kf": 0.0,
+      "update_us": 25.519934210526316,
+      "forecast_us": 312.2071184210526
+    },
+    {
+      "scenario": "bad_velocity",
+      "seed": 22,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.06564180939064515,
+      "velocity_rmse": 0.2248411084673931,
+      "trajectory_rmse": 0.7040459038467775,
+      "fde_05_rmse": 0.18762902455071942,
+      "fde_1_rmse": 0.420831512328421,
+      "fde_2_rmse": 1.45972473452387,
+      "p_pose_kf": 0.3862849217288822,
+      "update_us": 42.299618421052635,
+      "forecast_us": 546.671605263158
+    },
+    {
+      "scenario": "bad_velocity",
+      "seed": 22,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.0653299867382542,
+      "velocity_rmse": 0.2317365801904799,
+      "trajectory_rmse": 0.7506294891644244,
+      "fde_05_rmse": 0.18159638727081018,
+      "fde_1_rmse": 0.41507794980370055,
+      "fde_2_rmse": 1.6073428235384113,
+      "p_pose_kf": 0.6401076813761897,
+      "update_us": 25.38496052631579,
+      "forecast_us": 306.4861578947368
+    },
+    {
+      "scenario": "bad_velocity",
+      "seed": 22,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.06539370860390357,
+      "velocity_rmse": 0.22631623555540448,
+      "trajectory_rmse": 0.9521691850097574,
+      "fde_05_rmse": 0.16675428743710316,
+      "fde_1_rmse": 0.4014943802366039,
+      "fde_2_rmse": 2.2167187843758125,
+      "p_pose_kf": 1.0,
+      "update_us": 11.233947368421052,
+      "forecast_us": 124.38351315789475
+    },
+    {
+      "scenario": "bad_velocity",
+      "seed": 33,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.06655036313311878,
+      "velocity_rmse": 0.23749680307684387,
+      "trajectory_rmse": 0.9217942557199859,
+      "fde_05_rmse": 0.22368949891891213,
+      "fde_1_rmse": 0.560088710300699,
+      "fde_2_rmse": 1.8647362306521291,
+      "p_pose_kf": 0.0,
+      "update_us": 25.317552631578952,
+      "forecast_us": 304.31872368421057
+    },
+    {
+      "scenario": "bad_velocity",
+      "seed": 33,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.06651595656170324,
+      "velocity_rmse": 0.23392051212897605,
+      "trajectory_rmse": 0.7186724890647052,
+      "fde_05_rmse": 0.19880156278671016,
+      "fde_1_rmse": 0.4434562800040688,
+      "fde_2_rmse": 1.4690158139690705,
+      "p_pose_kf": 0.3856484733151084,
+      "update_us": 42.19822368421053,
+      "forecast_us": 539.8141184210527
+    },
+    {
+      "scenario": "bad_velocity",
+      "seed": 33,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.06638312679234268,
+      "velocity_rmse": 0.24725467471244686,
+      "trajectory_rmse": 0.7350958145146798,
+      "fde_05_rmse": 0.1933330737710562,
+      "fde_1_rmse": 0.42856304778252957,
+      "fde_2_rmse": 1.5483421201840668,
+      "p_pose_kf": 0.6238926085041357,
+      "update_us": 25.33419736842105,
+      "forecast_us": 303.5155789473685
+    },
+    {
+      "scenario": "bad_velocity",
+      "seed": 33,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.06634360393111671,
+      "velocity_rmse": 0.23824876258964536,
+      "trajectory_rmse": 0.9597697558809523,
+      "fde_05_rmse": 0.1738287208027926,
+      "fde_1_rmse": 0.4049508041371174,
+      "fde_2_rmse": 2.2427393850494037,
+      "p_pose_kf": 1.0,
+      "update_us": 11.245802631578947,
+      "forecast_us": 123.56255263157894
+    },
+    {
+      "scenario": "bad_velocity",
+      "seed": 44,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.06373230633849258,
+      "velocity_rmse": 0.21907473667731303,
+      "trajectory_rmse": 0.8833133398716022,
+      "fde_05_rmse": 0.20877861777236983,
+      "fde_1_rmse": 0.5298658629333264,
+      "fde_2_rmse": 1.7972705122153887,
+      "p_pose_kf": 0.0,
+      "update_us": 25.475197368421057,
+      "forecast_us": 305.0429078947368
+    },
+    {
+      "scenario": "bad_velocity",
+      "seed": 44,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.06343970394445037,
+      "velocity_rmse": 0.21408199470764785,
+      "trajectory_rmse": 0.7293210276523785,
+      "fde_05_rmse": 0.18377350652632687,
+      "fde_1_rmse": 0.42732912087623093,
+      "fde_2_rmse": 1.5199297949735913,
+      "p_pose_kf": 0.3732277565744395,
+      "update_us": 42.22240789473685,
+      "forecast_us": 538.3316842105263
+    },
+    {
+      "scenario": "bad_velocity",
+      "seed": 44,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.06345521806015877,
+      "velocity_rmse": 0.22697065653453694,
+      "trajectory_rmse": 0.799773295279001,
+      "fde_05_rmse": 0.18406959067192086,
+      "fde_1_rmse": 0.43921302116274025,
+      "fde_2_rmse": 1.7112186037561452,
+      "p_pose_kf": 0.6292969165652161,
+      "update_us": 25.445315789473685,
+      "forecast_us": 303.6088421052632
+    },
+    {
+      "scenario": "bad_velocity",
+      "seed": 44,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.06323610713163777,
+      "velocity_rmse": 0.2185751555498433,
+      "trajectory_rmse": 1.0026229766494408,
+      "fde_05_rmse": 0.16420249055846592,
+      "fde_1_rmse": 0.4190176118693268,
+      "fde_2_rmse": 2.3325519149992626,
+      "p_pose_kf": 1.0,
+      "update_us": 11.395065789473684,
+      "forecast_us": 124.1675263157895
+    },
+    {
+      "scenario": "bad_velocity",
+      "seed": 55,
+      "algorithm": "IMM_CV_CA",
+      "origins": 76,
+      "position_rmse": 0.065589203963226,
+      "velocity_rmse": 0.23606327694896398,
+      "trajectory_rmse": 0.8872885725886945,
+      "fde_05_rmse": 0.21808962459245998,
+      "fde_1_rmse": 0.5423103828526709,
+      "fde_2_rmse": 1.7911702380048564,
+      "p_pose_kf": 0.0,
+      "update_us": 34.49261842105264,
+      "forecast_us": 311.67331578947363
+    },
+    {
+      "scenario": "bad_velocity",
+      "seed": 55,
+      "algorithm": "IMM_CV_CA_POSE",
+      "origins": 76,
+      "position_rmse": 0.06546809238624358,
+      "velocity_rmse": 0.23157929119439652,
+      "trajectory_rmse": 0.7092866390632787,
+      "fde_05_rmse": 0.19181229637607747,
+      "fde_1_rmse": 0.42811598344743385,
+      "fde_2_rmse": 1.4679799583751492,
+      "p_pose_kf": 0.4213466933985128,
+      "update_us": 42.52336842105264,
+      "forecast_us": 537.4055263157894
+    },
+    {
+      "scenario": "bad_velocity",
+      "seed": 55,
+      "algorithm": "IMM_CV_POSE",
+      "origins": 76,
+      "position_rmse": 0.06536953137093397,
+      "velocity_rmse": 0.241378864487466,
+      "trajectory_rmse": 0.7434030345674407,
+      "fde_05_rmse": 0.1883391208541217,
+      "fde_1_rmse": 0.42445424124245845,
+      "fde_2_rmse": 1.5786785556674623,
+      "p_pose_kf": 0.6369746060121014,
+      "update_us": 25.372842105263157,
+      "forecast_us": 301.9875
+    },
+    {
+      "scenario": "bad_velocity",
+      "seed": 55,
+      "algorithm": "POSE_MODEL_PV",
+      "origins": 76,
+      "position_rmse": 0.06532745702085323,
+      "velocity_rmse": 0.23486399178212664,
+      "trajectory_rmse": 1.0309812866482118,
+      "fde_05_rmse": 0.17436166736131778,
+      "fde_1_rmse": 0.4351438522345684,
+      "fde_2_rmse": 2.399247182950946,
+      "p_pose_kf": 1.0,
+      "update_us": 11.325315789473684,
+      "forecast_us": 124.89871052631578
+    }
+  ],
+  "summary": {
+    "hover": {
+      "IMM_CV_CA": {
+        "position_rmse": {
+          "mean": 0.03165016065720313,
+          "std": 0.001566192070023674
+        },
+        "velocity_rmse": {
+          "mean": 0.07293592835325904,
+          "std": 0.003269436275542222
+        },
+        "trajectory_rmse": {
+          "mean": 0.3478718558296586,
+          "std": 0.019266425496044685
+        },
+        "fde_05_rmse": {
+          "mean": 0.08233181860862633,
+          "std": 0.003249906632042882
+        },
+        "fde_1_rmse": {
+          "mean": 0.21846255225185934,
+          "std": 0.011165922959218427
+        },
+        "fde_2_rmse": {
+          "mean": 0.6860747635536273,
+          "std": 0.039191647410019285
+        },
+        "p_pose_kf": {
+          "mean": 0.0,
+          "std": 0.0
+        },
+        "update_us": {
+          "mean": 27.060636842105264,
+          "std": 2.5718312990619148
+        },
+        "forecast_us": {
+          "mean": 324.04637105263157,
+          "std": 30.19793977935477
+        }
+      },
+      "IMM_CV_CA_POSE": {
+        "position_rmse": {
+          "mean": 0.031650415468827305,
+          "std": 0.0015671184174408808
+        },
+        "velocity_rmse": {
+          "mean": 0.07295763312100707,
+          "std": 0.0032730818411152492
+        },
+        "trajectory_rmse": {
+          "mean": 0.36548503793781517,
+          "std": 0.01796014217733803
+        },
+        "fde_05_rmse": {
+          "mean": 0.08232414049158941,
+          "std": 0.0031353492658035497
+        },
+        "fde_1_rmse": {
+          "mean": 0.2201230589419602,
+          "std": 0.010701519403678212
+        },
+        "fde_2_rmse": {
+          "mean": 0.7429620793021612,
+          "std": 0.037062487414705664
+        },
+        "p_pose_kf": {
+          "mean": 0.05084365571338102,
+          "std": 0.007652935029840917
+        },
+        "update_us": {
+          "mean": 42.10351315789474,
+          "std": 0.441517182396239
+        },
+        "forecast_us": {
+          "mean": 536.6366105263158,
+          "std": 4.642213224550902
+        }
+      },
+      "IMM_CV_POSE": {
+        "position_rmse": {
+          "mean": 0.03161898976394473,
+          "std": 0.0014615992252966599
+        },
+        "velocity_rmse": {
+          "mean": 0.10326489981129852,
+          "std": 0.0056435519770531755
+        },
+        "trajectory_rmse": {
+          "mean": 0.4715915097255188,
+          "std": 0.011076581882718374
+        },
+        "fde_05_rmse": {
+          "mean": 0.06814784336002437,
+          "std": 0.0024741166472157026
+        },
+        "fde_1_rmse": {
+          "mean": 0.18650361654220854,
+          "std": 0.005276841989153412
+        },
+        "fde_2_rmse": {
+          "mean": 1.1077306354637944,
+          "std": 0.025979525216251072
+        },
+        "p_pose_kf": {
+          "mean": 0.4875285023920308,
+          "std": 0.0029338640664062846
+        },
+        "update_us": {
+          "mean": 25.99065263157895,
+          "std": 1.5370702700638827
+        },
+        "forecast_us": {
+          "mean": 310.1752078947368,
+          "std": 14.275167170405494
+        }
+      },
+      "POSE_MODEL_PV": {
+        "position_rmse": {
+          "mean": 0.031586092970930915,
+          "std": 0.0014734629928750689
+        },
+        "velocity_rmse": {
+          "mean": 0.10329055779017896,
+          "std": 0.0056320193733205735
+        },
+        "trajectory_rmse": {
+          "mean": 0.928999961454046,
+          "std": 0.024157538426782917
+        },
+        "fde_05_rmse": {
+          "mean": 0.07806677447571861,
+          "std": 0.00183930269849734
+        },
+        "fde_1_rmse": {
+          "mean": 0.32195269636967117,
+          "std": 0.008786739853424635
+        },
+        "fde_2_rmse": {
+          "mean": 2.2173247610402798,
+          "std": 0.057556139235202385
+        },
+        "p_pose_kf": {
+          "mean": 1.0,
+          "std": 0.0
+        },
+        "update_us": {
+          "mean": 11.467494736842104,
+          "std": 0.6564849456493762
+        },
+        "forecast_us": {
+          "mean": 126.62137368421054,
+          "std": 7.204083167679416
+        }
+      },
+      "fusion_gain": {
+        "position_percent": -0.0008050879328314053,
+        "position_seeds_improved": 2,
+        "velocity_percent": -0.029758677565472347,
+        "velocity_seeds_improved": 3,
+        "fde_05_percent": 0.009325819794436807,
+        "fde_05_seeds_improved": 3,
+        "fde_1_percent": -0.7600875632847615,
+        "fde_1_seeds_improved": 1,
+        "fde_2_percent": -8.291707955249294,
+        "fde_2_seeds_improved": 0
+      }
+    },
+    "straight": {
+      "IMM_CV_CA": {
+        "position_rmse": {
+          "mean": 0.03165016066455591,
+          "std": 0.0015661920143473721
+        },
+        "velocity_rmse": {
+          "mean": 0.07293592835253469,
+          "std": 0.0032694362754794332
+        },
+        "trajectory_rmse": {
+          "mean": 0.34787185584379976,
+          "std": 0.019266425498382953
+        },
+        "fde_05_rmse": {
+          "mean": 0.08233181860719556,
+          "std": 0.003249906623596224
+        },
+        "fde_1_rmse": {
+          "mean": 0.21846255225642014,
+          "std": 0.011165922961224761
+        },
+        "fde_2_rmse": {
+          "mean": 0.6860747635866129,
+          "std": 0.039191647413476055
+        },
+        "p_pose_kf": {
+          "mean": 0.0,
+          "std": 0.0
+        },
+        "update_us": {
+          "mean": 26.389315789473688,
+          "std": 2.2924571249166306
+        },
+        "forecast_us": {
+          "mean": 316.8395789473684,
+          "std": 32.018352810521236
+        }
+      },
+      "IMM_CV_CA_POSE": {
+        "position_rmse": {
+          "mean": 0.03165041547824697,
+          "std": 0.00156711838341917
+        },
+        "velocity_rmse": {
+          "mean": 0.07295763311632097,
+          "std": 0.0032730818389166334
+        },
+        "trajectory_rmse": {
+          "mean": 0.3654850379227895,
+          "std": 0.017960142180197692
+        },
+        "fde_05_rmse": {
+          "mean": 0.08232414048819053,
+          "std": 0.003135349271180371
+        },
+        "fde_1_rmse": {
+          "mean": 0.22012305893003736,
+          "std": 0.01070151941642942
+        },
+        "fde_2_rmse": {
+          "mean": 0.7429620792762611,
+          "std": 0.03706248740801449
+        },
+        "p_pose_kf": {
+          "mean": 0.05084365571846973,
+          "std": 0.00765293502677508
+        },
+        "update_us": {
+          "mean": 42.18661052631579,
+          "std": 0.5970034661898218
+        },
+        "forecast_us": {
+          "mean": 538.7041631578948,
+          "std": 13.407829431257749
+        }
+      },
+      "IMM_CV_POSE": {
+        "position_rmse": {
+          "mean": 0.03161898976336563,
+          "std": 0.0014615991784275007
+        },
+        "velocity_rmse": {
+          "mean": 0.1032648998108379,
+          "std": 0.005643551977101094
+        },
+        "trajectory_rmse": {
+          "mean": 0.4715915097525,
+          "std": 0.011076581913194456
+        },
+        "fde_05_rmse": {
+          "mean": 0.06814784334939761,
+          "std": 0.0024741166201384945
+        },
+        "fde_1_rmse": {
+          "mean": 0.18650361654391426,
+          "std": 0.0052768419907521374
+        },
+        "fde_2_rmse": {
+          "mean": 1.1077306355318428,
+          "std": 0.025979525296027497
+        },
+        "p_pose_kf": {
+          "mean": 0.48752850242280255,
+          "std": 0.002933864093411779
+        },
+        "update_us": {
+          "mean": 25.32982368421053,
+          "std": 0.17343743149033847
+        },
+        "forecast_us": {
+          "mean": 304.9988447368421,
+          "std": 1.8756502897120817
+        }
+      },
+      "POSE_MODEL_PV": {
+        "position_rmse": {
+          "mean": 0.03158609297176337,
+          "std": 0.0014734629423669733
+        },
+        "velocity_rmse": {
+          "mean": 0.10329055778954259,
+          "std": 0.005632019373261996
+        },
+        "trajectory_rmse": {
+          "mean": 0.9289999614508739,
+          "std": 0.02415753840688686
+        },
+        "fde_05_rmse": {
+          "mean": 0.0780667744645702,
+          "std": 0.0018393026768995983
+        },
+        "fde_1_rmse": {
+          "mean": 0.321952696361489,
+          "std": 0.008786739827095318
+        },
+        "fde_2_rmse": {
+          "mean": 2.2173247610383884,
+          "std": 0.05755613920742262
+        },
+        "p_pose_kf": {
+          "mean": 1.0,
+          "std": 0.0
+        },
+        "update_us": {
+          "mean": 11.513802631578947,
+          "std": 0.36861362413159515
+        },
+        "forecast_us": {
+          "mean": 126.8221394736842,
+          "std": 3.9041630169627113
+        }
+      },
+      "fusion_gain": {
+        "position_percent": -0.0008050944630744183,
+        "position_seeds_improved": 2,
+        "velocity_percent": -0.029758672133950448,
+        "velocity_seeds_improved": 3,
+        "fde_05_percent": 0.00932582218504674,
+        "fde_05_seeds_improved": 3,
+        "fde_1_percent": -0.7600875557236098,
+        "fde_1_seeds_improved": 1,
+        "fde_2_percent": -8.291707946267657,
+        "fde_2_seeds_improved": 0
+      }
+    },
+    "circle": {
+      "IMM_CV_CA": {
+        "position_rmse": {
+          "mean": 0.031649111116893495,
+          "std": 0.0015679759804348428
+        },
+        "velocity_rmse": {
+          "mean": 0.07300888959391554,
+          "std": 0.0032420564834448433
+        },
+        "trajectory_rmse": {
+          "mean": 0.3829531973550388,
+          "std": 0.01901491378344127
+        },
+        "fde_05_rmse": {
+          "mean": 0.0836843260988646,
+          "std": 0.0023382919029136012
+        },
+        "fde_1_rmse": {
+          "mean": 0.22932968122208425,
+          "std": 0.010193579438221785
+        },
+        "fde_2_rmse": {
+          "mean": 0.7747237101477763,
+          "std": 0.039736087464681394
+        },
+        "p_pose_kf": {
+          "mean": 0.0,
+          "std": 0.0
+        },
+        "update_us": {
+          "mean": 25.531176315789473,
+          "std": 0.6534775074971677
+        },
+        "forecast_us": {
+          "mean": 303.97740263157897,
+          "std": 5.415055685846368
+        }
+      },
+      "IMM_CV_CA_POSE": {
+        "position_rmse": {
+          "mean": 0.03164512781499915,
+          "std": 0.0015674836512279192
+        },
+        "velocity_rmse": {
+          "mean": 0.07300495868710508,
+          "std": 0.0032729615217032093
+        },
+        "trajectory_rmse": {
+          "mean": 0.38784621820863274,
+          "std": 0.020841224459239298
+        },
+        "fde_05_rmse": {
+          "mean": 0.08312373737684768,
+          "std": 0.0026079581187160774
+        },
+        "fde_1_rmse": {
+          "mean": 0.2267252152295609,
+          "std": 0.010779136738566264
+        },
+        "fde_2_rmse": {
+          "mean": 0.7993588255367624,
+          "std": 0.045208308079325854
+        },
+        "p_pose_kf": {
+          "mean": 0.05128807368084315,
+          "std": 0.008022142767697155
+        },
+        "update_us": {
+          "mean": 41.85013157894737,
+          "std": 0.17468903019785617
+        },
+        "forecast_us": {
+          "mean": 537.2669736842105,
+          "std": 9.569072734117144
+        }
+      },
+      "IMM_CV_POSE": {
+        "position_rmse": {
+          "mean": 0.031535544635496,
+          "std": 0.0013997475065490505
+        },
+        "velocity_rmse": {
+          "mean": 0.10334911023854594,
+          "std": 0.005530997358472959
+        },
+        "trajectory_rmse": {
+          "mean": 0.5585625081718278,
+          "std": 0.011359387612844864
+        },
+        "fde_05_rmse": {
+          "mean": 0.07861846085271974,
+          "std": 0.0027263708145711615
+        },
+        "fde_1_rmse": {
+          "mean": 0.23801572631466197,
+          "std": 0.006054083170568934
+        },
+        "fde_2_rmse": {
+          "mean": 1.2841278878342712,
+          "std": 0.026122235327462905
+        },
+        "p_pose_kf": {
+          "mean": 0.5354584329762759,
+          "std": 0.0032762509911286038
+        },
+        "update_us": {
+          "mean": 25.360486842105264,
+          "std": 0.17427140398593713
+        },
+        "forecast_us": {
+          "mean": 304.36012631578944,
+          "std": 2.001699776123461
+        }
+      },
+      "POSE_MODEL_PV": {
+        "position_rmse": {
+          "mean": 0.031701172285855575,
+          "std": 0.0015616740506629826
+        },
+        "velocity_rmse": {
+          "mean": 0.10329148119733947,
+          "std": 0.0056405587011788836
+        },
+        "trajectory_rmse": {
+          "mean": 0.9306718282285716,
+          "std": 0.023806720911568234
+        },
+        "fde_05_rmse": {
+          "mean": 0.07940403195989361,
+          "std": 0.0005919023638185171
+        },
+        "fde_1_rmse": {
+          "mean": 0.32357321319728644,
+          "std": 0.008388219821264876
+        },
+        "fde_2_rmse": {
+          "mean": 2.2203728234849835,
+          "std": 0.05725519743676424
+        },
+        "p_pose_kf": {
+          "mean": 1.0,
+          "std": 0.0
+        },
+        "update_us": {
+          "mean": 11.26367894736842,
+          "std": 0.15415652531466673
+        },
+        "forecast_us": {
+          "mean": 123.3369394736842,
+          "std": 1.1189039600494795
+        }
+      },
+      "fusion_gain": {
+        "position_percent": 0.012585825490130098,
+        "position_seeds_improved": 4,
+        "velocity_percent": 0.005384148193898763,
+        "velocity_seeds_improved": 4,
+        "fde_05_percent": 0.6698849690856545,
+        "fde_05_seeds_improved": 5,
+        "fde_1_percent": 1.1356863963898123,
+        "fde_1_seeds_improved": 5,
+        "fde_2_percent": -3.1798581954187277,
+        "fde_2_seeds_improved": 0
+      }
+    },
+    "helix": {
+      "IMM_CV_CA": {
+        "position_rmse": {
+          "mean": 0.031649111111234474,
+          "std": 0.0015679759528630466
+        },
+        "velocity_rmse": {
+          "mean": 0.07300888959442586,
+          "std": 0.0032420564833726033
+        },
+        "trajectory_rmse": {
+          "mean": 0.3829531973694295,
+          "std": 0.01901491375899015
+        },
+        "fde_05_rmse": {
+          "mean": 0.08368432610188994,
+          "std": 0.002338291893812681
+        },
+        "fde_1_rmse": {
+          "mean": 0.22932968123203334,
+          "std": 0.010193579422990522
+        },
+        "fde_2_rmse": {
+          "mean": 0.7747237101752891,
+          "std": 0.03973608741565938
+        },
+        "p_pose_kf": {
+          "mean": 0.0,
+          "std": 0.0
+        },
+        "update_us": {
+          "mean": 25.42123947368421,
+          "std": 0.22653660345360185
+        },
+        "forecast_us": {
+          "mean": 308.7659710526315,
+          "std": 7.406071081194972
+        }
+      },
+      "IMM_CV_CA_POSE": {
+        "position_rmse": {
+          "mean": 0.031645127826788355,
+          "std": 0.0015674836394347536
+        },
+        "velocity_rmse": {
+          "mean": 0.07300495868744902,
+          "std": 0.0032729615248147698
+        },
+        "trajectory_rmse": {
+          "mean": 0.387846218194879,
+          "std": 0.02084122447860339
+        },
+        "fde_05_rmse": {
+          "mean": 0.08312373738203813,
+          "std": 0.0026079581307702194
+        },
+        "fde_1_rmse": {
+          "mean": 0.22672521522610908,
+          "std": 0.010779136752796884
+        },
+        "fde_2_rmse": {
+          "mean": 0.7993588255027562,
+          "std": 0.045208308115810045
+        },
+        "p_pose_kf": {
+          "mean": 0.05128807367957049,
+          "std": 0.008022142766322753
+        },
+        "update_us": {
+          "mean": 42.26374736842106,
+          "std": 0.5944229882888373
+        },
+        "forecast_us": {
+          "mean": 539.2348684210526,
+          "std": 8.972835386825535
+        }
+      },
+      "IMM_CV_POSE": {
+        "position_rmse": {
+          "mean": 0.03153554463104204,
+          "std": 0.001399747489704569
+        },
+        "velocity_rmse": {
+          "mean": 0.10334911023834603,
+          "std": 0.005530997358307371
+        },
+        "trajectory_rmse": {
+          "mean": 0.5585625081664666,
+          "std": 0.011359387617570027
+        },
+        "fde_05_rmse": {
+          "mean": 0.07861846085183219,
+          "std": 0.0027263708127624954
+        },
+        "fde_1_rmse": {
+          "mean": 0.2380157263117267,
+          "std": 0.00605408316985986
+        },
+        "fde_2_rmse": {
+          "mean": 1.2841278878235336,
+          "std": 0.02612223534147355
+        },
+        "p_pose_kf": {
+          "mean": 0.5354584329725041,
+          "std": 0.0032762509904751525
+        },
+        "update_us": {
+          "mean": 25.17232368421053,
+          "std": 0.1849573705751006
+        },
+        "forecast_us": {
+          "mean": 302.88703421052634,
+          "std": 2.759174545491732
+        }
+      },
+      "POSE_MODEL_PV": {
+        "position_rmse": {
+          "mean": 0.03170117228374769,
+          "std": 0.001561674033108795
+        },
+        "velocity_rmse": {
+          "mean": 0.10329148119722546,
+          "std": 0.005640558701102176
+        },
+        "trajectory_rmse": {
+          "mean": 0.9306718282213149,
+          "std": 0.02380672090399581
+        },
+        "fde_05_rmse": {
+          "mean": 0.07940403195808125,
+          "std": 0.000591902367902097
+        },
+        "fde_1_rmse": {
+          "mean": 0.3235732131919235,
+          "std": 0.008388219818107731
+        },
+        "fde_2_rmse": {
+          "mean": 2.2203728234708064,
+          "std": 0.05725519742199359
+        },
+        "p_pose_kf": {
+          "mean": 1.0,
+          "std": 0.0
+        },
+        "update_us": {
+          "mean": 11.137415789473682,
+          "std": 0.06872520870060633
+        },
+        "forecast_us": {
+          "mean": 123.5543736842105,
+          "std": 1.6634531367015053
+        }
+      },
+      "fusion_gain": {
+        "position_percent": 0.012585770362139037,
+        "position_seeds_improved": 4,
+        "velocity_percent": 0.005384148421760937,
+        "velocity_seeds_improved": 4,
+        "fde_05_percent": 0.6698849664742101,
+        "fde_05_seeds_improved": 5,
+        "fde_1_percent": 1.1356864021840662,
+        "fde_1_seeds_improved": 5,
+        "fde_2_percent": -3.1798581873650367,
+        "fde_2_seeds_improved": 0
+      }
+    },
+    "figure8": {
+      "IMM_CV_CA": {
+        "position_rmse": {
+          "mean": 0.03164186742288698,
+          "std": 0.0015635260918252412
+        },
+        "velocity_rmse": {
+          "mean": 0.07363084454996476,
+          "std": 0.0034857926559409475
+        },
+        "trajectory_rmse": {
+          "mean": 0.6023581691285591,
+          "std": 0.01563523223240482
+        },
+        "fde_05_rmse": {
+          "mean": 0.09124798031945279,
+          "std": 0.004475433335892242
+        },
+        "fde_1_rmse": {
+          "mean": 0.2946615822322289,
+          "std": 0.011277180127713985
+        },
+        "fde_2_rmse": {
+          "mean": 1.3195863148734601,
+          "std": 0.02884710714016711
+        },
+        "p_pose_kf": {
+          "mean": 0.0,
+          "std": 0.0
+        },
+        "update_us": {
+          "mean": 25.52446842105263,
+          "std": 0.41100129853759065
+        },
+        "forecast_us": {
+          "mean": 306.380494736842,
+          "std": 3.860086760380247
+        }
+      },
+      "IMM_CV_CA_POSE": {
+        "position_rmse": {
+          "mean": 0.03162675345580393,
+          "std": 0.0015584245393907448
+        },
+        "velocity_rmse": {
+          "mean": 0.07345595838713062,
+          "std": 0.0034533968678139115
+        },
+        "trajectory_rmse": {
+          "mean": 0.5699478924837016,
+          "std": 0.008819603416929354
+        },
+        "fde_05_rmse": {
+          "mean": 0.08912887641623339,
+          "std": 0.004251868182869083
+        },
+        "fde_1_rmse": {
+          "mean": 0.28046090850834887,
+          "std": 0.008793113745531813
+        },
+        "fde_2_rmse": {
+          "mean": 1.248794963991149,
+          "std": 0.015327084051987468
+        },
+        "p_pose_kf": {
+          "mean": 0.05395324855053696,
+          "std": 0.008784992607691888
+        },
+        "update_us": {
+          "mean": 41.727286842105265,
+          "std": 0.10239226501500805
+        },
+        "forecast_us": {
+          "mean": 532.9500631578946,
+          "std": 2.598123242341008
+        }
+      },
+      "IMM_CV_POSE": {
+        "position_rmse": {
+          "mean": 0.030959938954868517,
+          "std": 0.0012151554625715367
+        },
+        "velocity_rmse": {
+          "mean": 0.10391435555646034,
+          "std": 0.005739260648462535
+        },
+        "trajectory_rmse": {
+          "mean": 0.6787737625303353,
+          "std": 0.029195784764795618
+        },
+        "fde_05_rmse": {
+          "mean": 0.0964069622862122,
+          "std": 0.0046131074130966255
+        },
+        "fde_1_rmse": {
+          "mean": 0.3086994651661734,
+          "std": 0.013640208342464063
+        },
+        "fde_2_rmse": {
+          "mean": 1.5299276420311638,
+          "std": 0.0630733946925416
+        },
+        "p_pose_kf": {
+          "mean": 0.6655031247213438,
+          "std": 0.005809730169084549
+        },
+        "update_us": {
+          "mean": 25.26797894736842,
+          "std": 0.22602849642923695
+        },
+        "forecast_us": {
+          "mean": 303.7664868421053,
+          "std": 2.9874955893783
+        }
+      },
+      "POSE_MODEL_PV": {
+        "position_rmse": {
+          "mean": 0.03123983850568781,
+          "std": 0.0014077862838131389
+        },
+        "velocity_rmse": {
+          "mean": 0.10333367523652856,
+          "std": 0.005667406365063123
+        },
+        "trajectory_rmse": {
+          "mean": 0.9427144354080097,
+          "std": 0.02520576402798979
+        },
+        "fde_05_rmse": {
+          "mean": 0.08404608672085043,
+          "std": 0.0025687663168619955
+        },
+        "fde_1_rmse": {
+          "mean": 0.32964195792464607,
+          "std": 0.009312570070567804
+        },
+        "fde_2_rmse": {
+          "mean": 2.251554743272259,
+          "std": 0.06014168386578899
+        },
+        "p_pose_kf": {
+          "mean": 1.0,
+          "std": 0.0
+        },
+        "update_us": {
+          "mean": 11.139065789473685,
+          "std": 0.10757755689697732
+        },
+        "forecast_us": {
+          "mean": 123.10268947368422,
+          "std": 1.2104317280193744
+        }
+      },
+      "fusion_gain": {
+        "position_percent": 0.047765724067594384,
+        "position_seeds_improved": 4,
+        "velocity_percent": 0.2375175293765075,
+        "velocity_seeds_improved": 4,
+        "fde_05_percent": 2.322357049219681,
+        "fde_05_seeds_improved": 5,
+        "fde_1_percent": 4.819316320879652,
+        "fde_1_seeds_improved": 5,
+        "fde_2_percent": 5.364662400966125,
+        "fde_2_seeds_improved": 5
+      }
+    },
+    "aggressive": {
+      "IMM_CV_CA": {
+        "position_rmse": {
+          "mean": 0.03163366526191565,
+          "std": 0.0015766032330770188
+        },
+        "velocity_rmse": {
+          "mean": 0.09072111079954577,
+          "std": 0.003840547510942946
+        },
+        "trajectory_rmse": {
+          "mean": 2.715197579029844,
+          "std": 0.05797728497897154
+        },
+        "fde_05_rmse": {
+          "mean": 0.23485454327024255,
+          "std": 0.00825046796366168
+        },
+        "fde_1_rmse": {
+          "mean": 1.1386346806756322,
+          "std": 0.03166192998375936
+        },
+        "fde_2_rmse": {
+          "mean": 6.103658677462565,
+          "std": 0.12017413796364243
+        },
+        "p_pose_kf": {
+          "mean": 0.0,
+          "std": 0.0
+        },
+        "update_us": {
+          "mean": 26.20488947368421,
+          "std": 1.7293180599669045
+        },
+        "forecast_us": {
+          "mean": 318.6405394736842,
+          "std": 18.675531598769147
+        }
+      },
+      "IMM_CV_CA_POSE": {
+        "position_rmse": {
+          "mean": 0.03226635307781417,
+          "std": 0.0017016190002132753
+        },
+        "velocity_rmse": {
+          "mean": 0.09093641606341504,
+          "std": 0.004839145477034146
+        },
+        "trajectory_rmse": {
+          "mean": 2.382204564881093,
+          "std": 0.06482834147471396
+        },
+        "fde_05_rmse": {
+          "mean": 0.2059447864757573,
+          "std": 0.007857675281051222
+        },
+        "fde_1_rmse": {
+          "mean": 0.9693671691887881,
+          "std": 0.030531752025207838
+        },
+        "fde_2_rmse": {
+          "mean": 5.437527663659914,
+          "std": 0.14105925978556208
+        },
+        "p_pose_kf": {
+          "mean": 0.17731134141939772,
+          "std": 0.014498016765572809
+        },
+        "update_us": {
+          "mean": 42.321647368421054,
+          "std": 0.9045401738496962
+        },
+        "forecast_us": {
+          "mean": 543.4332105263159,
+          "std": 11.618919746733154
+        }
+      },
+      "IMM_CV_POSE": {
+        "position_rmse": {
+          "mean": 0.04070672096695806,
+          "std": 0.002687694750554066
+        },
+        "velocity_rmse": {
+          "mean": 0.104791792914216,
+          "std": 0.005553953958542511
+        },
+        "trajectory_rmse": {
+          "mean": 1.5734648753879876,
+          "std": 0.033692128532414906
+        },
+        "fde_05_rmse": {
+          "mean": 0.19554508014901142,
+          "std": 0.005350062655332847
+        },
+        "fde_1_rmse": {
+          "mean": 0.6486918299091509,
+          "std": 0.008605827028195002
+        },
+        "fde_2_rmse": {
+          "mean": 3.7308867119403595,
+          "std": 0.08714553553919005
+        },
+        "p_pose_kf": {
+          "mean": 0.9071563399934324,
+          "std": 0.0050152592178851025
+        },
+        "update_us": {
+          "mean": 25.210286842105265,
+          "std": 0.17188521875943283
+        },
+        "forecast_us": {
+          "mean": 303.7846421052632,
+          "std": 2.141398542361144
+        }
+      },
+      "POSE_MODEL_PV": {
+        "position_rmse": {
+          "mean": 0.04086328372575306,
+          "std": 0.002710431321717044
+        },
+        "velocity_rmse": {
+          "mean": 0.10408126651480207,
+          "std": 0.005498177993470479
+        },
+        "trajectory_rmse": {
+          "mean": 1.9409612684379567,
+          "std": 0.05044703403689473
+        },
+        "fde_05_rmse": {
+          "mean": 0.1695415378530729,
+          "std": 0.005011953097453155
+        },
+        "fde_1_rmse": {
+          "mean": 0.6107246730452898,
+          "std": 0.010385009496318567
+        },
+        "fde_2_rmse": {
+          "mean": 4.845586824623508,
+          "std": 0.12688884284639454
+        },
+        "p_pose_kf": {
+          "mean": 1.0,
+          "std": 0.0
+        },
+        "update_us": {
+          "mean": 11.190436842105264,
+          "std": 0.1329865496421871
+        },
+        "forecast_us": {
+          "mean": 123.72682368421053,
+          "std": 1.1548322263281647
+        }
+      },
+      "fusion_gain": {
+        "position_percent": -2.000045870941891,
+        "position_seeds_improved": 2,
+        "velocity_percent": -0.23732652959354006,
+        "velocity_seeds_improved": 2,
+        "fde_05_percent": 12.309643403925696,
+        "fde_05_seeds_improved": 5,
+        "fde_1_percent": 14.865831364490479,
+        "fde_1_seeds_improved": 5,
+        "fde_2_percent": 10.913634739476908,
+        "fde_2_seeds_improved": 5
+      }
+    },
+    "vertical": {
+      "IMM_CV_CA": {
+        "position_rmse": {
+          "mean": 0.031645954054434884,
+          "std": 0.001582440209508952
+        },
+        "velocity_rmse": {
+          "mean": 0.07470341162424138,
+          "std": 0.0033178940606728496
+        },
+        "trajectory_rmse": {
+          "mean": 0.9148813377229121,
+          "std": 0.005700289163533604
+        },
+        "fde_05_rmse": {
+          "mean": 0.10704229075009927,
+          "std": 0.002754917342840911
+        },
+        "fde_1_rmse": {
+          "mean": 0.40867939159886707,
+          "std": 0.003926848454651173
+        },
+        "fde_2_rmse": {
+          "mean": 2.0409337059318564,
+          "std": 0.016100509320971144
+        },
+        "p_pose_kf": {
+          "mean": 0.0,
+          "std": 0.0
+        },
+        "update_us": {
+          "mean": 25.29560789473684,
+          "std": 0.18455455267223636
+        },
+        "forecast_us": {
+          "mean": 304.75326315789476,
+          "std": 5.465791494952175
+        }
+      },
+      "IMM_CV_CA_POSE": {
+        "position_rmse": {
+          "mean": 0.03164618640063878,
+          "std": 0.0015836787820412961
+        },
+        "velocity_rmse": {
+          "mean": 0.0746084359599027,
+          "std": 0.00331820992795879
+        },
+        "trajectory_rmse": {
+          "mean": 0.9250045274673993,
+          "std": 0.003718472867310796
+        },
+        "fde_05_rmse": {
+          "mean": 0.10694709820907658,
+          "std": 0.0027735836730348163
+        },
+        "fde_1_rmse": {
+          "mean": 0.4101994544750457,
+          "std": 0.004542732960605695
+        },
+        "fde_2_rmse": {
+          "mean": 2.0692202554201033,
+          "std": 0.00935886263569022
+        },
+        "p_pose_kf": {
+          "mean": 0.04907433001284566,
+          "std": 0.010061437138121224
+        },
+        "update_us": {
+          "mean": 42.06304210526316,
+          "std": 0.29305424166200045
+        },
+        "forecast_us": {
+          "mean": 534.0503000000001,
+          "std": 2.6207201319960145
+        }
+      },
+      "IMM_CV_POSE": {
+        "position_rmse": {
+          "mean": 0.031615681492361936,
+          "std": 0.0015160537418551683
+        },
+        "velocity_rmse": {
+          "mean": 0.1062571788940353,
+          "std": 0.006201982405375816
+        },
+        "trajectory_rmse": {
+          "mean": 1.367440178720687,
+          "std": 0.0058577872564769835
+        },
+        "fde_05_rmse": {
+          "mean": 0.20006833880192626,
+          "std": 0.00546692599575104
+        },
+        "fde_1_rmse": {
+          "mean": 0.7437583201326377,
+          "std": 0.006896339914333021
+        },
+        "fde_2_rmse": {
+          "mean": 2.8416872152433656,
+          "std": 0.009532931686660431
+        },
+        "p_pose_kf": {
+          "mean": 0.4875587029159763,
+          "std": 0.0028465924137984697
+        },
+        "update_us": {
+          "mean": 25.371697368421053,
+          "std": 0.1100810749287975
+        },
+        "forecast_us": {
+          "mean": 304.27756578947367,
+          "std": 1.3112259943298443
+        }
+      },
+      "POSE_MODEL_PV": {
+        "position_rmse": {
+          "mean": 0.0315825668220449,
+          "std": 0.0015285546591029616
+        },
+        "velocity_rmse": {
+          "mean": 0.10628181423134783,
+          "std": 0.006207247566095315
+        },
+        "trajectory_rmse": {
+          "mean": 1.589435442911261,
+          "std": 0.009447462215988765
+        },
+        "fde_05_rmse": {
+          "mean": 0.20373702388946677,
+          "std": 0.005216022487354147
+        },
+        "fde_1_rmse": {
+          "mean": 0.7897637700381022,
+          "std": 0.005756626372876253
+        },
+        "fde_2_rmse": {
+          "mean": 3.443000265565881,
+          "std": 0.02630949313998802
+        },
+        "p_pose_kf": {
+          "mean": 1.0,
+          "std": 0.0
+        },
+        "update_us": {
+          "mean": 11.226973684210527,
+          "std": 0.04426845456919173
+        },
+        "forecast_us": {
+          "mean": 123.55473157894737,
+          "std": 0.7910022773154038
+        }
+      },
+      "fusion_gain": {
+        "position_percent": -0.0007342050851066872,
+        "position_seeds_improved": 1,
+        "velocity_percent": 0.12713698380524274,
+        "velocity_seeds_improved": 4,
+        "fde_05_percent": 0.08892984292061534,
+        "fde_05_seeds_improved": 3,
+        "fde_1_percent": -0.3719450766116905,
+        "fde_1_seeds_improved": 0,
+        "fde_2_percent": -1.385961210108566,
+        "fde_2_seeds_improved": 0
+      }
+    },
+    "bad_attitude": {
+      "IMM_CV_CA": {
+        "position_rmse": {
+          "mean": 0.03164186742239568,
+          "std": 0.0015635261036391933
+        },
+        "velocity_rmse": {
+          "mean": 0.07363084454980937,
+          "std": 0.003485792652194807
+        },
+        "trajectory_rmse": {
+          "mean": 0.6023581691408747,
+          "std": 0.015635232216698613
+        },
+        "fde_05_rmse": {
+          "mean": 0.09124798031790549,
+          "std": 0.004475433341186475
+        },
+        "fde_1_rmse": {
+          "mean": 0.29466158223630584,
+          "std": 0.011277180119040817
+        },
+        "fde_2_rmse": {
+          "mean": 1.319586314902115,
+          "std": 0.028847107109557565
+        },
+        "p_pose_kf": {
+          "mean": 0.0,
+          "std": 0.0
+        },
+        "update_us": {
+          "mean": 25.684086842105266,
+          "std": 0.4653924617892997
+        },
+        "forecast_us": {
+          "mean": 303.7392763157894,
+          "std": 1.5169303890231467
+        }
+      },
+      "IMM_CV_CA_POSE": {
+        "position_rmse": {
+          "mean": 0.031629541378882194,
+          "std": 0.0015609515791711393
+        },
+        "velocity_rmse": {
+          "mean": 0.07354901006015133,
+          "std": 0.0033946473355966162
+        },
+        "trajectory_rmse": {
+          "mean": 0.5894071941099205,
+          "std": 0.008794636620991869
+        },
+        "fde_05_rmse": {
+          "mean": 0.08975589432860061,
+          "std": 0.003995168068703739
+        },
+        "fde_1_rmse": {
+          "mean": 0.28494109029899317,
+          "std": 0.006985062015784975
+        },
+        "fde_2_rmse": {
+          "mean": 1.3016639646053578,
+          "std": 0.02526932950640483
+        },
+        "p_pose_kf": {
+          "mean": 0.049953799645452365,
+          "std": 0.007618273470182648
+        },
+        "update_us": {
+          "mean": 43.26284210526317,
+          "std": 1.2300329397600476
+        },
+        "forecast_us": {
+          "mean": 544.4653368421053,
+          "std": 7.791650943722297
+        }
+      },
+      "IMM_CV_POSE": {
+        "position_rmse": {
+          "mean": 0.0307493529021221,
+          "std": 0.0011587070532001417
+        },
+        "velocity_rmse": {
+          "mean": 0.1048380667442885,
+          "std": 0.005648833534906997
+        },
+        "trajectory_rmse": {
+          "mean": 0.937525299691214,
+          "std": 0.058161742353545216
+        },
+        "fde_05_rmse": {
+          "mean": 0.11186413381627162,
+          "std": 0.004566157744936799
+        },
+        "fde_1_rmse": {
+          "mean": 0.41200015019908287,
+          "std": 0.02214959924171185
+        },
+        "fde_2_rmse": {
+          "mean": 2.1203147553983497,
+          "std": 0.13372702656799598
+        },
+        "p_pose_kf": {
+          "mean": 0.5967932972321226,
+          "std": 0.009417633200749492
+        },
+        "update_us": {
+          "mean": 25.416634210526315,
+          "std": 0.22034051010033043
+        },
+        "forecast_us": {
+          "mean": 303.96062368421053,
+          "std": 1.952877327811251
+        }
+      },
+      "POSE_MODEL_PV": {
+        "position_rmse": {
+          "mean": 0.03113514166819409,
+          "std": 0.0013261421613606338
+        },
+        "velocity_rmse": {
+          "mean": 0.10469700687152757,
+          "std": 0.005496986167666765
+        },
+        "trajectory_rmse": {
+          "mean": 1.4895157497709788,
+          "std": 0.08409361506958167
+        },
+        "fde_05_rmse": {
+          "mean": 0.11903918503604609,
+          "std": 0.0044946362339670495
+        },
+        "fde_1_rmse": {
+          "mean": 0.5614282705734471,
+          "std": 0.03441313163296617
+        },
+        "fde_2_rmse": {
+          "mean": 3.483363238268325,
+          "std": 0.19016054842070781
+        },
+        "p_pose_kf": {
+          "mean": 1.0,
+          "std": 0.0
+        },
+        "update_us": {
+          "mean": 11.348718421052634,
+          "std": 0.2543434213215059
+        },
+        "forecast_us": {
+          "mean": 125.33172631578948,
+          "std": 2.976701177661387
+        }
+      },
+      "fusion_gain": {
+        "position_percent": 0.03895485480973626,
+        "position_seeds_improved": 4,
+        "velocity_percent": 0.11114158768432691,
+        "velocity_seeds_improved": 3,
+        "fde_05_percent": 1.6351989206845885,
+        "fde_05_seeds_improved": 5,
+        "fde_1_percent": 3.2988664024471537,
+        "fde_1_seeds_improved": 5,
+        "fde_2_percent": 1.3581794608173547,
+        "fde_2_seeds_improved": 3
+      }
+    },
+    "bad_velocity": {
+      "IMM_CV_CA": {
+        "position_rmse": {
+          "mean": 0.065451477235239,
+          "std": 0.0010366463034573207
+        },
+        "velocity_rmse": {
+          "mean": 0.23024921128022383,
+          "std": 0.007418862915299585
+        },
+        "trajectory_rmse": {
+          "mean": 0.8898175363337195,
+          "std": 0.018654063286646917
+        },
+        "fde_05_rmse": {
+          "mean": 0.21577047534485047,
+          "std": 0.006116708144131889
+        },
+        "fde_1_rmse": {
+          "mean": 0.5383551510840728,
+          "std": 0.013752316549403523
+        },
+        "fde_2_rmse": {
+          "mean": 1.8048708858385385,
+          "std": 0.03444779858545502
+        },
+        "p_pose_kf": {
+          "mean": 0.0,
+          "std": 0.0
+        },
+        "update_us": {
+          "mean": 27.43452894736842,
+          "std": 3.9667920521093616
+        },
+        "forecast_us": {
+          "mean": 310.32081315789475,
+          "std": 5.7863947921152015
+        }
+      },
+      "IMM_CV_CA_POSE": {
+        "position_rmse": {
+          "mean": 0.06533824656437362,
+          "std": 0.0011383197909107226
+        },
+        "velocity_rmse": {
+          "mean": 0.22675173641614704,
+          "std": 0.007834965585259684
+        },
+        "trajectory_rmse": {
+          "mean": 0.7194145110273784,
+          "std": 0.013268301158775007
+        },
+        "fde_05_rmse": {
+          "mean": 0.19203139688046972,
+          "std": 0.006534123470114201
+        },
+        "fde_1_rmse": {
+          "mean": 0.4327655582677747,
+          "std": 0.01044318252318927
+        },
+        "fde_2_rmse": {
+          "mean": 1.4868736894763284,
+          "std": 0.02939825304365254
+        },
+        "p_pose_kf": {
+          "mean": 0.38893549225837754,
+          "std": 0.01891396985708354
+        },
+        "update_us": {
+          "mean": 42.30466578947369,
+          "std": 0.12901101228791054
+        },
+        "forecast_us": {
+          "mean": 540.8962236842106,
+          "std": 3.7129082768171204
+        }
+      },
+      "IMM_CV_POSE": {
+        "position_rmse": {
+          "mean": 0.06514457138653999,
+          "std": 0.0010576570790151512
+        },
+        "velocity_rmse": {
+          "mean": 0.2368466677101011,
+          "std": 0.00794540928667237
+        },
+        "trajectory_rmse": {
+          "mean": 0.7623899525845799,
+          "std": 0.0276950180937903
+        },
+        "fde_05_rmse": {
+          "mean": 0.18760259569703602,
+          "std": 0.0047795394147323025
+        },
+        "fde_1_rmse": {
+          "mean": 0.42899917935664184,
+          "std": 0.009930498005130416
+        },
+        "fde_2_rmse": {
+          "mean": 1.6230949283233158,
+          "std": 0.06664218592048039
+        },
+        "p_pose_kf": {
+          "mean": 0.632594187665859,
+          "std": 0.006368695731254198
+        },
+        "update_us": {
+          "mean": 25.53646842105263,
+          "std": 0.34252492814735863
+        },
+        "forecast_us": {
+          "mean": 305.73487894736843,
+          "std": 4.414444729593613
+        }
+      },
+      "POSE_MODEL_PV": {
+        "position_rmse": {
+          "mean": 0.06511007202212576,
+          "std": 0.0011380341458191575
+        },
+        "velocity_rmse": {
+          "mean": 0.23013537180899707,
+          "std": 0.007791814000820078
+        },
+        "trajectory_rmse": {
+          "mean": 0.9966411569586204,
+          "std": 0.03948113593324231
+        },
+        "fde_05_rmse": {
+          "mean": 0.1718279949791299,
+          "std": 0.006343843652258529
+        },
+        "fde_1_rmse": {
+          "mean": 0.42098815508828913,
+          "std": 0.01861790192655809
+        },
+        "fde_2_rmse": {
+          "mean": 2.3197536230395484,
+          "std": 0.08765232980034143
+        },
+        "p_pose_kf": {
+          "mean": 1.0,
+          "std": 0.0
+        },
+        "update_us": {
+          "mean": 11.32226842105263,
+          "std": 0.08195588247610838
+        },
+        "forecast_us": {
+          "mean": 124.55594473684212,
+          "std": 0.8295469613263121
+        }
+      },
+      "fusion_gain": {
+        "position_percent": 0.17299941215752623,
+        "position_seeds_improved": 5,
+        "velocity_percent": 1.5189953722882454,
+        "velocity_seeds_improved": 5,
+        "fde_05_percent": 11.002004989997028,
+        "fde_05_seeds_improved": 5,
+        "fde_1_percent": 19.61337095106732,
+        "fde_1_seeds_improved": 5,
+        "fde_2_percent": 17.61883350533794,
+        "fde_2_seeds_improved": 5
+      }
+    }
+  },
+  "note": "RMSE mean/std across seeds; positive gain is improvement. Paired inputs, no tuning. Metrics use common forecast origins after 3s with a full 2s truth horizon. Trajectory RMSE averages squared displacement over 20 steps; it is not ADE.",
+  "experiment": {
+    "duration": 20,
+    "dt": 0.02,
+    "warmup": 3,
+    "forecast_interval": 0.2,
+    "forecast_step": 0.1,
+    "forecast_count": 20,
+    "seeds": [
+      11,
+      22,
+      33,
+      44,
+      55
+    ],
+    "scenarios": {
+      "hover": {
+        "trajectory": "hover"
+      },
+      "straight": {
+        "trajectory": "straight"
+      },
+      "circle": {
+        "trajectory": "circle"
+      },
+      "helix": {
+        "trajectory": "helix"
+      },
+      "figure8": {
+        "trajectory": "figure8"
+      },
+      "aggressive": {
+        "trajectory": "figure8",
+        "frequency": 0.65
+      },
+      "vertical": {
+        "trajectory": "vertical"
+      },
+      "bad_attitude": {
+        "trajectory": "figure8",
+        "attitude_std": 0.2
+      },
+      "bad_velocity": {
+        "trajectory": "figure8",
+        "velocity_std": 0.5
+      }
+    },
+    "position_std": 0.15,
+    "velocity_std": 0.1,
+    "attitude_std": 0.05,
+    "cv_accel_density": 0.3,
+    "pose_accel_density": 0.3,
+    "ca_jerk_density": 1.0,
+    "angular_accel_density": 0.3,
+    "stay_probability": 0.98,
+    "pose_gravity": 9.81,
+    "simulator_gravity": 9.8,
+    "observation_sha256": {
+      "hover/11": "d2e64054769f9ffa3552eb0ae6c7f2fe4fb386c29d9c06fbe927a0f3e9953cbb",
+      "hover/22": "a6167a78d3eae7e3a50499b7f7ce7fc4e974a97a92a8e00e5883e4b524adcdb7",
+      "hover/33": "be717e79fc2d892755a8c0154f5f52efdc066737e82a7a8df17cacb5f375f341",
+      "hover/44": "688bbb1a8ce9eca808863b01cf0d11d58f798247f5f5dda338e548d5dcd8ea07",
+      "hover/55": "85c97c96f04a1a61197488dc84c585ef2d3673e76f33157965308048dece524e",
+      "straight/11": "2bd222202a5a1c4863f9d5e2832b058179dd16986f9beb4e596406ef904ad70f",
+      "straight/22": "5d65544453a38d777611a72e0e8f416608e6761f2d6268281fc74195436ee2e6",
+      "straight/33": "bb36595d5d1e763725364238362ab8d70b7603adf25dc5995dae6002b6876895",
+      "straight/44": "d976fb01778adc8cd2f6ca3916b9dec9ae4c545e1ea63ff1c3719b5248d94676",
+      "straight/55": "0eca8f6e3522ca7ae92c7273244a01c93924cf14ea25effe857e26d0e164269d",
+      "circle/11": "f36bf52e8137423bffd8c13486db9c025ad3bb650d86f571f01cbbf9c5760c91",
+      "circle/22": "cec3411b7bb414bace2b4aebd938ee9b73477e99a2ec1fb7ec98d76cc96cd5fd",
+      "circle/33": "7d47d6e5bc022e425f57dc2b20f08b82d3cd4e655a7ff65156fd18a07f51f6a5",
+      "circle/44": "458f80965dc98882c3b21be9ac707c0286a8b946291c1ed511ada490af335cd9",
+      "circle/55": "189bd31a6b85a0083c0c6eda9d943cc63f6a3b253a1a82b6ea7cc22706b132a1",
+      "helix/11": "adaf21a96a42ab30f9e32f8d84a6953d1e782b75d7883ddd580535724b00062f",
+      "helix/22": "6917f568f852beeea6dc3cf25922c97ab663a9b7e2cba47ca2eed5f061504279",
+      "helix/33": "0c97d2b68b49dd97d968bab30347ec2e92c0e4b48c598686324ca0c210cd8823",
+      "helix/44": "ba2f4459b8eea8586ec441a2b707603b7d179dd09b75283bc1a8f00a272872e2",
+      "helix/55": "9d06c84d989109c3b27f1dd6160621f1ccc6c3f843f7613745901beb6f912c63",
+      "figure8/11": "4d8eea17927c055e6622e4c695a9e418c61a66e8c3efd4a47a34a64f43fc8afe",
+      "figure8/22": "71dd925520fdda59ec5b66754fc293992729ff05afb0b51d2e7f861fa9f84daa",
+      "figure8/33": "1a7bf9bc1dcca7a050724180d3a1c196c095235b1da1efd4f8bb0b68c041d91b",
+      "figure8/44": "8abbc16194c4d99eba5bfe9044dd6af28972f3b23dacb4590f6458ddf8ae5137",
+      "figure8/55": "cecf3e4f23835b1612659204667c1fd90ab16a788ae81f9fcf449fe4d6785687",
+      "aggressive/11": "ee95317fb4c46592f0d2c2181ee579cb9c2675d99c6ad5ff41f919050c7eb4f6",
+      "aggressive/22": "35df69e0c45854b46774a9c5213331f49a3ccef3c53d1869224dd3610e89b8d5",
+      "aggressive/33": "12478306ab2d293a8fe3d61a5c6978b131e5b18858b025063d0169092affa462",
+      "aggressive/44": "8dbd02782166c432f05d1f5037a34837ab2d32bba5193386f52d42a71d23c3e4",
+      "aggressive/55": "54a4acb3e5400c10b133377d27b7ed3c2e2e08c1f41983589169de945233a625",
+      "vertical/11": "3c1fed2d3cd13d3755d33e12b1306394d0fd2684e61354d8eeb93398cd51b061",
+      "vertical/22": "3b7bb97225c14d2b7fc28abcb9c2caf5cbf31c0bd596a4aef2a650d07689e73b",
+      "vertical/33": "ab3252dc34a0bd9f740d4ec259b9d65dddaff87049112f56c6ac1a00293e2441",
+      "vertical/44": "2dfd8283f41597635495a3750d712ca93143c765f0497642484e71d84c6dcc84",
+      "vertical/55": "2be0794ec64b97e92032ce2ea16522833a61a6fb9ffc9f95923cd659b8b749be",
+      "bad_attitude/11": "9e18d19f8cf05d99758fb1c40e58a0a7e8f658aebc3b70bb0932fb8d179f8fd2",
+      "bad_attitude/22": "8761d8d69f8ada96ee4924e344fb320f157ad16722c2f61dda91c7f751854efe",
+      "bad_attitude/33": "dae4381ca1453b0e4ddbcfe16881f8f1928116ab00a8992b3211b4e866e219ff",
+      "bad_attitude/44": "692df2f66676d066fd1e5e4b8c7c85579c08b08100b84dc009735e640da68ce6",
+      "bad_attitude/55": "bda6be0e3262524459ed657af70b5fdb357b3e5a7b2f424f89d6ae503801147d",
+      "bad_velocity/11": "021d438257a44cc4d95c4b1c49a1d83b8ea13b16e59b1bfe7918dccb6ab36d3f",
+      "bad_velocity/22": "d4de2bb90aab09dcadbc38960a125d42147672c41fa1643908b00fa36659f435",
+      "bad_velocity/33": "9f17d68175d9d49b7eb887eb4cf68fcc39d8e68fcc55d676823f860fd29e7a4f",
+      "bad_velocity/44": "6c16a5064b6408dcd295ab69c364945695747eec339bf8304dfbd58529025ed1",
+      "bad_velocity/55": "938cf0c3db07d81207902981da9acfdc64bb7c8fbbeab54c3263c9c633beb7a3"
+    },
+    "executable_sha256": "566d06d94dd42baa941b7b10bd917bacf08eb06d554099c08e47b1c9bad964d9"
+  }
+}

@@ -149,7 +149,7 @@ prediction_viewer:
 
 - `duration`：运行时长，秒；`sample_rate`：轨迹指令频率，Hz，仿真器里程计为 100 Hz。
 - `inject_noise`：是否注入观测噪声；`position_noise_std`、`velocity_noise_std` 为位置/速度噪声标准差。关闭噪声时仍保留正的标准差配置，供滤波器使用。
-- `motion_models`：可选择 `[cv, ca]` 或加入 `body_velocity`。分别采用世界系匀速、恒加速度和恒机体系速度假设。
+- `motion_models`：可选择 `[cv, ca]` 或加入 `body_velocity`、`pose_kf`。分别采用世界系匀速、恒加速度、恒机体系速度和姿态驱动加速度假设；`pose_kf` 要求 `use_attitude: true`。
 - `stay_probability`：默认模型转移矩阵的对角概率；也可通过 `model_transition` 与 `model_initial_probability` 指定转移矩阵和先验。
 - `prediction_algorithm`：`pose_kf`（默认）、`kf` 或 `imm`，所有算法通过统一基类创建。
 - `prediction_step × prediction_steps`：预测总时域，默认 1 秒。
@@ -233,3 +233,34 @@ Pose-KF 诊断提供位置/速度、对应三维协方差与预测终点协方�
 比较结果写入 `comparison_metrics.json`，报告每个数据集的样本数、时长、位置/速度 RMSE 与已评分时域误差。位置/速度指标排除预热，预测指标只取 CSV 中有限值。各运行以自己的 elapsed time 作横轴，指标分别汇总，不做逐样本配对；应使用相同轨迹、时长、噪声参数与预测时域。固定种子仍不能消除 ROS 调度时刻差异。主运行 `metrics.json` 的预测 RMSE 继续以 `predictions.csv` 为准，比较表则使用 `samples.csv` 的 `horizon_error`，两者可能因采样/重采样略有差异。
 
 例如先用 `prediction_algorithm: kf`、新的 `output_dir` 运行基线，再切换为 `pose_kf`、另一个 `output_dir` 并填写基线 CSV 路径。不要把输出目录改成已存在数据的目录来启动新仿真。
+
+
+## 将 Pose-KF 运动假设加入 IMM
+
+使用 `config/imm_pose.yaml`，或设置：
+
+```yaml
+    prediction_algorithm: imm
+    motion_models: [cv, ca, pose_kf]
+    use_attitude: true
+    imm_pose_accel_density: 0.30
+```
+
+Pose 假设嵌入 IMM 的公共 15 维误差状态，用滤波姿态计算 `a = sign*g*(R*e3-e3)`，和 CV/CA 共用位置、速度、姿态观测更新及模型概率。它不是独立六维 PoseKF 的输出平均；预测姿态按 IMM 的估计角速度传播。`imm_pose_accel_density` 是此模型未建模加速度的连续噪声密度，默认与 CV 相同；公共观测协方差仍由 `position_noise_std`、`velocity_noise_std`、`attitude_noise_std` 的平方构造。重力和坐标方向沿用 `pose_kf_gravity` 与 `pose_kf_world_up_sign`。
+
+配对实验（9 个条件 × 5 个种子）显示，相对 CV/CA IMM，普通八字、激烈八字及较差速度观测的 1 秒预测 RMSE 分别下降约 4.8%、14.9%、19.6%，但悬停的 2 秒预测退化约 8.3%。保持该模型为可选项，不保证所有运动均改善。完整方法、噪声、消融和复现命令见 [实验报告](../../assets/reports/20261111-imm-pose-experiment.md)。
+
+实验通过生产 C++ 库执行固定观测 CSV 回放，完全共享带噪位置/速度/姿态和评分时间戳。运行 `PYTHONNOUSERSITE=1 /usr/bin/python3 scripts/experiment_imm_pose.py --output outputs/new_experiment`，选择新的输出目录；输出原始观测、逐起点评分、每种子指标、配置和比较图。脚本需要系统 NumPy、SciPy 和 Matplotlib；`--analyze-only` 可重绘已有结果。
+
+
+## 记录 Pose-KF 的推力偏差 w
+
+论文的 w 表示单位质量推力相对重力的偏差，单位 m/s²；当前生产实现没有 w 状态或 w 随机采样，均值传播采用 w=0。为检查机动时的假设，新增独立诊断脚本：
+
+```bash
+PYTHONNOUSERSITE=1 /usr/bin/python3 scripts/experiment_pose_w.py --output outputs/pose_w_new
+```
+
+脚本以 50 Hz 记录六个条件的 40 秒数据，并调用生产 PoseKF 回放。输出真值反推的等效 w、从速度观测得到的原始/窗口诊断量、倾角、单位质量推力、加速度残差及滤波状态；这些诊断量未反馈进滤波器。通过 `--plot-only` 重绘已有目录。脚本需要系统 NumPy/SciPy/Matplotlib，C++ 工具为 `build/predictor/pose_kf_replay`。
+
+本次激烈八字中 w 约为 -0.140～1.428 m/s²，均值约 0.691，具有明显时间相关性；垂直机动约为 ±2 m/s²。均值取零不能表达这部分持续机动，单个标量推力修正也不能消除姿态方向误差。完整推导、数据字段和限制见 [w 诊断实验报告](../../assets/reports/20261111-pose-w-experiment.md)。

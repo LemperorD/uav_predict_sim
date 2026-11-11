@@ -100,6 +100,17 @@ namespace predictor
           y.mean.head<3>() += x.mean.segment<3>(6) * (dt * dt / 2);
           y.mean.segment<3>(3) += x.mean.segment<3>(6) * dt;
         }
+        else if (name_ == "pose_kf")
+        {
+          // Pose-KF's equal-weight thrust hypothesis embedded in the common
+          // IMM error state. Current filtered attitude drives acceleration;
+          // all hypotheses retain the same measurement update and likelihood.
+          const Eigen::Vector3d acceleration =
+              settings_.pose_world_up_sign * settings_.pose_gravity *
+              (x.orientation * Eigen::Vector3d::UnitZ() - Eigen::Vector3d::UnitZ());
+          y.mean.segment<3>(3) += acceleration * dt;
+          y.mean.segment<3>(6) = acceleration;
+        }
         else if (name_ == "body_velocity")
         {
           // Constant velocity in the rotating body frame. Exact integrated arc.
@@ -150,8 +161,9 @@ namespace predictor
           }
           else
           {
-            const double n = settings_.cv_accel_density;
-            q(k, k)        = n * dt * dt * dt / 3;
+            const double n =
+                name_ == "pose_kf" ? settings_.pose_accel_density : settings_.cv_accel_density;
+            q(k, k)     = n * dt * dt * dt / 3;
             q(k, k + 3) = q(k + 3, k) = n * dt * dt / 2;
             q(k + 3, k + 3)           = n * dt;
             q(k + 6, k + 6)           = n;
@@ -173,13 +185,16 @@ namespace predictor
   void Settings::validate() const
   {
     for (double v : {position_std, velocity_std, attitude_std, angular_velocity_std,
-                     cv_accel_density, ca_jerk_density, angular_accel_density})
+                     cv_accel_density, ca_jerk_density, angular_accel_density, pose_accel_density})
     {
       if (!std::isfinite(v) || v <= 0)
       {
         throw std::invalid_argument("IMM noise values must be finite and positive");
       }
     }
+    if (!std::isfinite(pose_gravity) || pose_gravity <= 0 ||
+        (pose_world_up_sign != 1 && pose_world_up_sign != -1))
+      throw std::invalid_argument("Invalid IMM pose gravity or world up sign");
     if (!std::isfinite(stay_probability) || stay_probability <= 0 || stay_probability >= 1)
     {
       throw std::invalid_argument("stay_probability must be in (0,1)");
@@ -215,7 +230,7 @@ namespace predictor
     {
       for (const auto &name : settings_.models)
       {
-        if (name != "cv" && name != "ca" && name != "body_velocity")
+        if (name != "cv" && name != "ca" && name != "body_velocity" && name != "pose_kf")
         {
           throw std::invalid_argument("unknown motion model: " + name);
         }
@@ -308,6 +323,9 @@ namespace predictor
     {
       throw std::invalid_argument("invalid measurement or dt");
     }
+    if (!q && std::find(settings_.models.begin(), settings_.models.end(), "pose_kf") !=
+                  settings_.models.end())
+      throw std::invalid_argument("IMM pose_kf hypothesis requires attitude observations");
     const int       dim = q ? (omega ? 12 : 9) : 6;
     Eigen::MatrixXd h   = Eigen::MatrixXd::Zero(dim, 15);
     h.topLeftCorner(6, 6).setIdentity();
