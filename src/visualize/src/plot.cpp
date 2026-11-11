@@ -63,7 +63,7 @@ int main(int argc, char **argv)
     plt::title("Trajectory (XY projection)");
     plt::named_plot("truth", columns[1], columns[2], "g-");
     plt::named_plot("observation", columns[4], columns[5], "k.");
-    plt::named_plot("IMM", columns[7], columns[8], "b-");
+    plt::named_plot("estimate", columns[7], columns[8], "b-");
     plt::xlabel("x (m)");
     plt::ylabel("y (m)");
     plt::legend();
@@ -92,7 +92,7 @@ int main(int argc, char **argv)
     plt::legend();
     plt::grid(true);
     plt::subplot(2, 2, 4);
-    plt::title("IMM model probabilities");
+    plt::title("Model probabilities (optional diagnostics)");
     for (size_t i = 0; i < names.size(); ++i)
     {
       if (names[i].rfind("p_", 0) == 0)

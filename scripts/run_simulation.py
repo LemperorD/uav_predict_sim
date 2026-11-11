@@ -34,19 +34,30 @@ def summarize(samples, forecasts, destination):
     # Warm-up is excluded from aggregate filter metrics, retained in raw files.
     settled = [r for r in rows if r['t'] >= min(2.0, rows[-1]['t'] / 4)]
     for row in rows:
-        if not all(math.isfinite(v) for k, v in row.items() if k != 'horizon_error'):
-            raise RuntimeError('nonfinite filter output')
-        if abs(sum(value for key, value in row.items() if key.startswith('p_')) - 1) > 1e-8:
-            raise RuntimeError('invalid model probabilities')
+        required = ['t'] + [f'{kind}_{a}' for kind in ('truth', 'measurement') for a in 'xyz']
+        if any(not math.isfinite(row[key]) for key in required) or any(math.isinf(v) for v in row.values()):
+            raise RuntimeError('nonfinite observation or infinite diagnostic output')
+        probabilities = [v for k, v in row.items() if k.startswith('p_')]
+        if any(math.isfinite(v) for v in probabilities):
+            if not all(math.isfinite(v) and v >= 0 for v in probabilities) or abs(sum(probabilities)-1) > 1e-8:
+                raise RuntimeError('invalid model probabilities')
+    def finite_mean(values):
+        values = [v for v in values if math.isfinite(v)]
+        return sum(values)/len(values) if values else None
+    def coverage(axis):
+        valid = [r for r in settled if all(math.isfinite(r[key]) for key in
+                 (f'estimate_{axis}', f'truth_{axis}', f'std_{axis}'))]
+        return (sum(abs(r[f'estimate_{axis}']-r[f'truth_{axis}']) <= 2*r[f'std_{axis}']
+                    for r in valid)/len(valid)) if valid else None
     result = {
         'samples': len(rows), 'scored_predictions': len(predictions), 'duration_s': rows[-1]['t'],
         'measurement_position_rmse_m': rmse([math.sqrt(sum((r[f'measurement_{a}'] - r[f'truth_{a}'])**2 for a in 'xyz')) for r in settled]),
         'filtered_position_rmse_m': rmse([r['position_error'] for r in settled]),
         'velocity_rmse_mps': rmse([r['velocity_error'] for r in settled]),
         'horizon_position_rmse_m': rmse([float(r['error']) for r in predictions]),
-        'mean_position_nees': sum(r['position_nees'] for r in settled)/len(settled),
+        'mean_position_nees': finite_mean([r['position_nees'] for r in settled]),
         'position_2sigma_axis_coverage': {
-            a: sum(abs(r[f'estimate_{a}']-r[f'truth_{a}'])<=2*r[f'std_{a}'] for r in settled)/len(settled)
+            a: coverage(a)
             for a in 'xyz'
         },
         'unscored_tail_note': 'Predictions whose target is beyond the last truth sample are excluded.',
@@ -134,8 +145,14 @@ def main():
                     raise RuntimeError('Invalid recording timestamps')
                 f.write(entry(index)+f'duration {interval:.9f}\n')
             f.write(entry(times[-1][0]))
+        # Frames retain their actual window sizes. Encode to a fixed, even canvas
+        # so a resize (including odd dimensions) cannot break H.264 or crop the panel.
+        video_width = (int(params['window_width']) + 1) // 2 * 2
+        video_height = (int(params['window_height']) + 1) // 2 * 2
+        resize_filter = (f'scale={video_width}:{video_height}:force_original_aspect_ratio=decrease,'
+                         f'pad={video_width}:{video_height}:(ow-iw)/2:(oh-ih)/2,setsar=1')
         subprocess.run([ffmpeg,'-y','-loglevel','error','-f','concat','-safe','0',
-                        '-i',str(manifest),'-vsync','vfr','-c:v','libx264','-pix_fmt','yuv420p',str(video)], check=True)
+                        '-i',str(manifest),'-vf',resize_filter,'-vsync','vfr','-c:v','libx264','-pix_fmt','yuv420p',str(video)], check=True)
     print(f'Acceptance artifacts: {output}')
 
 

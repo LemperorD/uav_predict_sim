@@ -11,12 +11,13 @@
 #include <std_msgs/msg/bool.hpp>
 #include <std_msgs/msg/float64_multi_array.hpp>
 
-#include "predictor/imm.hpp"
+#include "core/diagnostics.hpp"
+#include "predictor/factory.hpp"
 
-class Predictor : public rclcpp::Node
+class PredictionNode : public rclcpp::Node
 {
  public:
-  Predictor() : Node("predictor_node")
+  PredictionNode() : Node("predictor_node")
   {
     predictor::Settings s;
     s.position_std          = declare_parameter("position_noise_std", 0.15);
@@ -58,8 +59,9 @@ class Predictor : public rclcpp::Node
     {
       throw std::invalid_argument("use_angular_velocity requires use_attitude");
     }
-    filter_   = std::make_unique<predictor::Imm>(s);
-    settings_ = s;
+    const auto algorithm = declare_parameter<std::string>("prediction_algorithm", "imm");
+    filter_              = predictor::makePredictor(algorithm, s, use_attitude_);
+    settings_            = s;
 
     noise_ = declare_parameter("inject_noise", true);
     rng_.seed(declare_parameter("noise_seed", 42));
@@ -160,7 +162,7 @@ class Predictor : public rclcpp::Node
       return;
     }
 
-    predictor::Measurement truth;
+    Eigen::Matrix<double, 6, 1> truth;  // ROS position/velocity observations, not algorithm state.
     truth << m.pose.pose.position.x, m.pose.pose.position.y, m.pose.pose.position.z,
         m.twist.twist.linear.x, m.twist.twist.linear.y, m.twist.twist.linear.z;
     if (!truth.allFinite())
@@ -181,12 +183,12 @@ class Predictor : public rclcpp::Node
     }
     if (dt > max_gap_)
     {
-      filter_ = std::make_unique<predictor::Imm>(settings_);
+      filter_->reset();
       pending_.clear();
-      RCLCPP_WARN(get_logger(), "Reset IMM after time gap %.3f", dt);
+      RCLCPP_WARN(get_logger(), "Reset predictor after time gap %.3f", dt);
     }
 
-    predictor::Measurement z = truth;
+    Eigen::Matrix<double, 6, 1> z = truth;
     if (noise_)
     {
       for (int i = 0; i < 6; ++i)
@@ -232,7 +234,16 @@ class Predictor : public rclcpp::Node
         }
       }
     }
-    auto e = use_attitude_ ? filter_->update(z, orientation, dt, omega) : filter_->update(z, dt);
+    predictor::Observation observation;
+    observation.timestamp = stamp;
+    observation.position  = z.head<3>();
+    observation.velocity  = z.tail<3>();
+    if (use_attitude_)
+    {
+      observation.orientation      = orientation;
+      observation.angular_velocity = omega;
+    }
+    filter_->update(observation);
 
     double horizon_error = std::numeric_limits<double>::quiet_NaN();
     while (!pending_.empty() && pending_.front().target <= t)
@@ -263,44 +274,59 @@ class Predictor : public rclcpp::Node
       predictions_ << '\n';
     }
 
-    const auto future = filter_->forecast(step_, count_);
-    pending_.push_back({t, t + step_ * count_, future.back().mean.head<3>(),
-                        future.back().covariance.diagonal().head<3>().cwiseMax(0).cwiseSqrt()});
-
-    nav_msgs::msg::Odometry odom;
-    odom.header                  = m.header;
-    odom.child_frame_id          = "prediction";
-    odom.pose.pose.position.x    = e.mean(0);
-    odom.pose.pose.position.y    = e.mean(1);
-    odom.pose.pose.position.z    = e.mean(2);
-    odom.pose.pose.orientation.w = e.orientation.w();
-    odom.pose.pose.orientation.x = e.orientation.x();
-    odom.pose.pose.orientation.y = e.orientation.y();
-    odom.pose.pose.orientation.z = e.orientation.z();
-    odom.twist.twist.angular.x   = e.mean(12);
-    odom.twist.twist.angular.y   = e.mean(13);
-    odom.twist.twist.angular.z   = e.mean(14);
-    odom.twist.twist.linear.x    = e.mean(3);
-    odom.twist.twist.linear.y    = e.mean(4);
-    odom.twist.twist.linear.z    = e.mean(5);
-    // Pose covariance uses fixed/world axes; filter attitude errors use body axes.
-    Eigen::Matrix<double, 6, 15> pose_map = Eigen::Matrix<double, 6, 15>::Zero();
-    pose_map.topLeftCorner<3, 3>().setIdentity();
-    pose_map.block<3, 3>(3, 9)             = e.orientation.toRotationMatrix();
-    Eigen::Matrix<double, 6, 15> twist_map = Eigen::Matrix<double, 6, 15>::Zero();
-    twist_map.block<3, 3>(0, 3).setIdentity();
-    twist_map.block<3, 3>(3, 12).setIdentity();
-    const Eigen::Matrix<double, 6, 6> pose_cov  = pose_map * e.covariance * pose_map.transpose();
-    const Eigen::Matrix<double, 6, 6> twist_cov = twist_map * e.covariance * twist_map.transpose();
-    for (int i = 0; i < 6; ++i)
+    const auto future = filter_->predict(step_, count_);
+    if (future.size() != static_cast<size_t>(count_) ||
+        !std::all_of(future.begin(), future.end(), [](const auto &p) { return p.allFinite(); }))
     {
-      for (int j = 0; j < 6; ++j)
-      {
-        odom.pose.covariance[6 * i + j]  = pose_cov(i, j);
-        odom.twist.covariance[6 * i + j] = twist_cov(i, j);
-      }
+      throw std::runtime_error(
+          "Predictor must return exactly prediction_steps finite XYZ positions");
     }
-    estimate_pub_->publish(odom);
+    predictor::Diagnostics diagnostic;
+    if (const auto *provider = dynamic_cast<const predictor::DiagnosticsProvider *>(filter_.get()))
+    {
+      diagnostic = provider->diagnostics();
+    }
+    Eigen::Vector3d forecast_std = Eigen::Vector3d::Constant(predictor::Diagnostics::unavailable);
+    if (diagnostic.forecast_endpoint_covariance)
+    {
+      forecast_std = diagnostic.forecast_endpoint_covariance->diagonal().cwiseMax(0).cwiseSqrt();
+    }
+    pending_.push_back({t, t + step_ * count_, future.back(), forecast_std});
+
+    // Estimated state is optional diagnostics, independent of the position-only prediction output.
+    if (diagnostic.position.allFinite())
+    {
+      nav_msgs::msg::Odometry odom;
+      odom.header               = m.header;
+      odom.child_frame_id       = "prediction";
+      odom.pose.pose.position.x = diagnostic.position.x();
+      odom.pose.pose.position.y = diagnostic.position.y();
+      odom.pose.pose.position.z = diagnostic.position.z();
+      const auto q              = diagnostic.orientation.value_or(Eigen::Quaterniond::Identity());
+      odom.pose.pose.orientation.w = q.w();
+      odom.pose.pose.orientation.x = q.x();
+      odom.pose.pose.orientation.y = q.y();
+      odom.pose.pose.orientation.z = q.z();
+      odom.twist.twist.linear.x    = diagnostic.velocity.x();
+      odom.twist.twist.linear.y    = diagnostic.velocity.y();
+      odom.twist.twist.linear.z    = diagnostic.velocity.z();
+      odom.twist.twist.angular.x   = diagnostic.angular_velocity.x();
+      odom.twist.twist.angular.y   = diagnostic.angular_velocity.y();
+      odom.twist.twist.angular.z   = diagnostic.angular_velocity.z();
+      for (int i = 0; i < 6; ++i)
+      {
+        for (int j = 0; j < 6; ++j)
+        {
+          odom.pose.covariance[6 * i + j]  = diagnostic.pose_covariance
+                                                 ? (*diagnostic.pose_covariance)(i, j)
+                                                 : predictor::Diagnostics::unavailable;
+          odom.twist.covariance[6 * i + j] = diagnostic.twist_covariance
+                                                 ? (*diagnostic.twist_covariance)(i, j)
+                                                 : predictor::Diagnostics::unavailable;
+        }
+      }
+      estimate_pub_->publish(odom);
+    }
 
     nav_msgs::msg::Path path;
     path.header = m.header;
@@ -310,19 +336,24 @@ class Predictor : public rclcpp::Node
       p.header = m.header;
       p.header.stamp =
           rclcpp::Time(m.header.stamp) + rclcpp::Duration::from_seconds((i + 1) * step_);
-      p.pose.position.x    = future[i].mean(0);
-      p.pose.position.y    = future[i].mean(1);
-      p.pose.position.z    = future[i].mean(2);
-      p.pose.orientation.w = future[i].orientation.w();
-      p.pose.orientation.x = future[i].orientation.x();
-      p.pose.orientation.y = future[i].orientation.y();
-      p.pose.orientation.z = future[i].orientation.z();
+      p.pose.position.x = future[i].x();
+      p.pose.position.y = future[i].y();
+      p.pose.position.z = future[i].z();
+      // Path requires PoseStamped; identity is a neutral placeholder, not predicted attitude.
+      p.pose.orientation.w = 1.0;
       path.poses.push_back(p);
     }
     path_pub_->publish(path);
 
-    Eigen::Vector3d error = e.mean.head<3>() - truth.head<3>();
-    double          nees  = error.dot(e.covariance.topLeftCorner<3, 3>().ldlt().solve(error));
+    const Eigen::Vector3d error  = diagnostic.position - truth.head<3>();
+    Eigen::Vector3d position_std = Eigen::Vector3d::Constant(predictor::Diagnostics::unavailable);
+    double          nees         = predictor::Diagnostics::unavailable;
+    if (diagnostic.pose_covariance)
+    {
+      const Eigen::Matrix3d covariance = diagnostic.pose_covariance->topLeftCorner<3, 3>();
+      position_std                     = covariance.diagonal().cwiseMax(0).cwiseSqrt();
+      nees                             = error.dot(covariance.ldlt().solve(error));
+    }
 
     std_msgs::msg::Float64MultiArray metrics;
     metrics.data.push_back(t);
@@ -334,24 +365,34 @@ class Predictor : public rclcpp::Node
     {
       metrics.data.push_back(v);
     }
-    for (double v : e.mean.head<3>())
+    for (double v : diagnostic.position)
     {
       metrics.data.push_back(v);
     }
-    for (double v : e.covariance.diagonal().head<3>().cwiseMax(0).cwiseSqrt())
+    for (double v : position_std)
     {
       metrics.data.push_back(v);
     }
     const auto probability = [&](const std::string &name)
     {
-      const auto it = std::find(settings_.models.begin(), settings_.models.end(), name);
-      return it == settings_.models.end() ? 0.0 : e.probability(it - settings_.models.begin());
+      if (diagnostic.model_probabilities.empty())
+      {
+        return predictor::Diagnostics::unavailable;
+      }
+      for (const auto &entry : diagnostic.model_probabilities)
+      {
+        if (entry.name == name)
+        {
+          return entry.probability;
+        }
+      }
+      return 0.0;
     };
     metrics.data.push_back(probability("cv"));
     metrics.data.push_back(probability("ca"));
     metrics.data.push_back(error.norm());
     metrics.data.push_back(horizon_error);
-    metrics.data.push_back((e.mean.segment<3>(3) - truth.tail<3>()).norm());
+    metrics.data.push_back((diagnostic.velocity - truth.tail<3>()).norm());
     metrics.data.push_back(nees);
     for (const auto &name : settings_.models)
     {
@@ -364,17 +405,17 @@ class Predictor : public rclcpp::Node
     std_msgs::msg::Float64MultiArray probabilities;
     probabilities.layout.dim.resize(1);
     auto &dimension = probabilities.layout.dim[0];
-    for (const auto &name : settings_.models)
+    for (const auto &entry : diagnostic.model_probabilities)
     {
       if (!dimension.label.empty())
       {
         dimension.label += ",";
       }
-      dimension.label += name;
+      dimension.label += entry.name;
+      probabilities.data.push_back(entry.probability);
     }
-    dimension.size   = e.probability.size();
+    dimension.size   = probabilities.data.size();
     dimension.stride = dimension.size;
-    probabilities.data.assign(e.probability.data(), e.probability.data() + e.probability.size());
     probability_pub_->publish(probabilities);
 
     for (size_t i = 0; i < metrics.data.size(); ++i)
@@ -397,7 +438,7 @@ class Predictor : public rclcpp::Node
   }
 
   predictor::Settings                                  settings_;
-  std::unique_ptr<predictor::Imm>                      filter_;
+  std::unique_ptr<predictor::Predictor>                filter_;
   bool                                                 noise_;
   bool                                                 use_attitude_, use_angular_velocity_;
   bool                                                 finished_ = false;
@@ -421,7 +462,7 @@ int main(int argc, char **argv)
   rclcpp::init(argc, argv);
   try
   {
-    rclcpp::spin(std::make_shared<Predictor>());
+    rclcpp::spin(std::make_shared<PredictionNode>());
   }
   catch (const std::exception &e)
   {

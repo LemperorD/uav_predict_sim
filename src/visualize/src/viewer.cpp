@@ -27,7 +27,10 @@ void line(const std::deque<Point> &points, const pangolin::Colour &color)
   glBegin(GL_LINE_STRIP);
   for (auto &p : points)
   {
-    glVertex3dv(p.data());
+    if (std::all_of(p.begin(), p.end(), [](double value) { return std::isfinite(value); }))
+    {
+      glVertex3dv(p.data());
+    }
   }
   glEnd();
 }
@@ -37,9 +40,10 @@ int main(int argc, char **argv)
   rclcpp::init(argc, argv);
   try
   {
-    auto      node                = std::make_shared<rclcpp::Node>("prediction_viewer");
-    const int width               = node->declare_parameter("window_width", 1280),
-              height              = node->declare_parameter("window_height", 800);
+    auto      node             = std::make_shared<rclcpp::Node>("prediction_viewer");
+    const int initial_width    = node->declare_parameter("window_width", 1280),
+              initial_height   = node->declare_parameter("window_height", 800);
+    int                  width = initial_width, height = initial_height;
     const int            fps      = node->declare_parameter("video_fps", 15);
     const bool           record   = node->declare_parameter("record_video", true);
     const double         duration = node->declare_parameter("duration", 30.0);
@@ -53,7 +57,7 @@ int main(int argc, char **argv)
     {
       frames = output / frames;
     }
-    if (width <= 0 || height <= 0 || width % 2 || height % 2 || fps <= 0 || fps > 120)
+    if (width <= 0 || height <= 0 || fps <= 0 || fps > 120)
     {
       throw std::invalid_argument("invalid video dimensions/fps");
     }
@@ -76,7 +80,7 @@ int main(int argc, char **argv)
       {
         throw std::runtime_error("cannot open frame timestamps file");
       }
-      frame_times << "frame,elapsed_s\n" << std::setprecision(12);
+      frame_times << "frame,elapsed_s,width,height\n" << std::setprecision(12);
     }
     pangolin::CreateWindowAndBind("UAV trajectory prediction | IMM-KF", width, height);
     glEnable(GL_DEPTH_TEST);
@@ -234,6 +238,24 @@ int main(int argc, char **argv)
     while (rclcpp::ok() && !pangolin::ShouldQuit())
     {
       executor.spin_all(std::chrono::milliseconds(5));
+      const auto viewport = pangolin::DisplayBase().v;
+      if (viewport.w <= 0 || viewport.h <= 0)
+      {
+        pangolin::FinishFrame();
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        next = std::chrono::steady_clock::now();
+        continue;
+      }
+      if (width != viewport.w || height != viewport.h)
+      {
+        width  = viewport.w;
+        height = viewport.h;
+        // Preserve the user's orbit/pan and vertical field of view when resizing.
+        const double focal = style.focal_length * height / initial_height;
+        camera.SetProjectionMatrix(pangolin::ProjectionMatrix(view.v.w, view.v.h, focal, focal,
+                                                              view.v.w * .5, view.v.h * .5,
+                                                              style.near_clip, style.far_clip));
+      }
       glClearColor(style.background.r, style.background.g, style.background.b, 1);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       view.Activate(camera);
@@ -266,12 +288,15 @@ int main(int argc, char **argv)
         glVertex3dv(p.data());
       }
       glEnd();
-      if (!estimate.empty())
+      if (!estimate.empty() && std::all_of(estimate.back().begin(), estimate.back().end(),
+                                           [](double value) { return std::isfinite(value); }))
       {
         // Position marginal 2-sigma radii (axis-aligned; cross-correlation is
         // logged in odometry).
         auto p = estimate.back();
-        if (style.show_uncertainty)
+        if (style.show_uncertainty &&
+            std::all_of(stddev.begin(), stddev.end(),
+                        [](double value) { return std::isfinite(value); }))
         {
           glColor3f(style.uncertainty.r, style.uncertainty.g, style.uncertainty.b);
           glBegin(GL_LINES);
@@ -312,28 +337,38 @@ int main(int argc, char **argv)
       glLoadIdentity();
       if (style.show_legend)
       {
+        const double hud_scale = std::min(1.0, width / 1280.0);
+        const double text_top  = height / hud_scale;
+        glScaled(hud_scale, hud_scale, 1);
+        // Draw(x,y) keeps Pangolin text at a fixed pixel size. Draw in our
+        // transformed local coordinates so the whole legend scales together.
+        auto draw_text = [](const pangolin::GlText &text, double x, double y)
+        {
+          glPushMatrix();
+          glTranslated(x, y, 0);
+          text.Draw();
+          glPopMatrix();
+        };
         glColor3f(style.text.r, style.text.g, style.text.b);
-        pangolin::default_font().Text("IMM-KF | Trajectory prediction").Draw(20, height - 32);
+        draw_text(pangolin::default_font().Text("Trajectory prediction"), 20, text_top - 32);
         glColor3f(style.truth.r, style.truth.g, style.truth.b);
-        pangolin::default_font().Text("Truth").Draw(20, height - 62);
+        draw_text(pangolin::default_font().Text("Truth"), 20, text_top - 62);
         glColor3f(style.observation.r, style.observation.g, style.observation.b);
-        pangolin::default_font().Text("Observation").Draw(100, height - 62);
+        draw_text(pangolin::default_font().Text("Observation"), 100, text_top - 62);
         glColor3f(style.estimate.r, style.estimate.g, style.estimate.b);
-        pangolin::default_font()
-            .Text(style.show_uncertainty ? "Estimate + 2 sigma" : "Estimate")
-            .Draw(240, height - 62);
+        draw_text(pangolin::default_font().Text(style.show_uncertainty ? "Estimate + 2 sigma"
+                                                                       : "Estimate"),
+                  240, text_top - 62);
         glColor3f(style.forecast.r, style.forecast.g, style.forecast.b);
-        pangolin::default_font().Text("Forecast").Draw(460, height - 62);
+        draw_text(pangolin::default_font().Text("Forecast"), 460, text_top - 62);
         glColor3f(style.text.r, style.text.g, style.text.b);
-        pangolin::default_font()
-            .Text("t = %.2f s | World frame / meters", current_time)
-            .Draw(20, height - 92);
+        draw_text(pangolin::default_font().Text("t = %.2f s | World frame / meters", current_time),
+                  20, text_top - 92);
         if (style.show_drone)
         {
-          pangolin::default_font()
-              .Text("Drone: %s | body axes: X red, Y green, Z blue",
-                    style.drone_pose_source.c_str())
-              .Draw(20, height - 120);
+          draw_text(pangolin::default_font().Text("Drone: %s | body axes: X red, Y green, Z blue",
+                                                  style.drone_pose_source.c_str()),
+                    20, text_top - 120);
         }
       }
       glPopMatrix();
@@ -345,8 +380,8 @@ int main(int argc, char **argv)
         const double elapsed =
             std::chrono::duration<double>(std::chrono::steady_clock::now() - recording_start)
                 .count();
-        frame_times << frame << ',' << elapsed << '\n';
-        std::vector<unsigned char> pixels(width * height * 3);
+        frame_times << frame << ',' << elapsed << ',' << width << ',' << height << '\n';
+        std::vector<unsigned char> pixels(static_cast<size_t>(width) * height * 3);
         glPixelStorei(GL_PACK_ALIGNMENT, 1);
         glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixels.data());
         pangolin::Image<unsigned char> image(pixels.data(), width, height, width * 3);

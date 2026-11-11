@@ -56,8 +56,9 @@ def setup(context):
     for key in ('duration', 'sample_rate', 'prediction_step'):
         if not math.isfinite(params[key]) or params[key] <= 0:
             raise ValueError(f'{key} must be finite and positive')
-    if params['window_width'] % 2 or params['window_height'] % 2:
-        raise ValueError('Video dimensions must be even')
+    for key in ('window_width', 'window_height'):
+        if type(params[key]) is not int or params[key] <= 0:
+            raise ValueError(f'{key} must be a positive integer')
     output = Path(params['output_dir'])
     output.mkdir(parents=True, exist_ok=True)
     # Snapshot of resolved parameters makes each run reproducible.

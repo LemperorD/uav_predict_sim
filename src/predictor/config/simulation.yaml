@@ -1,7 +1,7 @@
 /**:
   ros__parameters:
     # Relative file paths resolve from this YAML's directory. Use a new output_dir for each run.
-    output_dir: ../../../outputs/demo
+    output_dir: ../../../outputs/demo2
     input_csv: ""  # optional: t,px,py,pz,vx,vy,vz,ax,ay,az; seconds, SI, world frame
     duration: 30.0
     sample_rate: 50.0
@@ -33,6 +33,7 @@
     attitude_noise_std: 0.05  # local rotation, rad
     angular_velocity_noise_std: 0.10  # body axes, rad/s
     angular_accel_density: 0.30
+    prediction_algorithm: imm  # 通过 core/predictor.hpp 统一接口创建预测算法
     prediction_step: 0.05
     prediction_steps: 20
     max_time_gap: 1.0
@@ -52,7 +53,8 @@
     video_file: simulation.mp4
     plot_file: summary.png
     metrics_file: metrics.json
-    # 背景、颜色、相机、网格和曲线样式见同目录 visualization.yaml。
+    # 主题、相机、网格和曲线样式见同目录 visualization.yaml。
+    # 初始窗口尺寸（运行中可拖动缩放）；录像固定为此尺寸，奇数自动补齐为偶数。
     window_width: 1280
     window_height: 800
     video_fps: 15

@@ -51,37 +51,42 @@ scripts/run_simulation.sh --config /absolute/path/to/simulation.yaml --headless
 | 文件 | 内容 |
 | --- | --- |
 | `config/simulation.yaml` | 时长、轨迹、噪声、预测模型、输出路径、显示/录像开关、窗口尺寸与帧率 |
-| `config/visualization.yaml` | Pangolin 背景、轨迹和曲线颜色、线宽、点大小、网格、相机、曲线纵轴范围和显示开关 |
+| `config/visualization.yaml` | Pangolin 浅色/深色主题、线宽、点大小、网格、相机、曲线纵轴范围和显示开关 |
 
 默认使用上述两份文件。`--config` 和 `--visualization-config` 可以分别替换它们，省略显示配置参数时继续加载默认的 `visualization.yaml`。显示配置采用 `prediction_viewer.ros__parameters` 结构；同名参数优先使用显示配置。修改显示参数后重新启动生效，不需要重新编译。
 
 `output_dir`、`input_csv` 和 `ffmpeg_path` 的相对路径以数值配置所在目录为基准；CSV、日志、图像、录像帧等输出路径以 `output_dir` 为基准。支持绝对路径和含空格路径。每轮的 `resolved.yaml` 保存解析后的数值参数与显示参数。
 
-### 修改背景和显示样式
+### 切换浅色/深色主题
 
-编辑 `config/visualization.yaml` 中对应字段。例如改成浅色主题：
+在 `config/visualization.yaml` 中只需修改一个参数：
 
 ```yaml
 prediction_viewer:
   ros__parameters:
-    background_color: [1.0, 1.0, 1.0]
-    plot_background_color: [0.96, 0.96, 0.96]
-    text_color: [0.1, 0.1, 0.1]
-    grid_color: [0.75, 0.75, 0.75]
-    plot_axis_color: [0.15, 0.15, 0.15]
-    plot_tick_color: [0.6, 0.6, 0.6]
-    truth_color: [0.0, 0.55, 0.2]
-    estimate_color: [0.0, 0.3, 0.85]
-    forecast_color: [0.9, 0.35, 0.0]
+    theme: light   # light 为浅色，dark 为深色
 ```
 
-RGB 必须是三个 `0.0～1.0` 的浮点数。未填写的字段使用内置默认值；完整参数及单位见配置文件注释。录像使用相同的显示样式，离线 `summary.png` 使用独立的 Matplotlib 样式。
+背景、文字、轨迹、误差曲线与四旋翼配色会统一切换，无需配置 RGB。修改后重新启动生效。录像采用同一主题；离线 `summary.png` 使用独立的 Matplotlib 样式。
+
+### 调整窗口大小
+
+运行时可以拖动窗口边框或最大化，三维视图、曲线区、相机投影和文字布局会跟随实际窗口大小调整。相机的鼠标旋转和平移结果会保留。
+
+初始窗口大小在 `simulation.yaml` 中设置，单位为像素：
+
+```yaml
+    window_width: 1280
+    window_height: 800
+```
+
+宽高为正整数，允许奇数。录像帧保留采集时的实际窗口尺寸；最终 MP4 固定为初始窗口尺寸（奇数向上补齐为偶数），缩放后按比例完整放入画布，必要时补边，避免裁切与视频尺寸变化。窗口调整不会改变数值仿真结果。
 
 常用字段：
 
 | 参数 | 作用 |
 | --- | --- |
-| `truth/observation/estimate/forecast_color` | 真实、观测、估计、预测轨迹的 RGB 颜色，分别为四个字段 |
+| `theme` | `light` / `dark`，统一切换整个实时面板的配色 |
 | `trajectory_line_width` | 轨迹线宽，像素 |
 | `observation_point_size`、`estimate_point_size` | 观测点和当前位置点的大小，像素 |
 | `show_grid`、`show_legend`、`show_uncertainty` | 网格、标题/图例/时间、三轴 2σ 线段开关 |
@@ -107,7 +112,7 @@ RGB 必须是三个 `0.0～1.0` 的浮点数。未填写的字段使用内置默
 
 默认 `truth` 使用仿真里程计的位置和四元数；`estimate` 使用滤波输出，观察估计姿态时请保持数值配置中的 `use_attitude: true`。不使用轨迹切线或速度方向代替姿态。仿真器根据加速度和偏航构造运动学姿态，这里显示该姿态，未引入额外动力学。
 
-机头橙色箭头沿机体系 +X，三根坐标轴 X 红、Y 绿、Z 蓝，随机体一起旋转。`drone_scale` 仅改变显示倍率，不影响位置、轨迹或滤波计算。可通过 `drone_body_color`、`drone_front_color` 改色，通过 `show_drone: false` 隐藏模型。若要替换模型，`drone_mesh_file` 可指定包含三角面的 PLY；相对路径以显示配置所在目录为基准，顶点应使用 m 并与机体系对齐。空字符串使用内置模型。
+机头橙色箭头沿机体系 +X，三根坐标轴 X 红、Y 绿、Z 蓝，随机体一起旋转。`drone_scale` 仅改变显示倍率，不影响位置、轨迹或滤波计算。机体颜色随主题切换，通过 `show_drone: false` 隐藏模型。若要替换模型，`drone_mesh_file` 可指定包含三角面的 PLY；相对路径以显示配置所在目录为基准，顶点应使用 m 并与机体系对齐。空字符串使用内置模型。
 
 修改 `odometry_topic` 时，启动流程会将四旋翼的真值订阅同步重映射。模型也包含在面板录像中。
 
@@ -146,9 +151,10 @@ RGB 必须是三个 `0.0～1.0` 的浮点数。未填写的字段使用内置默
 - `inject_noise`：是否注入观测噪声；`position_noise_std`、`velocity_noise_std` 为位置/速度噪声标准差。关闭噪声时仍保留正的标准差配置，供滤波器使用。
 - `motion_models`：可选择 `[cv, ca]` 或加入 `body_velocity`。分别采用世界系匀速、恒加速度和恒机体系速度假设。
 - `stay_probability`：默认模型转移矩阵的对角概率；也可通过 `model_transition` 与 `model_initial_probability` 指定转移矩阵和先验。
+- `prediction_algorithm`：当前为 `imm`，所有算法通过统一基类创建。
 - `prediction_step × prediction_steps`：预测总时域，默认 1 秒。
 - `use_attitude`：是否使用姿态观测。本项目引用的仿真器将加速度写在 `twist.angular` 中，保持 `use_angular_velocity: false`。
-- `show_viewer`、`record_video`：是否显示窗口、录制视频；`window_width/height` 必须为正偶数，`video_fps` 为 1～120。
+- `show_viewer`、`record_video`：是否显示窗口、录制视频；`window_width/height` 为初始窗口宽高，必须为正整数，`video_fps` 为 1～120。
 
 预测只使用当前及过去的含噪观测。仿真真值用于显示和误差评估。
 
@@ -175,3 +181,9 @@ scripts/run_simulation.sh --config /absolute/path/to/simulation.yaml --finalize-
 # 原来是无图形运行时：
 scripts/run_simulation.sh --config /absolute/path/to/simulation.yaml --finalize-only --headless
 ```
+
+## 统一预测算法接口
+
+所有算法通过 [core/predictor.hpp](core/predictor.hpp) 的 `predictor::Predictor` 基类调用，预测结果统一为三维位置序列，内部状态维度由各算法自行决定。ROS `prediction` 话题仅携带这些预测位置，姿态字段为单位四元数占位。当前估计姿态、协方差和概率保留为可选诊断，供仿真面板与评估使用。
+
+新增算法、输入输出约定与 `PoseKF` 占位类的说明见 [统一接口说明](core/README.md)。

@@ -52,6 +52,8 @@ namespace predictor
     Eigen::VectorXd probability;
   };
 
+  // Low-level numerical filter engine. Applications use ImmPredictor through
+  // core/predictor.hpp; this stateful API stays available for numerical tests.
   class Imm
   {
    public:

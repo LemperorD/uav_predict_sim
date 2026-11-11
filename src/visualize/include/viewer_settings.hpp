@@ -1,7 +1,7 @@
 #pragma once
 
-#include <pangolin/gl/colour.h>
 #include <rclcpp/rclcpp.hpp>
+#include "viewer_theme.hpp"
 
 #include <array>
 #include <cmath>
@@ -10,9 +10,10 @@
 #include <vector>
 
 // Read and validate display settings before opening a window or creating recording files.
-struct ViewerSettings
+struct ViewerSettings : ViewerTheme
 {
   explicit ViewerSettings(rclcpp::Node &node)
+      : ViewerTheme(makeViewerTheme(node.declare_parameter<std::string>("theme", "light")))
   {
     auto vector = [&](const std::string &name, std::vector<double> value)
     {
@@ -30,18 +31,6 @@ struct ViewerSettings
       }
       return result;
     };
-    auto color = [&](const std::string &name, std::vector<double> value)
-    {
-      const auto rgb = vector(name, value);
-      for (double component : rgb)
-      {
-        if (component < 0 || component > 1)
-        {
-          throw std::invalid_argument(name + " components must be in [0, 1]");
-        }
-      }
-      return pangolin::Colour(rgb[0], rgb[1], rgb[2]);
-    };
     auto positive = [&](const std::string &name, double value)
     {
       const double result = node.declare_parameter(name, value);
@@ -51,27 +40,7 @@ struct ViewerSettings
       }
       return result;
     };
-    background      = color("background_color", {.04, .055, .08});
-    plot_background = color("plot_background_color", {.06, .08, .12});
-    plot_axis       = color("plot_axis_color", {.5, .5, .5});
-    plot_ticks      = color("plot_tick_color", {.3, .3, .3});
-    text            = color("text_color", {.9, .94, 1.});
-    grid            = color("grid_color", {.2, .25, .3});
-    truth           = color("truth_color", {.2, .9, .4});
-    observation     = color("observation_color", {.55, .55, .6});
-    estimate        = color("estimate_color", {.2, .65, 1.});
-    forecast        = color("forecast_color", {1., .6, .1});
-    uncertainty     = color("uncertainty_color", {.3, .7, 1.});
-    position_error  = color("position_error_color", {.2, .7, 1.});
-    horizon_error   = color("horizon_error_color", {1., .6, .1});
-    covariance      = {color("covariance_x_color", {.9, .3, .9}),
-                       color("covariance_y_color", {.7, .9, .2}),
-                       color("covariance_z_color", {.2, .65, 1.})};
-    models          = {color("model_cv_color", {.9, .3, .9}), color("model_ca_color", {.7, .9, .2}),
-                       color("model_body_velocity_color", {.2, .65, 1.})};
-    drone_body      = color("drone_body_color", {.75, .8, .85});
-    drone_front     = color("drone_front_color", {1., .3, .05});
-    drone_scale     = positive("drone_scale", 2.);
+    drone_scale       = positive("drone_scale", 2.);
     drone_axis_length = positive("drone_axis_length", .45);
     show_drone        = node.declare_parameter("show_drone", true);
     show_drone_axes   = node.declare_parameter("show_drone_axes", true);
@@ -115,17 +84,12 @@ struct ViewerSettings
     show_uncertainty = node.declare_parameter("show_uncertainty", true);
   }
 
-  pangolin::Colour background, plot_background, plot_axis, plot_ticks, text, grid;
-  pangolin::Colour truth, observation, estimate, forecast, uncertainty, position_error,
-      horizon_error;
-  pangolin::Colour                drone_body, drone_front;
-  double                          drone_scale, drone_axis_length;
-  bool                            show_drone, show_drone_axes;
-  std::string                     drone_pose_source;
-  std::array<pangolin::Colour, 3> covariance, models;
-  std::vector<double>             eye, target;
-  double                          focal_length, near_clip, far_clip, grid_extent, grid_spacing;
-  double line_width, observation_size, estimate_size, error_max, covariance_max;
-  int    max_track_points;
-  bool   show_grid, show_legend, show_uncertainty;
+  double              drone_scale, drone_axis_length;
+  bool                show_drone, show_drone_axes;
+  std::string         drone_pose_source;
+  std::vector<double> eye, target;
+  double              focal_length, near_clip, far_clip, grid_extent, grid_spacing;
+  double              line_width, observation_size, estimate_size, error_max, covariance_max;
+  int                 max_track_points;
+  bool                show_grid, show_legend, show_uncertainty;
 };
