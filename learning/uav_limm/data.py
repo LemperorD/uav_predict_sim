@@ -6,7 +6,7 @@ import torch
 from torch.utils.data import Dataset
 
 
-def resample_csv(path, dt=1.0, columns=None, target_columns=None, max_gap=None):
+def resample_csv(path, dt=1.0, columns=None, target_columns=None, max_gap=None, return_origin=False):
     """Read one flight per CSV. No interpolation over missing-flight gaps.
 
     Defaults: simulator samples.csv (measurement/truth) or t,px,py,pz.
@@ -45,7 +45,8 @@ def resample_csv(path, dt=1.0, columns=None, target_columns=None, max_gap=None):
     origin = obs[0].copy()
     def interpolate(values):
         return np.stack([np.interp(grid, t, values[:, d]) for d in range(3)], -1) - origin
-    return grid, interpolate(obs), interpolate(target)
+    result = (grid, interpolate(obs), interpolate(target))
+    return (*result, origin) if return_origin else result
 
 
 class Windows(Dataset):
@@ -55,6 +56,7 @@ class Windows(Dataset):
         self.flights = flights
         self.observation = observation
         self.horizon = horizon
+        self.stride = stride
         self.indices = [(f, i) for f, (_, x, _) in enumerate(flights)
                         for i in range(0, len(x)-observation-horizon+1, stride)]
         if not self.indices:

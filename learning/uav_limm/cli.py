@@ -61,7 +61,9 @@ def main():
     model, _ = load_checkpoint(args.checkpoint, args.device)
     paths = sorted({p for root in map(Path, args.data) for p in
                     (root.glob("*.csv") if root.is_dir() else [root])})
-    flights = [resample_csv(p, model.config.dt) for p in paths]
+    loaded = [resample_csv(p, model.config.dt, return_origin=True) for p in paths]
+    flights = [flight[:3] for flight in loaded]
+    origins = [flight[3] for flight in loaded]
     dataset = Windows(flights, model.config.observation, model.config.horizon, args.stride)
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -79,7 +81,8 @@ def main():
             origin = flights[f][0][start+model.config.observation-1]
             for k, (predicted, truth) in enumerate(zip(prediction, future)):
                 writer.writerow([str(paths[f]), origin, origin+(k+1)*model.config.dt,
-                                 *predicted.tolist(), *truth.tolist(), (predicted-truth).norm().item()])
+                                 *(predicted.numpy()+origins[f]).tolist(),
+                                 *(truth.numpy()+origins[f]).tolist(), (predicted-truth).norm().item()])
 
 
 if __name__ == "__main__":

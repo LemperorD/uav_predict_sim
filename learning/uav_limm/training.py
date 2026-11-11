@@ -137,6 +137,7 @@ def train(config, datasets, output, paths, upstream_epochs=50, fusion_epochs=50,
                 "windows": dict(zip(("train", "val", "test"), map(len, datasets))),
                 "sources": source_manifest(paths), "config": asdict(config),
                 "batch_size": batch_size, "upstream_epochs": upstream_epochs,
+                "window_stride": training.stride,
                 "fusion_epochs": fusion_epochs, "patience": patience, "threads": threads,
                 "optimizer": "AdamW(lr=.001,weight_decay=.001)",
                 "lr_schedule": "0.9**floor(step/6000)"}
